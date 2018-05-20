@@ -4,9 +4,9 @@ package gotype
 
 import "strconv"
 
-const _Kind_name = "InvalidpredeclaredTypesBegBoolIntInt8Int16Int32Int64UintUint8Uint16Uint32Uint64UintptrFloat32Float64Complex64Complex128StringBytesRuneErrorpredeclaredTypesEndArrayChanFuncInterfaceMapPtrSliceStructAliasBuiltinNamed"
+const _Kind_name = "InvalidpredeclaredTypesBegBoolIntInt8Int16Int32Int64UintUint8Uint16Uint32Uint64UintptrFloat32Float64Complex64Complex128StringBytesRuneErrorpredeclaredTypesEndArrayChanFuncInterfaceMapPtrSliceStructAliasNamed"
 
-var _Kind_index = [...]uint8{0, 7, 26, 30, 33, 37, 42, 47, 52, 56, 61, 67, 73, 79, 86, 93, 100, 109, 119, 125, 130, 134, 139, 158, 163, 167, 171, 180, 183, 186, 191, 197, 202, 209, 214}
+var _Kind_index = [...]uint8{0, 7, 26, 30, 33, 37, 42, 47, 52, 56, 61, 67, 73, 79, 86, 93, 100, 109, 119, 125, 130, 134, 139, 158, 163, 167, 171, 180, 183, 186, 191, 197, 202, 207}
 
 func (i Kind) String() string {
 	if i >= Kind(len(_Kind_index)-1) {

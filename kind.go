@@ -41,6 +41,6 @@ const (
 	Struct
 
 	Alias
-	Builtin
 	Named
+	// Builtin
 )
