@@ -51,7 +51,7 @@ func (r *Parser) ParserPackage(pkg *ast.Package) {
 func (r *Parser) ParserDecl(decl ast.Decl) {
 	switch d := decl.(type) {
 	case *ast.FuncDecl:
-		f := r.GetTypes(d.Type)
+		f := r.EvalType(d.Type)
 		if d.Recv != nil {
 			name, ok := typeName(d.Recv.List[0].Type)
 			if ok { // 不是当前包的方法
@@ -96,7 +96,7 @@ func (r *Parser) ParserDecl(decl ast.Decl) {
 				if !ok {
 					continue
 				}
-				tt := r.GetTypes(s.Type)
+				tt := r.EvalType(s.Type)
 				r.Types[s.Name.Name] = tt
 			}
 		}
@@ -114,14 +114,14 @@ func (r *Parser) ParserValue(decl *ast.GenDecl) {
 		}
 		name = nil
 		if s.Type != nil { // 有类型声明
-			name = r.GetTypes(s.Type)
+			name = r.EvalType(s.Type)
 		} else if len(s.Values) == 0 { // 没有类型声明 但是一个常量  使用之前的类型
 			if decl.Tok == token.CONST {
 				name = prev
 			}
 		} else {
 			// TODO: 还需要考虑多种情况
-			name = r.GetTypes(s.Values[0])
+			name = r.EvalType(s.Values[0])
 		}
 		for _, v := range s.Names {
 			if v.Name == "" || v.Name == "_" {

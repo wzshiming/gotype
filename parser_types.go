@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func (r *Parser) GetTypes(expr ast.Expr) Type {
+func (r *Parser) EvalType(expr ast.Expr) Type {
 	switch t := expr.(type) {
 	case *ast.BadExpr:
 		return nil
@@ -28,28 +28,28 @@ func (r *Parser) GetTypes(expr ast.Expr) Type {
 		}
 		return nil
 	case *ast.FuncLit:
-		return r.GetTypes(t.Type)
+		return r.EvalType(t.Type)
 		//	case *ast.CompositeLit:
 	case *ast.ParenExpr:
-		return r.GetTypes(t.X)
+		return r.EvalType(t.X)
 	case *ast.SelectorExpr:
 		return &TypeNamed{
-			Type: r.GetTypes(t.X),
+			Type: r.EvalType(t.X),
 			name: t.Sel.Name,
 		}
 	case *ast.IndexExpr:
-		return r.GetTypes(t.X).Elem()
+		return r.EvalType(t.X).Elem()
 	case *ast.SliceExpr:
-		return r.GetTypes(t.X)
+		return r.EvalType(t.X)
 		// case *ast.TypeAssertExpr:
 	case *ast.CallExpr:
-		return r.GetTypes(t.Fun)
+		return r.EvalType(t.Fun)
 	case *ast.StarExpr:
-		return r.GetTypes(t.X).Elem()
+		return r.EvalType(t.X).Elem()
 	case *ast.UnaryExpr:
-		return r.GetTypes(t.X)
+		return r.EvalType(t.X)
 	case *ast.BinaryExpr:
-		return r.GetTypes(t.X)
+		return r.EvalType(t.X)
 	// case *ast.KeyValueExpr:
 
 	case *ast.ArrayType:
@@ -62,7 +62,7 @@ func (r *Parser) GetTypes(expr ast.Expr) Type {
 			return s
 		}
 		for _, v := range t.Fields.List {
-			ty := r.GetTypes(v.Type)
+			ty := r.EvalType(v.Type)
 			tag := reflect.StructTag(v.Tag.Value)
 			if ty == nil {
 				continue
@@ -83,7 +83,7 @@ func (r *Parser) GetTypes(expr ast.Expr) Type {
 		s := &TypeFunc{}
 		if t.Params != nil {
 			for _, v := range t.Params.List {
-				ty := r.GetTypes(v.Type)
+				ty := r.EvalType(v.Type)
 				if ty == nil {
 					continue
 				}
@@ -94,7 +94,7 @@ func (r *Parser) GetTypes(expr ast.Expr) Type {
 		}
 		if t.Results != nil {
 			for _, v := range t.Results.List {
-				ty := r.GetTypes(v.Type)
+				ty := r.EvalType(v.Type)
 				if ty == nil {
 					continue
 				}
@@ -111,7 +111,7 @@ func (r *Parser) GetTypes(expr ast.Expr) Type {
 			return s
 		}
 		for _, v := range t.Methods.List {
-			ty := r.GetTypes(v.Type)
+			ty := r.EvalType(v.Type)
 			if ty == nil {
 				continue
 			}
