@@ -40,9 +40,9 @@ const (
 	Slice
 	Struct
 
-	Alias
-	Named
-	Var
-	Scope
-	// Builtin
+	// 特殊
+	Alias // type 别名
+	Named // func 和 type 定义的名字
+	Var   // 变量名
+	Scope // 包名 和 函数内作用域
 )
