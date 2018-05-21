@@ -1,6 +1,6 @@
 package gotype
 
-//go:generate stringer -type ChanDir chan_dir.go
+//go:generate stringer -type ChanDir chandir.go
 type ChanDir int
 
 const (
