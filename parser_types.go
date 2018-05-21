@@ -3,6 +3,7 @@ package gotype
 import (
 	"go/ast"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -53,8 +54,9 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 		if t.Len == nil {
 			return NewTypeSlice(r.EvalType(t.Elt))
 		} else {
-			// TODO
-			return NewTypeArray(r.EvalType(t.Elt), 1)
+			le := constValue(t.Len)
+			i, _ := strconv.ParseInt(le, 0, 0)
+			return NewTypeArray(r.EvalType(t.Elt), int(i))
 		}
 	case *ast.StructType:
 		s := &TypeStruct{}
