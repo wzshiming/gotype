@@ -94,8 +94,9 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 				if ty == nil {
 					continue
 				}
-				for range v.Names {
-					s.params = append(s.params, ty)
+				for _, name := range v.Names {
+					t := NewTypeVar(name.Name, ty)
+					s.params = append(s.params, t)
 				}
 			}
 		}
@@ -105,8 +106,9 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 				if ty == nil {
 					continue
 				}
-				for range v.Names {
-					s.results = append(s.results, ty)
+				for _, name := range v.Names {
+					t := NewTypeVar(name.Name, ty)
+					s.results = append(s.results, t)
 				}
 			}
 		}
