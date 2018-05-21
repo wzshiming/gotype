@@ -1,14 +1,13 @@
 package gotype
 
 type TypeFunc struct {
-	TypeBuiltin
-	name    string
+	typeBase
 	params  []Type
 	results []Type
 }
 
-func (t *TypeFunc) Name() string {
-	return t.name
+func (t *TypeFunc) Kind() Kind {
+	return Func
 }
 
 func (t *TypeFunc) NumOut() int {

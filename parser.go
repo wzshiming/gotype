@@ -13,10 +13,10 @@ type Parser struct {
 	DotImp   []*Parser      // 尝试用点导入的包
 	Imports  map[string]int // 导入的包
 
-	Values map[string]Type          // 变量
-	Funcs  map[string]Type          // 函数
-	Method map[string][]*TypeMethod // 方法
-	Types  map[string]Type          // 类型
+	Values Types            // 变量
+	Funcs  Types            // 函数
+	Method map[string]Types // 方法
+	Types  Types            // 类型
 }
 
 // NewParser
@@ -25,10 +25,10 @@ func NewParser(i *Importer) *Parser {
 		importer: i,
 		Imports:  map[string]int{},
 
-		Values: map[string]Type{},
-		Funcs:  map[string]Type{},
-		Method: map[string][]*TypeMethod{},
-		Types:  map[string]Type{},
+		Values: Types{},
+		Funcs:  Types{},
+		Method: map[string]Types{},
+		Types:  Types{},
 	}
 	return r
 }
@@ -58,13 +58,15 @@ func (r *Parser) ParserDecl(decl ast.Decl) {
 				return
 			}
 
-			r.Method[name] = append(r.Method[name], &TypeMethod{
-				Name: d.Name.Name,
-				Func: f,
-			})
+			t := NewTypeNamed(d.Name.Name, f, r)
+			b := r.Method[name]
+			b.Add(t)
+			r.Method[name] = b
 			return
 		}
-		r.Funcs[d.Name.Name] = f
+
+		t := NewTypeNamed(d.Name.Name, f, r)
+		r.Funcs.Add(t)
 		return
 	case *ast.GenDecl:
 		switch d.Tok {
@@ -98,14 +100,12 @@ func (r *Parser) ParserDecl(decl ast.Decl) {
 				}
 
 				tt := r.EvalType(s.Type)
-
-				t := &TypeNamed{}
-				t.resetMethod = s.Assign == 0
-				t.typ = tt
-				t.name = s.Name.Name
-				t.parser = r
-				t.kind = Named
-				r.Types[s.Name.Name] = t
+				if s.Assign == 0 {
+					tt = NewTypeNamed(s.Name.Name, tt, r)
+				} else {
+					tt = NewTypeAlias(s.Name.Name, tt)
+				}
+				r.Types.Add(tt)
 			}
 		}
 	}
@@ -113,29 +113,33 @@ func (r *Parser) ParserDecl(decl ast.Decl) {
 
 // ParserValue 解析
 func (r *Parser) ParserValue(decl *ast.GenDecl) {
-	var prev, name Type
+	var prev, val Type
 	for _, spec := range decl.Specs {
-		prev = name
+		prev = val
 		s, ok := spec.(*ast.ValueSpec)
 		if !ok {
 			continue
 		}
-		name = nil
+		val = nil
 		if s.Type != nil { // 有类型声明
-			name = r.EvalType(s.Type)
+			val = r.EvalType(s.Type)
 		} else if len(s.Values) == 0 { // 没有类型声明 但是一个常量  使用之前的类型
 			if decl.Tok == token.CONST {
-				name = prev
+				val = prev
 			}
 		} else {
 			// TODO: 还需要考虑多种情况
-			name = r.EvalType(s.Values[0])
+
+			val = r.EvalType(s.Values[0])
+			//ffmt.P(s.Values)
 		}
 		for _, v := range s.Names {
 			if v.Name == "" || v.Name == "_" {
 				continue
 			}
-			r.Values[v.Name] = name
+
+			t := NewTypeVar(v.Name, val)
+			r.Values.Add(t)
 		}
 	}
 }

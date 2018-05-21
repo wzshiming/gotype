@@ -12,29 +12,22 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 		return nil
 	case *ast.Ident:
 		if k := predeclaredTypes[t.Name]; k != 0 {
-			s := &TypeBuiltin{}
-			s.name = t.Name
-			//s.Query = r
-			s.kind = k
+			s := NewTypeBuiltin(k)
 			return s
 		}
-		s := &TypeNamed{}
-		s.name = t.Name
-		s.parser = r
-		s.kind = Named
+
+		s := NewTypeNamed(t.Name, nil, r)
 		return s
 	case *ast.BasicLit:
 		if k := predeclaredTypes[strings.ToLower(t.Kind.String())]; k != 0 {
-			s := &TypeBuiltin{}
-			s.name = k.String()
-			//s.Query = r
-			s.kind = k
+			s := NewTypeBuiltin(k)
 			return s
 		}
 		return nil
 	case *ast.FuncLit:
 		return r.EvalType(t.Type)
-		//	case *ast.CompositeLit:
+	case *ast.CompositeLit:
+		return r.EvalType(t.Type)
 	case *ast.ParenExpr:
 		return r.EvalType(t.X)
 	case *ast.SelectorExpr:
@@ -44,11 +37,12 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 		return r.EvalType(t.X).Elem()
 	case *ast.SliceExpr:
 		return r.EvalType(t.X)
-		// case *ast.TypeAssertExpr:
+		//	case *ast.TypeAssertExpr:
+
 	case *ast.CallExpr:
 		return r.EvalType(t.Fun)
 	case *ast.StarExpr:
-		return r.EvalType(t.X).Elem()
+		return NewTypePtr(r.EvalType(t.X))
 	case *ast.UnaryExpr:
 		return r.EvalType(t.X)
 	case *ast.BinaryExpr:
@@ -56,11 +50,15 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 	// case *ast.KeyValueExpr:
 
 	case *ast.ArrayType:
-	// TODO
+		if t.Len == nil {
+			return NewTypeSlice(r.EvalType(t.Elt))
+		} else {
+			// TODO
+			return NewTypeArray(r.EvalType(t.Elt), 1)
+		}
 	case *ast.StructType:
 		s := &TypeStruct{}
-		s.parser = r
-		s.kind = Struct
+
 		if t.Fields == nil {
 			return s
 		}
@@ -84,8 +82,6 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 		return s
 	case *ast.FuncType:
 		s := &TypeFunc{}
-		s.parser = r
-		s.kind = Func
 		if t.Params != nil {
 			for _, v := range t.Params.List {
 				ty := r.EvalType(v.Type)
@@ -111,8 +107,6 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 		return s
 	case *ast.InterfaceType:
 		s := &TypeInterface{}
-		s.parser = r
-		s.kind = Interface
 		if t.Methods == nil {
 			return s
 		}
@@ -125,17 +119,21 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 				if name.Name == "" || name.Name == "_" {
 					continue
 				}
-				s.methods = append(s.methods, &TypeMethod{
-					Name: name.Name,
-					Func: ty,
-				})
+
+				t := NewTypeNamed(name.Name, ty, r)
+				s.methods.Add(t)
 			}
 		}
 		return s
 	case *ast.MapType:
-		// TODO
+		k := r.EvalType(t.Key)
+		v := r.EvalType(t.Value)
+		s := NewTypeMap(k, v)
+		return s
 	case *ast.ChanType:
-		// TODO
+		v := r.EvalType(t.Value)
+		s := NewTypeChan(v, ChanDir(t.Dir))
+		return s
 	}
 	return nil
 }

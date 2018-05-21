@@ -1,16 +1,17 @@
 package gotype
 
-func (r *Parser) ChildByName(name string) Type {
-	v, ok := r.Values[name]
-	if ok {
+func (r *Parser) Search(name string) Type {
+
+	v := r.Values.Search(name)
+	if v != nil {
 		return v
 	}
-	v, ok = r.Funcs[name]
-	if ok {
+	v = r.Funcs.Search(name)
+	if v != nil {
 		return v
 	}
-	v, ok = r.Types[name]
-	if ok {
+	v = r.Types.Search(name)
+	if v != nil {
 		return v
 	}
 	return nil
@@ -27,24 +28,24 @@ func (r *Parser) Range(f func(k string, v Type) bool) {
 }
 
 func (r *Parser) RangeValues(f func(k string, v Type) bool) {
-	for k, v := range r.Values {
-		if !f(k, v) {
+	for _, v := range r.Values {
+		if !f(v.Name(), v) {
 			return
 		}
 	}
 }
 
 func (r *Parser) RangeFuncs(f func(k string, v Type) bool) {
-	for k, v := range r.Funcs {
-		if !f(k, v) {
+	for _, v := range r.Funcs {
+		if !f(v.Name(), v) {
 			return
 		}
 	}
 }
 
 func (r *Parser) RangeTypes(f func(k string, v Type) bool) {
-	for k, v := range r.Types {
-		if !f(k, v) {
+	for _, v := range r.Types {
+		if !f(v.Name(), v) {
 			return
 		}
 	}

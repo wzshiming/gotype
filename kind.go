@@ -42,5 +42,6 @@ const (
 
 	Alias
 	Named
+	Var
 	// Builtin
 )

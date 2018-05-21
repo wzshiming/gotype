@@ -1,6 +1,8 @@
 package gotype
 
-import "reflect"
+import (
+	"reflect"
+)
 
 type TypeStructField struct {
 	Name string
@@ -9,13 +11,12 @@ type TypeStructField struct {
 }
 
 type TypeStruct struct {
-	TypeBuiltin
-	name   string             // 名字
+	typeBase
 	fields []*TypeStructField // 字段
 }
 
-func (t *TypeStruct) Name() string {
-	return t.name
+func (t *TypeStruct) Kind() Kind {
+	return Struct
 }
 
 func (t *TypeStruct) NumField() int {

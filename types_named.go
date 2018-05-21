@@ -1,20 +1,32 @@
 package gotype
 
+func NewTypeNamed(name string, typ Type, parser *Parser) Type {
+	return &TypeNamed{
+		name:   name,
+		Type:   typ,
+		parser: parser,
+	}
+}
+
 type TypeNamed struct {
-	TypeBuiltin
-	typ         Type
-	resetMethod bool // 是否依赖指向的 方法
+	name   string
+	parser *Parser
+	Type
 }
 
 func (t *TypeNamed) ToChild() Type {
-	if t.typ == nil {
-		t.typ = t.parser.ChildByName(t.name)
+	if t.Type == nil {
+		t.Type = t.parser.Search(t.Name())
 	}
-	return t.typ
+	return t.Type
+}
+
+func (t *TypeNamed) Name() string {
+	return t.name
 }
 
 func (t *TypeNamed) Kind() Kind {
-	return t.ToChild().Kind()
+	return Named
 }
 
 func (t *TypeNamed) Key() Type {
@@ -22,7 +34,7 @@ func (t *TypeNamed) Key() Type {
 }
 
 func (t *TypeNamed) Elem() Type {
-	return t.ToChild().Elem()
+	return t.ToChild()
 }
 
 func (t *TypeNamed) NumField() int {
@@ -54,15 +66,20 @@ func (t *TypeNamed) In(i int) Type {
 }
 
 func (t *TypeNamed) NumMethods() int {
-	if t.resetMethod {
-		return t.TypeBuiltin.NumMethods()
+	if t.parser == nil {
+		return 0
 	}
-	return t.ToChild().NumMethods()
+	b := t.parser.Method[t.Name()]
+	return b.Len()
 }
 
-func (t *TypeNamed) Methods(i int) *TypeMethod {
-	if t.resetMethod {
-		return t.TypeBuiltin.Methods(i)
+func (t *TypeNamed) Methods(i int) Type {
+	if t.parser == nil {
+		return nil
 	}
-	return t.ToChild().Methods(i)
+	b := t.parser.Method[t.Name()]
+	if b.Len() <= i {
+		return nil
+	}
+	return b.Index(i)
 }
