@@ -74,9 +74,6 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 				continue
 			}
 			for _, name := range v.Names {
-				if name.Name == "" || name.Name == "_" {
-					continue
-				}
 				t := &TypeStructField{
 					name: name.Name,
 					typ:  ty,
@@ -124,10 +121,6 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 				continue
 			}
 			for _, name := range v.Names {
-				if name.Name == "" || name.Name == "_" {
-					continue
-				}
-
 				t := NewTypeNamed(name.Name, ty, r)
 				s.methods.Add(t)
 			}
