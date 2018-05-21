@@ -96,8 +96,16 @@ func (r *Parser) ParserDecl(decl ast.Decl) {
 				if !ok {
 					continue
 				}
+
 				tt := r.EvalType(s.Type)
-				r.Types[s.Name.Name] = tt
+
+				t := &TypeNamed{}
+				t.resetMethod = s.Assign == 0
+				t.typ = tt
+				t.name = s.Name.Name
+				t.parser = r
+				t.kind = Named
+				r.Types[s.Name.Name] = t
 			}
 		}
 	}

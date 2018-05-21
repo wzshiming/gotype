@@ -9,7 +9,7 @@ type TypeStructField struct {
 }
 
 type TypeStruct struct {
-	typeBase
+	TypeBuiltin
 	name   string             // 名字
 	fields []*TypeStructField // 字段
 }

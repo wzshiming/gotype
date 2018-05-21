@@ -13,16 +13,21 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 	case *ast.Ident:
 		if k := predeclaredTypes[t.Name]; k != 0 {
 			s := &TypeBuiltin{}
+			s.name = t.Name
+			//s.Query = r
 			s.kind = k
 			return s
 		}
 		s := &TypeNamed{}
 		s.name = t.Name
-		//		s.parser = r
+		s.parser = r
+		s.kind = Named
 		return s
 	case *ast.BasicLit:
 		if k := predeclaredTypes[strings.ToLower(t.Kind.String())]; k != 0 {
 			s := &TypeBuiltin{}
+			s.name = k.String()
+			//s.Query = r
 			s.kind = k
 			return s
 		}
@@ -33,10 +38,8 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 	case *ast.ParenExpr:
 		return r.EvalType(t.X)
 	case *ast.SelectorExpr:
-		return &TypeNamed{
-			Type: r.EvalType(t.X),
-			name: t.Sel.Name,
-		}
+	// TODO:
+	// a = b.c
 	case *ast.IndexExpr:
 		return r.EvalType(t.X).Elem()
 	case *ast.SliceExpr:
@@ -81,6 +84,8 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 		return s
 	case *ast.FuncType:
 		s := &TypeFunc{}
+		s.parser = r
+		s.kind = Func
 		if t.Params != nil {
 			for _, v := range t.Params.List {
 				ty := r.EvalType(v.Type)
@@ -106,6 +111,7 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 		return s
 	case *ast.InterfaceType:
 		s := &TypeInterface{}
+		s.parser = r
 		s.kind = Interface
 		if t.Methods == nil {
 			return s

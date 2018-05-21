@@ -1,7 +1,7 @@
 package gotype
 
 type TypePtr struct {
-	typeBase
+	TypeBuiltin
 	elem Type
 }
 

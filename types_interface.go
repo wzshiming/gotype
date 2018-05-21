@@ -6,7 +6,7 @@ type TypeMethod struct {
 }
 
 type TypeInterface struct {
-	typeBase
+	TypeBuiltin
 	name    string        // 名字
 	methods []*TypeMethod // 这个类型的方法集合
 }
