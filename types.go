@@ -8,22 +8,24 @@ import (
 type Type interface {
 	Name() string
 	Kind() Kind
-	Key() Type
-	Elem() Type // 指针 接口 别名 数组 map值 到下一级
-	NumMethods() int
-	Methods(int) Type
-	NumField() int
-	Field(int) Type
-	Tag() reflect.StructTag  // field
-	Len() int                // 数组
-	NumOut() int             // func
-	Out(int) Type            // func
-	NumIn() int              // func
-	In(int) Type             // func
-	ChanDir() ChanDir        // chan
-	Child(int) Type          // scope
-	NumChild() int           // scope
-	ChildByName(string) Type // scope
+	Key() Type                 // map key
+	Elem() Type                // map value, ptr, slice, array, chan
+	Tag() reflect.StructTag    // field
+	Len() int                  // array
+	ChanDir() ChanDir          // chan
+	Out(int) Type              // func
+	NumOut() int               // func
+	In(int) Type               // func
+	NumIn() int                // func
+	Field(int) Type            // struct
+	FieldByName(string) Type   // struct
+	NumField() int             // struct
+	Methods(int) Type          // named, alias, interface
+	MethodsByName(string) Type // named, alias, interface
+	NumMethods() int           // named, alias, interface
+	Child(int) Type            // scope
+	ChildByName(string) Type   // scope
+	NumChild() int             // scope
 }
 
 type Types []Type
@@ -72,20 +74,23 @@ func (t *Types) Len() int {
 
 type typeBase struct{}
 
-func (t *typeBase) Name() string            { return "" }
-func (t *typeBase) Key() Type               { return nil }
-func (t *typeBase) Elem() Type              { return nil }
-func (t *typeBase) NumField() int           { return 0 }
-func (t *typeBase) Field(int) Type          { return nil }
-func (t *typeBase) Tag() reflect.StructTag  { return reflect.StructTag("") }
-func (t *typeBase) Len() int                { return 0 }
-func (t *typeBase) NumOut() int             { return 0 }
-func (t *typeBase) Out(int) Type            { return nil }
-func (t *typeBase) NumIn() int              { return 0 }
-func (t *typeBase) In(int) Type             { return nil }
-func (t *typeBase) NumMethods() int         { return 0 }
-func (t *typeBase) Methods(int) Type        { return nil }
-func (t *typeBase) ChanDir() ChanDir        { return 0 }
-func (t *typeBase) Child(int) Type          { return nil }
-func (t *typeBase) NumChild() int           { return 0 }
-func (t *typeBase) ChildByName(string) Type { return nil }
+func (t *typeBase) Name() string              { return "" }
+func (t *typeBase) Kind() Kind                { return Invalid }
+func (t *typeBase) Key() Type                 { return nil }
+func (t *typeBase) Elem() Type                { return nil }
+func (t *typeBase) Tag() reflect.StructTag    { return reflect.StructTag("") }
+func (t *typeBase) Len() int                  { return 0 }
+func (t *typeBase) ChanDir() ChanDir          { return 0 }
+func (t *typeBase) Out(int) Type              { return nil }
+func (t *typeBase) NumOut() int               { return 0 }
+func (t *typeBase) In(int) Type               { return nil }
+func (t *typeBase) NumIn() int                { return 0 }
+func (t *typeBase) Field(int) Type            { return nil }
+func (t *typeBase) FieldByName(string) Type   { return nil }
+func (t *typeBase) NumField() int             { return 0 }
+func (t *typeBase) Methods(int) Type          { return nil }
+func (t *typeBase) MethodsByName(string) Type { return nil }
+func (t *typeBase) NumMethods() int           { return 0 }
+func (t *typeBase) Child(int) Type            { return nil }
+func (t *typeBase) ChildByName(string) Type   { return nil }
+func (t *typeBase) NumChild() int             { return 0 }

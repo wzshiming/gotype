@@ -2,8 +2,8 @@ package gotype
 
 type TypeFunc struct {
 	typeBase
-	params  []Type
-	results []Type
+	params  Types
+	results Types
 }
 
 func (t *TypeFunc) Kind() Kind {
@@ -11,17 +11,17 @@ func (t *TypeFunc) Kind() Kind {
 }
 
 func (t *TypeFunc) NumOut() int {
-	return len(t.results)
+	return t.results.Len()
 }
 
 func (t *TypeFunc) Out(i int) Type {
-	return t.results[i]
+	return t.results.Index(i)
 }
 
 func (t *TypeFunc) NumIn() int {
-	return len(t.params)
+	return t.params.Len()
 }
 
 func (t *TypeFunc) In(i int) Type {
-	return t.params[i]
+	return t.params.Index(i)
 }

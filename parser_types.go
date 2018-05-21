@@ -77,11 +77,12 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 				if name.Name == "" || name.Name == "_" {
 					continue
 				}
-				s.fields = append(s.fields, &TypeStructField{
+				t := &TypeStructField{
 					name: name.Name,
-					typ: ty,
+					typ:  ty,
 					tag:  tag,
-				})
+				}
+				s.fields.Add(t)
 			}
 		}
 		return s

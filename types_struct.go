@@ -10,9 +10,13 @@ func (t *TypeStruct) Kind() Kind {
 }
 
 func (t *TypeStruct) NumField() int {
-	return len(t.fields)
+	return t.fields.Len()
 }
 
 func (t *TypeStruct) Field(i int) Type {
-	return t.fields[i]
+	return t.fields.Index(i)
+}
+
+func (t *TypeStruct) FieldByName(name string) Type {
+	return t.fields.Search(name)
 }

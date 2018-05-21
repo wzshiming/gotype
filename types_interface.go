@@ -10,9 +10,13 @@ func (t *TypeInterface) Kind() Kind {
 }
 
 func (t *TypeInterface) NumMethods() int {
-	return len(t.methods)
+	return t.methods.Len()
 }
 
 func (t *TypeInterface) Methods(i int) Type {
-	return t.methods[i]
+	return t.methods.Index(i)
+}
+
+func (t *TypeInterface) MethodsByName(name string) Type {
+	return t.methods.Search(name)
 }

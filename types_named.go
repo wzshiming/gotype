@@ -45,6 +45,10 @@ func (t *TypeNamed) Field(i int) Type {
 	return t.ToChild().Field(i)
 }
 
+func (t *TypeNamed) FieldByName(name string) Type {
+	return t.ToChild().FieldByName(name)
+}
+
 func (t *TypeNamed) Len() int {
 	return t.ToChild().Len()
 }
@@ -82,4 +86,12 @@ func (t *TypeNamed) Methods(i int) Type {
 		return nil
 	}
 	return b.Index(i)
+}
+
+func (t *TypeNamed) MethodsByName(name string) Type {
+	if t.parser == nil {
+		return nil
+	}
+	b := t.parser.Method[t.Name()]
+	return b.Search(name)
 }
