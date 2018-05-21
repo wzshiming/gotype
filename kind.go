@@ -43,5 +43,6 @@ const (
 	Alias
 	Named
 	Var
+	Scope
 	// Builtin
 )

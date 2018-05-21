@@ -13,12 +13,15 @@ type Type interface {
 	Methods(int) Type
 	NumField() int
 	Field(int) *TypeStructField
-	Len() int         // 数组
-	NumOut() int      // func
-	Out(int) Type     // func
-	NumIn() int       // func
-	In(int) Type      // func
-	ChanDir() ChanDir // chan
+	Len() int                // 数组
+	NumOut() int             // func
+	Out(int) Type            // func
+	NumIn() int              // func
+	In(int) Type             // func
+	ChanDir() ChanDir        // chan
+	Child(int) Type          // scope
+	NumChild() int           // scope
+	ChildByName(string) Type // scope
 }
 
 type Types []Type
@@ -78,5 +81,8 @@ func (t *typeBase) Out(int) Type               { return nil }
 func (t *typeBase) NumIn() int                 { return 0 }
 func (t *typeBase) In(int) Type                { return nil }
 func (t *typeBase) NumMethods() int            { return 0 }
-func (t *typeBase) Methods(i int) Type         { return nil }
+func (t *typeBase) Methods(int) Type           { return nil }
 func (t *typeBase) ChanDir() ChanDir           { return 0 }
+func (t *typeBase) Child(int) Type             { return nil }
+func (t *typeBase) NumChild() int              { return 0 }
+func (t *typeBase) ChildByName(string) Type    { return nil }

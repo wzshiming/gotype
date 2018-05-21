@@ -21,15 +21,20 @@ func NewImporter() *Importer {
 	}
 }
 
-func (i *Importer) Import(path string) (*Parser, error) {
-	np := NewParser(i)
+func (i *Importer) Import(path string) (Types, error) {
+
 	p, err := parser.ParseDir(i.fset, path, i.filter, i.mode)
 	if err != nil {
 		return nil, err
 	}
-	for _, v := range p {
+
+	pkg := make(Types, 0, len(p))
+	for name, v := range p {
+		np := NewParser(i)
 		np.ParserPackage(v)
+		t := NewTypeScope(name, np)
+		pkg = append(pkg, t)
 	}
 
-	return np, nil
+	return pkg, nil
 }

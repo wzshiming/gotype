@@ -10,7 +10,7 @@ import (
 
 type Parser struct {
 	importer *Importer
-	DotImp   []*Parser      // 尝试用点导入的包
+	DotImp   []Types        // 尝试用点导入的包
 	Imports  map[string]int // 导入的包
 
 	Values Types            // 变量
