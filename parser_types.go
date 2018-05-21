@@ -66,7 +66,10 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 		}
 		for _, v := range t.Fields.List {
 			ty := r.EvalType(v.Type)
-			tag := reflect.StructTag(v.Tag.Value)
+			var tag reflect.StructTag
+			if v.Tag != nil {
+				tag = reflect.StructTag(v.Tag.Value)
+			}
 			if ty == nil {
 				continue
 			}

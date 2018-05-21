@@ -1,6 +1,7 @@
 package gotype
 
 import (
+	"go/build"
 	"go/parser"
 	"go/token"
 	"os"
@@ -13,7 +14,6 @@ type Importer struct {
 }
 
 func NewImporter() *Importer {
-
 	return &Importer{
 		fset:   token.NewFileSet(),
 		mode:   parser.ParseComments,
@@ -22,8 +22,8 @@ func NewImporter() *Importer {
 }
 
 func (i *Importer) Import(path string) (Types, error) {
-
-	p, err := parser.ParseDir(i.fset, path, i.filter, i.mode)
+	imp, err := build.Import(path, "", build.FindOnly)
+	p, err := parser.ParseDir(i.fset, imp.Dir, i.filter, i.mode)
 	if err != nil {
 		return nil, err
 	}
