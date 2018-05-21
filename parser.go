@@ -4,31 +4,27 @@ import (
 	"go/ast"
 	"go/token"
 	"strconv"
-
-	ffmt "gopkg.in/ffmt.v1"
 )
 
 type Parser struct {
 	importer *Importer
-	DotImp   []Types        // 尝试用点导入的包
-	Imports  map[string]int // 导入的包
-
-	Values Types            // 变量
-	Funcs  Types            // 函数
-	Method map[string]Types // 方法
-	Types  Types            // 类型
+	DotImp   Types            // 尝试用点导入的包
+	Imports  Types            // 导入的包
+	Values   Types            // 变量
+	Funcs    Types            // 函数
+	Method   map[string]Types // 方法
+	Types    Types            // 类型
 }
 
 // NewParser
 func NewParser(i *Importer) *Parser {
 	r := &Parser{
 		importer: i,
-		Imports:  map[string]int{},
-
-		Values: Types{},
-		Funcs:  Types{},
-		Method: map[string]Types{},
-		Types:  Types{},
+		Imports:  Types{},
+		Values:   Types{},
+		Funcs:    Types{},
+		Method:   map[string]Types{},
+		Types:    Types{},
 	}
 	return r
 }
@@ -82,14 +78,25 @@ func (r *Parser) ParserDecl(decl ast.Decl) {
 				if err != nil {
 					continue
 				}
-				r.Imports[name] = 1
-				if s.Name != nil && s.Name.Name == "." && r.importer != nil {
-					p, err := r.importer.Import(name)
-					if err != nil {
-						ffmt.Mark(err)
-						continue
+
+				if r.importer == nil {
+					continue
+				}
+
+				if s.Name == nil {
+					p := NewTypeImport("", name, r.importer)
+					r.Imports.Add(p)
+				} else {
+					switch s.Name.Name {
+					case "_":
+					case ".":
+					// TODO
+					//r.DotImp = append(r.DotImp, p)
+					default:
+
+						t := NewTypeImport(s.Name.Name, name, r.importer)
+						r.Imports.Add(t)
 					}
-					r.DotImp = append(r.DotImp, p)
 				}
 			}
 		case token.TYPE:
