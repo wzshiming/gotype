@@ -78,9 +78,9 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 					continue
 				}
 				s.fields = append(s.fields, &TypeStructField{
-					Name: name.Name,
-					Type: ty,
-					Tag:  tag,
+					name: name.Name,
+					typ: ty,
+					tag:  tag,
 				})
 			}
 		}

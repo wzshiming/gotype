@@ -41,6 +41,7 @@ const (
 	Struct
 
 	// 特殊
+	Field // Struct Field
 	Alias // type 别名
 	Named // func 和 type 定义的名字
 	Var   // 变量名

@@ -1,6 +1,7 @@
 package gotype
 
 import (
+	"reflect"
 	"sort"
 )
 
@@ -12,7 +13,8 @@ type Type interface {
 	NumMethods() int
 	Methods(int) Type
 	NumField() int
-	Field(int) *TypeStructField
+	Field(int) Type
+	Tag() reflect.StructTag  // field
 	Len() int                // 数组
 	NumOut() int             // func
 	Out(int) Type            // func
@@ -70,19 +72,20 @@ func (t *Types) Len() int {
 
 type typeBase struct{}
 
-func (t *typeBase) Name() string               { return "" }
-func (t *typeBase) Key() Type                  { return nil }
-func (t *typeBase) Elem() Type                 { return nil }
-func (t *typeBase) NumField() int              { return 0 }
-func (t *typeBase) Field(int) *TypeStructField { return nil }
-func (t *typeBase) Len() int                   { return 0 }
-func (t *typeBase) NumOut() int                { return 0 }
-func (t *typeBase) Out(int) Type               { return nil }
-func (t *typeBase) NumIn() int                 { return 0 }
-func (t *typeBase) In(int) Type                { return nil }
-func (t *typeBase) NumMethods() int            { return 0 }
-func (t *typeBase) Methods(int) Type           { return nil }
-func (t *typeBase) ChanDir() ChanDir           { return 0 }
-func (t *typeBase) Child(int) Type             { return nil }
-func (t *typeBase) NumChild() int              { return 0 }
-func (t *typeBase) ChildByName(string) Type    { return nil }
+func (t *typeBase) Name() string            { return "" }
+func (t *typeBase) Key() Type               { return nil }
+func (t *typeBase) Elem() Type              { return nil }
+func (t *typeBase) NumField() int           { return 0 }
+func (t *typeBase) Field(int) Type          { return nil }
+func (t *typeBase) Tag() reflect.StructTag  { return reflect.StructTag("") }
+func (t *typeBase) Len() int                { return 0 }
+func (t *typeBase) NumOut() int             { return 0 }
+func (t *typeBase) Out(int) Type            { return nil }
+func (t *typeBase) NumIn() int              { return 0 }
+func (t *typeBase) In(int) Type             { return nil }
+func (t *typeBase) NumMethods() int         { return 0 }
+func (t *typeBase) Methods(int) Type        { return nil }
+func (t *typeBase) ChanDir() ChanDir        { return 0 }
+func (t *typeBase) Child(int) Type          { return nil }
+func (t *typeBase) NumChild() int           { return 0 }
+func (t *typeBase) ChildByName(string) Type { return nil }

@@ -41,7 +41,7 @@ func (t *TypeNamed) NumField() int {
 	return t.ToChild().NumField()
 }
 
-func (t *TypeNamed) Field(i int) *TypeStructField {
+func (t *TypeNamed) Field(i int) Type {
 	return t.ToChild().Field(i)
 }
 
