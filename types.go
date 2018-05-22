@@ -33,15 +33,33 @@ type Type interface {
 
 type Types []Type
 
+func (t *Types) add(i int, n Type) {
+	*t = append(*t, n)
+	l := len(*t)
+	copy((*t)[i+1:l], (*t)[i:l-1])
+	(*t)[i] = n
+}
+
 func (t *Types) Add(n Type) {
 	if n == nil {
 		return
 	}
-	i := t.SearchIndex(n.Name())
-	*t = append(*t, nil)
-	l := len(*t)
-	copy((*t)[i+1:l], (*t)[i:l-1])
-	(*t)[i] = n
+	name := n.Name()
+	i := t.SearchIndex(name)
+	t.add(i, n)
+}
+
+func (t *Types) AddNoRepeat(n Type) {
+	if n == nil {
+		return
+	}
+	name := n.Name()
+	i := t.SearchIndex(name)
+	tt := t.Index(i - 1)
+	if tt == nil || tt.Name() != name {
+		t.add(i, n)
+	}
+	return
 }
 
 func (t *Types) Search(name string) Type {
@@ -49,8 +67,7 @@ func (t *Types) Search(name string) Type {
 	if i == 0 {
 		return nil
 	}
-	i--
-	tt := t.Index(i)
+	tt := t.Index(i - 1)
 	if tt == nil || tt.Name() != name {
 		return nil
 	}
@@ -59,13 +76,17 @@ func (t *Types) Search(name string) Type {
 
 func (t *Types) SearchIndex(name string) int {
 	i := sort.Search(t.Len(), func(i int) bool {
-		return t.Index(i).Name() < name
+		d := t.Index(i)
+		if d == nil {
+			return false
+		}
+		return d.Name() < name
 	})
 	return i
 }
 
 func (t *Types) Index(i int) Type {
-	if i >= t.Len() {
+	if i >= t.Len() || i < 0 {
 		return nil
 	}
 	return (*t)[i]

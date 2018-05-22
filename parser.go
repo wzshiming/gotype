@@ -78,7 +78,7 @@ func (r *astParser) ParserDecl(decl ast.Decl) {
 
 				if s.Name == nil {
 					p := newTypeImport("", path, r.importer)
-					r.nameds.Add(p)
+					r.nameds.AddNoRepeat(p)
 				} else {
 					switch s.Name.Name {
 					case "_":
@@ -90,12 +90,12 @@ func (r *astParser) ParserDecl(decl ast.Decl) {
 						}
 						l := p.NumChild()
 						for i := 0; i != l; i++ {
-							r.nameds.Add(p.Child(i))
+							r.nameds.AddNoRepeat(p.Child(i))
 						}
 					default:
 
 						t := newTypeImport(s.Name.Name, path, r.importer)
-						r.nameds.Add(t)
+						r.nameds.AddNoRepeat(t)
 					}
 				}
 			}

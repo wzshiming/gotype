@@ -9,5 +9,5 @@ func (r *astParser) Child(i int) Type {
 }
 
 func (r *astParser) NumChild() int {
-	return len(r.nameds)
+	return r.nameds.Len()
 }
