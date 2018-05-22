@@ -33,10 +33,12 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 	case *ast.SelectorExpr:
 		s := r.EvalType(t.X)
 		name := t.Sel.Name
-		if s.Kind() == Scope {
-			return s.ChildByName(name)
+
+		b := s.ChildByName(name)
+		if b != nil {
+			return b
 		}
-		b := s.MethodsByName(name)
+		b = s.MethodsByName(name)
 		if b != nil {
 			return b
 		}
@@ -52,7 +54,7 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 	case *ast.TypeAssertExpr:
 		return r.EvalType(t.Type)
 	case *ast.CallExpr:
-		return r.EvalType(t.Fun)
+		return r.EvalType(t.Fun).Out(0)
 	case *ast.StarExpr:
 		return newTypePtr(r.EvalType(t.X))
 	case *ast.UnaryExpr:
@@ -112,6 +114,12 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 				if ty == nil {
 					continue
 				}
+
+				if v.Names == nil {
+					t := newTypeVar("_", ty)
+					s.params = append(s.params, t)
+					continue
+				}
 				for _, name := range v.Names {
 					t := newTypeVar(name.Name, ty)
 					s.params = append(s.params, t)
@@ -122,6 +130,12 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 			for _, v := range t.Results.List {
 				ty := r.EvalType(v.Type)
 				if ty == nil {
+					continue
+				}
+
+				if v.Names == nil {
+					t := newTypeVar("_", ty)
+					s.results = append(s.results, t)
 					continue
 				}
 				for _, name := range v.Names {
@@ -167,7 +181,6 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 		s := newTypeSlice(v)
 		return s
 	default:
-
 	}
 	return nil
 }
