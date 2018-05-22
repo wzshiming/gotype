@@ -1,6 +1,13 @@
 package gotype
 
 func newTypeVar(name string, typ Type) *typeVar {
+	v, ok := typ.(*typeVar)
+	if ok {
+		return &typeVar{
+			name: name,
+			Type: v.Type,
+		}
+	}
 	return &typeVar{
 		name: name,
 		Type: typ,
