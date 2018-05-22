@@ -26,6 +26,9 @@ type Type interface {
 	Child(int) Type            // scope
 	ChildByName(string) Type   // scope
 	NumChild() int             // scope
+	Anonymo(int) Type          // struct, interface
+	AnonymoByName(string) Type // struct, interface
+	NumAnonymo() int           // struct, interface
 }
 
 type Types []Type
@@ -94,3 +97,6 @@ func (t *typeBase) NumMethods() int           { return 0 }
 func (t *typeBase) Child(int) Type            { return nil }
 func (t *typeBase) ChildByName(string) Type   { return nil }
 func (t *typeBase) NumChild() int             { return 0 }
+func (t *typeBase) Anonymo(int) Type          { return nil }
+func (t *typeBase) AnonymoByName(string) Type { return nil }
+func (t *typeBase) NumAnonymo() int           { return 0 }

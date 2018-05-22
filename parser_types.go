@@ -32,8 +32,20 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 	case *ast.ParenExpr:
 		return r.EvalType(t.X)
 	case *ast.SelectorExpr:
-	// TODO:
-	// a = b.c
+		s := r.EvalType(t.X)
+		name := t.Sel.Name
+		if s.Kind() == Scope {
+			return s.ChildByName(name)
+		}
+		b := s.MethodsByName(name)
+		if b != nil {
+			return b
+		}
+		b = s.FieldByName(name)
+		if b != nil {
+			return b
+		}
+		return nil
 	case *ast.IndexExpr:
 		return r.EvalType(t.X).Elem()
 	case *ast.SliceExpr:
@@ -71,6 +83,16 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 				tag = reflect.StructTag(v.Tag.Value)
 			}
 			if ty == nil {
+				continue
+			}
+
+			if v.Names == nil {
+				t := &TypeStructField{
+					name: ty.Name(),
+					typ:  ty,
+					tag:  tag,
+				}
+				s.anonymo.Add(t)
 				continue
 			}
 			for _, name := range v.Names {
@@ -115,11 +137,17 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 		if t.Methods == nil {
 			return s
 		}
+
 		for _, v := range t.Methods.List {
 			ty := r.EvalType(v.Type)
 			if ty == nil {
 				continue
 			}
+
+			if v.Names == nil {
+				s.anonymo.Add(ty)
+			}
+
 			for _, name := range v.Names {
 				t := NewTypeNamed(name.Name, ty, r)
 				s.methods.Add(t)

@@ -137,5 +137,13 @@ func (t *TypeNamed) MethodsByName(name string) Type {
 		return nil
 	}
 	b := t.parser.Method[t.Name()]
-	return b.Search(name)
+	m := b.Search(name)
+	if m != nil {
+		return m
+	}
+	child := t.ToChild()
+	if child == nil {
+		return nil
+	}
+	return child.MethodsByName(name)
 }
