@@ -16,7 +16,7 @@ type typeNamed struct {
 
 func (t *typeNamed) ToChild() Type {
 	if t.Type == nil {
-		t.Type = t.parser.Search(t.Name())
+		t.Type = t.parser.nameds.Search(t.Name())
 	}
 	return t.Type
 }
@@ -146,4 +146,52 @@ func (t *typeNamed) MethodsByName(name string) Type {
 		return nil
 	}
 	return child.MethodsByName(name)
+}
+
+func (t *typeNamed) Child(i int) Type {
+	child := t.ToChild()
+	if child == nil {
+		return nil
+	}
+	return child.Child(i)
+}
+
+func (t *typeNamed) ChildByName(name string) Type {
+	child := t.ToChild()
+	if child == nil {
+		return nil
+	}
+	return child.ChildByName(name)
+}
+
+func (t *typeNamed) NumChild() int {
+	child := t.ToChild()
+	if child == nil {
+		return 0
+	}
+	return child.NumChild()
+}
+
+func (t *typeNamed) Anonymo(i int) Type {
+	child := t.ToChild()
+	if child == nil {
+		return nil
+	}
+	return child.Anonymo(i)
+}
+
+func (t *typeNamed) AnonymoByName(name string) Type {
+	child := t.ToChild()
+	if child == nil {
+		return nil
+	}
+	return child.AnonymoByName(name)
+}
+
+func (t *typeNamed) NumAnonymo() int {
+	child := t.ToChild()
+	if child == nil {
+		return 0
+	}
+	return child.NumAnonymo()
 }

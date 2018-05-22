@@ -14,15 +14,15 @@ type typeScope struct {
 }
 
 func (t *typeScope) ChildByName(name string) Type {
-	return t.parser.Search(name)
+	return t.parser.nameds.Search(name)
 }
 
 func (t *typeScope) Child(i int) Type {
-	return t.parser.Child(i)
+	return t.parser.nameds.Index(i)
 }
 
 func (t *typeScope) NumChild() int {
-	return t.parser.NumChild()
+	return t.parser.nameds.Len()
 }
 
 func (t *typeScope) Name() string {
