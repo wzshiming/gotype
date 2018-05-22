@@ -10,14 +10,16 @@ type astParser struct {
 	importer *Importer
 	method   map[string]Types // 方法
 	nameds   Types            // 变量 函数 类型 导入的包
+	src      string
 }
 
 // NewParser
-func newParser(i *Importer) *astParser {
+func newParser(i *Importer, src string) *astParser {
 	r := &astParser{
 		importer: i,
 		method:   map[string]Types{},
 		nameds:   Types{},
+		src:      src,
 	}
 	return r
 }
@@ -77,15 +79,14 @@ func (r *astParser) ParserDecl(decl ast.Decl) {
 				}
 
 				if s.Name == nil {
-					p := newTypeImport("", path, r.importer)
+					p := newTypeImport("", path, r.src, r.importer)
 					r.nameds.AddNoRepeat(p)
 				} else {
 					switch s.Name.Name {
 					case "_":
 					case ".":
-						p, err := r.importer.Import(path)
-						if err != nil {
-							r.importer.errorHandler(err)
+						p := r.importer.impor(path, r.src)
+						if p == nil {
 							continue
 						}
 						l := p.NumChild()
@@ -93,7 +94,7 @@ func (r *astParser) ParserDecl(decl ast.Decl) {
 							r.nameds.AddNoRepeat(p.Child(i))
 						}
 					default:
-						t := newTypeImport(s.Name.Name, path, r.importer)
+						t := newTypeImport(s.Name.Name, path, r.src, r.importer)
 						r.nameds.AddNoRepeat(t)
 					}
 				}

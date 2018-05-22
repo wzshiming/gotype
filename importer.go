@@ -31,35 +31,41 @@ func NewImporter(options ...option) *Importer {
 	return i
 }
 
-func (i *Importer) importBuild(path string) (*build.Package, error) {
+func (i *Importer) importBuild(path string, src string) (*build.Package, bool) {
 	if v, ok := i.bufBuild[path]; ok {
-		return v, nil
+		return v, true
 	}
-	imp, err := build.Import(path, ".", 0)
+
+	imp, err := build.Import(path, src, 0)
 	if err != nil {
-		return nil, err
+		i.errorHandler(err)
+		return nil, false
 	}
 	i.bufBuild[path] = imp
-	return imp, nil
+	return imp, true
 }
 
-func (i *Importer) ImportName(path string) (name string, goroot bool, err error) {
-	imp, err := i.importBuild(path)
-	if err != nil {
-		return "", false, err
+func (i *Importer) importName(path string, src string) (name string, goroot bool) {
+	imp, ok := i.importBuild(path, src)
+	if !ok {
+		return "", false
 	}
-
-	return imp.Name, imp.Goroot, nil
+	return imp.Name, imp.Goroot
 }
 
-func (i *Importer) Import(path string) (Type, error) {
-	if v, ok := i.bufType[path]; ok {
-		return v, nil
+func (i *Importer) Import(path string) Type {
+	return i.impor(path, ".")
+}
+
+func (i *Importer) impor(path string, src string) Type {
+	tt, ok := i.bufType[path]
+	if ok {
+		return tt
 	}
 
-	imp, err := i.importBuild(path)
-	if err != nil {
-		return nil, err
+	imp, ok := i.importBuild(path, src)
+	if !ok {
+		return nil
 	}
 
 	m := map[string]bool{}
@@ -73,15 +79,16 @@ func (i *Importer) Import(path string) (Type, error) {
 	}, i.mode)
 
 	if err != nil {
-		return nil, err
+		i.errorHandler(err)
+		return nil
 	}
 
 	for name, v := range p {
-		np := newParser(i)
+		np := newParser(i, dir)
 		np.ParserPackage(v)
 		t := newTypeScope(name, np)
 		i.bufType[path] = t
-		return t, nil
+		return t
 	}
-	return nil, nil
+	return nil
 }
