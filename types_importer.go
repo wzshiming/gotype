@@ -34,7 +34,7 @@ func (t *TypeImport) check() {
 
 func (t *TypeImport) Name() string {
 	if t.name == "" {
-		name, err := t.imp.ImportName(t.path)
+		name, _, err := t.imp.ImportName(t.path)
 		if err != nil {
 			ffmt.Mark(err)
 			return ""

@@ -9,16 +9,14 @@ import (
 type Parser struct {
 	importer *Importer
 	DotImp   Types            // 尝试用点导入的包
-	Imports  Types            // 导入的包
 	Method   map[string]Types // 方法
-	Nameds   Types            // 变量 函数 类型
+	Nameds   Types            // 变量 函数 类型 导入的包
 }
 
 // NewParser
 func NewParser(i *Importer) *Parser {
 	r := &Parser{
 		importer: i,
-		Imports:  Types{},
 		Method:   map[string]Types{},
 		Nameds:   Types{},
 	}
@@ -70,7 +68,7 @@ func (r *Parser) ParserDecl(decl ast.Decl) {
 				if !ok {
 					continue
 				}
-				name, err := strconv.Unquote(s.Path.Value)
+				path, err := strconv.Unquote(s.Path.Value)
 				if err != nil {
 					continue
 				}
@@ -80,8 +78,8 @@ func (r *Parser) ParserDecl(decl ast.Decl) {
 				}
 
 				if s.Name == nil {
-					p := NewTypeImport("", name, r.importer)
-					r.Imports.Add(p)
+					p := NewTypeImport("", path, r.importer)
+					r.Nameds.Add(p)
 				} else {
 					switch s.Name.Name {
 					case "_":
@@ -90,8 +88,8 @@ func (r *Parser) ParserDecl(decl ast.Decl) {
 					//r.DotImp = append(r.DotImp, p)
 					default:
 
-						t := NewTypeImport(s.Name.Name, name, r.importer)
-						r.Imports.Add(t)
+						t := NewTypeImport(s.Name.Name, path, r.importer)
+						r.Nameds.Add(t)
 					}
 				}
 			}
