@@ -25,7 +25,7 @@ const (
 	Complex64
 	Complex128
 	String
-	Bytes
+	Byte
 	Rune
 	Error
 	predeclaredTypesEnd
@@ -43,7 +43,6 @@ const (
 	// 特殊
 	Field // Struct Field
 	Alias // type 别名
-	//	Named // func 和 type 定义的名字
 	Var   // 变量名
 	Scope // 包名 和 函数内作用域
 )
