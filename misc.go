@@ -45,3 +45,18 @@ var tokenTypes = map[token.Token]Kind{
 	token.CHAR:   Int32,
 	token.STRING: String,
 }
+
+var builtinFunc = map[string]builtinfunc{
+	"append":  builtinfuncItem,
+	"close":   builtinfuncVoid,
+	"delete":  builtinfuncVoid,
+	"panic":   builtinfuncVoid,
+	"recover": builtinfuncInterface,
+	"imag":    builtinfuncInt,
+	"real":    builtinfuncInt,
+	"make":    builtinfuncItem,
+	"new":     builtinfuncPtrItem,
+	"cap":     builtinfuncInt,
+	"copy":    builtinfuncInt,
+	"len":     builtinfuncInt,
+}

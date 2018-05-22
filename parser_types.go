@@ -15,7 +15,6 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 			s := newTypeBuiltin(k)
 			return s
 		}
-
 		s := newTypeNamed(t.Name, nil, r)
 		return s
 	case *ast.BasicLit:
@@ -33,6 +32,10 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 	case *ast.SelectorExpr:
 		s := r.EvalType(t.X)
 		name := t.Sel.Name
+
+		if s == nil {
+			return nil
+		}
 
 		b := s.ChildByName(name)
 		if b != nil {
@@ -54,7 +57,29 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 	case *ast.TypeAssertExpr:
 		return r.EvalType(t.Type)
 	case *ast.CallExpr:
-		return r.EvalType(t.Fun).Out(0)
+		switch b := t.Fun.(type) {
+		case *ast.Ident:
+			if bf, ok := builtinFunc[b.Name]; ok {
+				switch bf {
+				case builtinfuncInt:
+					return newTypeBuiltin(Int)
+				case builtinfuncPtrItem:
+					return newTypePtr(r.EvalType(t.Args[0]))
+				case builtinfuncItem:
+					return r.EvalType(t.Args[0])
+				case builtinfuncInterface:
+					return newTypeBuiltin(Interface)
+				case builtinfuncVoid:
+					return newTypeBuiltin(Invalid)
+				}
+			}
+		}
+
+		b := r.EvalType(t.Fun)
+		if b.Kind() == Func {
+			return b.Out(0)
+		}
+		return b
 	case *ast.StarExpr:
 		return newTypePtr(r.EvalType(t.X))
 	case *ast.UnaryExpr:
