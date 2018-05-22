@@ -32,7 +32,8 @@ func NewImporter(options ...option) *Importer {
 }
 
 func (i *Importer) importBuild(path string, src string) (*build.Package, bool) {
-	if v, ok := i.bufBuild[path]; ok {
+	k := path + " " + src
+	if v, ok := i.bufBuild[k]; ok {
 		return v, true
 	}
 
@@ -41,7 +42,7 @@ func (i *Importer) importBuild(path string, src string) (*build.Package, bool) {
 		i.errorHandler(err)
 		return nil, false
 	}
-	i.bufBuild[path] = imp
+	i.bufBuild[k] = imp
 	return imp, true
 }
 
