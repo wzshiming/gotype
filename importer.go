@@ -58,14 +58,16 @@ func (i *Importer) Import(path string) Type {
 }
 
 func (i *Importer) impor(path string, src string) Type {
-	tt, ok := i.bufType[path]
-	if ok {
-		return tt
-	}
 
 	imp, ok := i.importBuild(path, src)
 	if !ok {
 		return nil
+	}
+	dir := imp.Dir
+
+	tt, ok := i.bufType[dir]
+	if ok {
+		return tt
 	}
 
 	m := map[string]bool{}
@@ -73,7 +75,6 @@ func (i *Importer) impor(path string, src string) Type {
 		m[v] = true
 	}
 
-	dir := imp.Dir
 	p, err := parser.ParseDir(i.fset, dir, func(fi os.FileInfo) bool {
 		return m[fi.Name()]
 	}, i.mode)
@@ -87,7 +88,7 @@ func (i *Importer) impor(path string, src string) Type {
 		np := newParser(i, dir)
 		np.ParserPackage(v)
 		t := newTypeScope(name, np)
-		i.bufType[path] = t
+		i.bufType[dir] = t
 		return t
 	}
 	return nil
