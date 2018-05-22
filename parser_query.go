@@ -1,13 +1,13 @@
 package gotype
 
 func (r *astParser) Search(name string) Type {
-	return r.Nameds.Search(name)
+	return r.nameds.Search(name)
 }
 
 func (r *astParser) Child(i int) Type {
-	return r.Nameds.Index(i)
+	return r.nameds.Index(i)
 }
 
 func (r *astParser) NumChild() int {
-	return len(r.Nameds)
+	return len(r.nameds)
 }

@@ -1,7 +1,5 @@
 package gotype
 
-import ffmt "gopkg.in/ffmt.v1"
-
 func newTypeImport(name, path string, imp *Importer) Type {
 	return &typeImport{
 		name: name,
@@ -25,10 +23,9 @@ func (t *typeImport) check() {
 
 	s, err := t.imp.Import(t.path)
 	if err != nil {
-		ffmt.Mark(err)
+		t.imp.errorHandler(err)
 		return
 	}
-
 	t.scope = s
 }
 
@@ -36,7 +33,7 @@ func (t *typeImport) Name() string {
 	if t.name == "" {
 		name, _, err := t.imp.ImportName(t.path)
 		if err != nil {
-			ffmt.Mark(err)
+			t.imp.errorHandler(err)
 			return ""
 		}
 		t.name = name

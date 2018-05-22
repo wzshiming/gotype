@@ -8,17 +8,16 @@ import (
 
 type astParser struct {
 	importer *Importer
-	DotImp   Types            // 尝试用点导入的包
-	Method   map[string]Types // 方法
-	Nameds   Types            // 变量 函数 类型 导入的包
+	method   map[string]Types // 方法
+	nameds   Types            // 变量 函数 类型 导入的包
 }
 
 // NewParser
 func newParser(i *Importer) *astParser {
 	r := &astParser{
 		importer: i,
-		Method:   map[string]Types{},
-		Nameds:   Types{},
+		method:   map[string]Types{},
+		nameds:   Types{},
 	}
 	return r
 }
@@ -49,14 +48,14 @@ func (r *astParser) ParserDecl(decl ast.Decl) {
 			}
 
 			t := newTypeNamed(d.Name.Name, f, r)
-			b := r.Method[name]
+			b := r.method[name]
 			b.Add(t)
-			r.Method[name] = b
+			r.method[name] = b
 			return
 		}
 
 		t := newTypeNamed(d.Name.Name, f, r)
-		r.Nameds.Add(t)
+		r.nameds.Add(t)
 		return
 	case *ast.GenDecl:
 		switch d.Tok {
@@ -79,17 +78,24 @@ func (r *astParser) ParserDecl(decl ast.Decl) {
 
 				if s.Name == nil {
 					p := newTypeImport("", path, r.importer)
-					r.Nameds.Add(p)
+					r.nameds.Add(p)
 				} else {
 					switch s.Name.Name {
 					case "_":
 					case ".":
-					// TODO: import . "package"
-					//r.DotImp = append(r.DotImp, p)
+						p, err := r.importer.Import(path)
+						if err != nil {
+							r.importer.errorHandler(err)
+							continue
+						}
+						l := p.NumChild()
+						for i := 0; i != l; i++ {
+							r.nameds.Add(p.Child(i))
+						}
 					default:
 
 						t := newTypeImport(s.Name.Name, path, r.importer)
-						r.Nameds.Add(t)
+						r.nameds.Add(t)
 					}
 				}
 			}
@@ -106,7 +112,7 @@ func (r *astParser) ParserDecl(decl ast.Decl) {
 				} else {
 					tt = newTypeAlias(s.Name.Name, tt)
 				}
-				r.Nameds.Add(tt)
+				r.nameds.Add(tt)
 			}
 		}
 	}
@@ -138,7 +144,7 @@ func (r *astParser) ParserValue(decl *ast.GenDecl) {
 			}
 
 			t := newTypeVar(v.Name, val)
-			r.Nameds.Add(t)
+			r.nameds.Add(t)
 		}
 	}
 }

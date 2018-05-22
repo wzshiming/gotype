@@ -117,7 +117,7 @@ func (t *typeNamed) NumMethods() int {
 	if t.parser == nil {
 		return 0
 	}
-	b := t.parser.Method[t.Name()]
+	b := t.parser.method[t.Name()]
 	return b.Len()
 }
 
@@ -125,7 +125,7 @@ func (t *typeNamed) Methods(i int) Type {
 	if t.parser == nil {
 		return nil
 	}
-	b := t.parser.Method[t.Name()]
+	b := t.parser.method[t.Name()]
 	if b.Len() <= i {
 		return nil
 	}
@@ -136,7 +136,7 @@ func (t *typeNamed) MethodsByName(name string) Type {
 	if t.parser == nil {
 		return nil
 	}
-	b := t.parser.Method[t.Name()]
+	b := t.parser.method[t.Name()]
 	m := b.Search(name)
 	if m != nil {
 		return m
