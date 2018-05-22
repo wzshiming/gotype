@@ -93,7 +93,6 @@ func (r *astParser) ParserDecl(decl ast.Decl) {
 							r.nameds.AddNoRepeat(p.Child(i))
 						}
 					default:
-
 						t := newTypeImport(s.Name.Name, path, r.importer)
 						r.nameds.AddNoRepeat(t)
 					}
@@ -137,6 +136,9 @@ func (r *astParser) ParserValue(decl *ast.GenDecl) {
 		} else {
 			// TODO: 还需要考虑多种情况
 			val = r.EvalType(s.Values[0])
+		}
+		if val == nil {
+			continue
 		}
 		for _, v := range s.Names {
 			if v.Name == "" || v.Name == "_" {

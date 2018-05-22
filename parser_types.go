@@ -4,7 +4,6 @@ import (
 	"go/ast"
 	"reflect"
 	"strconv"
-	"strings"
 )
 
 func (r *astParser) EvalType(expr ast.Expr) Type {
@@ -20,7 +19,7 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 		s := newTypeNamed(t.Name, nil, r)
 		return s
 	case *ast.BasicLit:
-		if k := predeclaredTypes[strings.ToLower(t.Kind.String())]; k != 0 {
+		if k := tokenTypes[t.Kind]; k != 0 {
 			s := newTypeBuiltin(k)
 			return s
 		}
@@ -50,8 +49,8 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 		return r.EvalType(t.X).Elem()
 	case *ast.SliceExpr:
 		return r.EvalType(t.X)
-		//	case *ast.TypeAssertExpr:
-
+	case *ast.TypeAssertExpr:
+		return r.EvalType(t.Type)
 	case *ast.CallExpr:
 		return r.EvalType(t.Fun)
 	case *ast.StarExpr:
@@ -163,6 +162,12 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 		v := r.EvalType(t.Value)
 		s := newTypeChan(v, ChanDir(t.Dir))
 		return s
+	case *ast.Ellipsis:
+		v := r.EvalType(t.Elt)
+		s := newTypeSlice(v)
+		return s
+	default:
+
 	}
 	return nil
 }

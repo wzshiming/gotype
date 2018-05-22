@@ -2,6 +2,7 @@ package gotype
 
 import (
 	"go/ast"
+	"go/token"
 	"strings"
 )
 
@@ -36,3 +37,11 @@ func init() {
 }
 
 var predeclaredTypes = map[string]Kind{}
+
+var tokenTypes = map[token.Token]Kind{
+	token.INT:    Int,
+	token.FLOAT:  Float64,
+	token.IMAG:   Complex128,
+	token.CHAR:   Int32,
+	token.STRING: String,
+}
