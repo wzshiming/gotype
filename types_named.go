@@ -26,47 +26,91 @@ func (t *TypeNamed) Name() string {
 }
 
 func (t *TypeNamed) Kind() Kind {
-	return t.ToChild().Kind()
+	child := t.ToChild()
+	if child == nil {
+		return Invalid
+	}
+	return child.Kind()
 }
 
 func (t *TypeNamed) Key() Type {
-	return t.ToChild().Key()
+	child := t.ToChild()
+	if child == nil {
+		return nil
+	}
+	return child.Key()
 }
 
 func (t *TypeNamed) Elem() Type {
-	return t.ToChild()
+	child := t.ToChild()
+	if child == nil {
+		return nil
+	}
+	return child.Elem()
 }
 
 func (t *TypeNamed) NumField() int {
-	return t.ToChild().NumField()
+	child := t.ToChild()
+	if child == nil {
+		return 0
+	}
+	return child.NumField()
 }
 
 func (t *TypeNamed) Field(i int) Type {
-	return t.ToChild().Field(i)
+	child := t.ToChild()
+	if child == nil {
+		return nil
+	}
+	return child.Field(i)
 }
 
 func (t *TypeNamed) FieldByName(name string) Type {
-	return t.ToChild().FieldByName(name)
+	child := t.ToChild()
+	if child == nil {
+		return nil
+	}
+	return child.FieldByName(name)
 }
 
 func (t *TypeNamed) Len() int {
-	return t.ToChild().Len()
+	child := t.ToChild()
+	if child == nil {
+		return 0
+	}
+	return child.Len()
 }
 
 func (t *TypeNamed) NumOut() int {
-	return t.ToChild().NumOut()
+	child := t.ToChild()
+	if child == nil {
+		return 0
+	}
+	return child.NumOut()
 }
 
 func (t *TypeNamed) Out(i int) Type {
-	return t.ToChild().Out(i)
+	child := t.ToChild()
+	if child == nil {
+		return nil
+	}
+	return child.Out(i)
 }
 
 func (t *TypeNamed) NumIn() int {
-	return t.ToChild().NumIn()
+	child := t.ToChild()
+	if child == nil {
+		return 0
+	}
+	return child.NumIn()
 }
 
 func (t *TypeNamed) In(i int) Type {
-	return t.ToChild().In(i)
+	child := t.ToChild()
+	if child == nil {
+		return nil
+	}
+	return child.In(i)
 }
 
 func (t *TypeNamed) NumMethods() int {
