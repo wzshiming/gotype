@@ -5,8 +5,6 @@ import (
 	"go/parser"
 	"go/token"
 	"os"
-
-	ffmt "gopkg.in/ffmt.v1"
 )
 
 type Importer struct {
@@ -14,20 +12,23 @@ type Importer struct {
 	mode         parser.Mode
 	bufType      map[string]Type
 	bufBuild     map[string]*build.Package
-	errorHandler func(error) error
+	errorHandler func(error)
 }
 
-func NewImporter() *Importer {
-	return &Importer{
+func NewImporter(options ...option) *Importer {
+	i := &Importer{
 		fset:     token.NewFileSet(),
 		mode:     parser.ParseComments,
 		bufType:  map[string]Type{},
 		bufBuild: map[string]*build.Package{},
-		errorHandler: func(err error) error {
-			ffmt.Mark(err)
-			return nil
+		errorHandler: func(err error) {
+			return
 		},
 	}
+	for _, v := range options {
+		v(i)
+	}
+	return i
 }
 
 func (i *Importer) importBuild(path string) (*build.Package, error) {
