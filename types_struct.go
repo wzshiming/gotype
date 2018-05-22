@@ -1,24 +1,24 @@
 package gotype
 
-type TypeStruct struct {
+type typeStruct struct {
 	typeBase
 	fields  Types // 字段
 	anonymo Types // 组合的类型
 }
 
-func (t *TypeStruct) Kind() Kind {
+func (t *typeStruct) Kind() Kind {
 	return Struct
 }
 
-func (t *TypeStruct) NumField() int {
+func (t *typeStruct) NumField() int {
 	return t.fields.Len()
 }
 
-func (t *TypeStruct) Field(i int) Type {
+func (t *typeStruct) Field(i int) Type {
 	return t.fields.Index(i)
 }
 
-func (t *TypeStruct) FieldByName(name string) Type {
+func (t *typeStruct) FieldByName(name string) Type {
 	b := t.fields.Search(name)
 	if b != nil {
 		return b
@@ -37,7 +37,7 @@ func (t *TypeStruct) FieldByName(name string) Type {
 	return nil
 }
 
-func (t *TypeStruct) MethodsByName(name string) Type {
+func (t *typeStruct) MethodsByName(name string) Type {
 	for _, v := range t.anonymo {
 		b := v.MethodsByName(name)
 		if b != nil {
@@ -47,14 +47,14 @@ func (t *TypeStruct) MethodsByName(name string) Type {
 	return nil
 }
 
-func (t *TypeStruct) NumAnonymo() int {
+func (t *typeStruct) NumAnonymo() int {
 	return t.anonymo.Len()
 }
 
-func (t *TypeStruct) Anonymo(i int) Type {
+func (t *typeStruct) Anonymo(i int) Type {
 	return t.anonymo.Index(i)
 }
 
-func (t *TypeStruct) AnonymoByName(name string) Type {
+func (t *typeStruct) AnonymoByName(name string) Type {
 	return t.anonymo.Search(name)
 }

@@ -1,34 +1,34 @@
 package gotype
 
-func NewTypeScope(name string, parser *Parser) Type {
-	return &TypeScope{
+func newTypeScope(name string, parser *astParser) Type {
+	return &typeScope{
 		name:   name,
 		parser: parser,
 	}
 }
 
-type TypeScope struct {
+type typeScope struct {
 	typeBase
 	name   string
-	parser *Parser
+	parser *astParser
 }
 
-func (t *TypeScope) ChildByName(name string) Type {
+func (t *typeScope) ChildByName(name string) Type {
 	return t.parser.Search(name)
 }
 
-func (t *TypeScope) Child(i int) Type {
+func (t *typeScope) Child(i int) Type {
 	return t.parser.Child(i)
 }
 
-func (t *TypeScope) NumChild() int {
+func (t *typeScope) NumChild() int {
 	return t.parser.NumChild()
 }
 
-func (t *TypeScope) Name() string {
+func (t *typeScope) Name() string {
 	return t.name
 }
 
-func (t *TypeScope) Kind() Kind {
+func (t *typeScope) Kind() Kind {
 	return Scope
 }

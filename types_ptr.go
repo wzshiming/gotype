@@ -1,20 +1,20 @@
 package gotype
 
-func NewTypePtr(elem Type) Type {
-	return &TypePtr{
+func newTypePtr(elem Type) Type {
+	return &typePtr{
 		elem: elem,
 	}
 }
 
-type TypePtr struct {
+type typePtr struct {
 	typeBase
 	elem Type
 }
 
-func (y *TypePtr) Kind() Kind {
+func (y *typePtr) Kind() Kind {
 	return Ptr
 }
 
-func (t *TypePtr) Elem() Type {
+func (t *typePtr) Elem() Type {
 	return t.elem
 }

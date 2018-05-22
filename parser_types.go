@@ -7,21 +7,21 @@ import (
 	"strings"
 )
 
-func (r *Parser) EvalType(expr ast.Expr) Type {
+func (r *astParser) EvalType(expr ast.Expr) Type {
 	switch t := expr.(type) {
 	case *ast.BadExpr:
 		return nil
 	case *ast.Ident:
 		if k := predeclaredTypes[t.Name]; k != 0 {
-			s := NewTypeBuiltin(k)
+			s := newTypeBuiltin(k)
 			return s
 		}
 
-		s := NewTypeNamed(t.Name, nil, r)
+		s := newTypeNamed(t.Name, nil, r)
 		return s
 	case *ast.BasicLit:
 		if k := predeclaredTypes[strings.ToLower(t.Kind.String())]; k != 0 {
-			s := NewTypeBuiltin(k)
+			s := newTypeBuiltin(k)
 			return s
 		}
 		return nil
@@ -55,7 +55,7 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 	case *ast.CallExpr:
 		return r.EvalType(t.Fun)
 	case *ast.StarExpr:
-		return NewTypePtr(r.EvalType(t.X))
+		return newTypePtr(r.EvalType(t.X))
 	case *ast.UnaryExpr:
 		return r.EvalType(t.X)
 	case *ast.BinaryExpr:
@@ -64,14 +64,14 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 
 	case *ast.ArrayType:
 		if t.Len == nil {
-			return NewTypeSlice(r.EvalType(t.Elt))
+			return newTypeSlice(r.EvalType(t.Elt))
 		} else {
 			le := constValue(t.Len)
 			i, _ := strconv.ParseInt(le, 0, 0)
-			return NewTypeArray(r.EvalType(t.Elt), int(i))
+			return newTypeArray(r.EvalType(t.Elt), int(i))
 		}
 	case *ast.StructType:
-		s := &TypeStruct{}
+		s := &typeStruct{}
 
 		if t.Fields == nil {
 			return s
@@ -87,7 +87,7 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 			}
 
 			if v.Names == nil {
-				t := &TypeStructField{
+				t := &typeStructField{
 					name: ty.Name(),
 					typ:  ty,
 					tag:  tag,
@@ -96,7 +96,7 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 				continue
 			}
 			for _, name := range v.Names {
-				t := &TypeStructField{
+				t := &typeStructField{
 					name: name.Name,
 					typ:  ty,
 					tag:  tag,
@@ -106,7 +106,7 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 		}
 		return s
 	case *ast.FuncType:
-		s := &TypeFunc{}
+		s := &typeFunc{}
 		if t.Params != nil {
 			for _, v := range t.Params.List {
 				ty := r.EvalType(v.Type)
@@ -114,7 +114,7 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 					continue
 				}
 				for _, name := range v.Names {
-					t := NewTypeVar(name.Name, ty)
+					t := newTypeVar(name.Name, ty)
 					s.params = append(s.params, t)
 				}
 			}
@@ -126,14 +126,14 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 					continue
 				}
 				for _, name := range v.Names {
-					t := NewTypeVar(name.Name, ty)
+					t := newTypeVar(name.Name, ty)
 					s.results = append(s.results, t)
 				}
 			}
 		}
 		return s
 	case *ast.InterfaceType:
-		s := &TypeInterface{}
+		s := &typeInterface{}
 		if t.Methods == nil {
 			return s
 		}
@@ -149,7 +149,7 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 			}
 
 			for _, name := range v.Names {
-				t := NewTypeNamed(name.Name, ty, r)
+				t := newTypeNamed(name.Name, ty, r)
 				s.methods.Add(t)
 			}
 		}
@@ -157,11 +157,11 @@ func (r *Parser) EvalType(expr ast.Expr) Type {
 	case *ast.MapType:
 		k := r.EvalType(t.Key)
 		v := r.EvalType(t.Value)
-		s := NewTypeMap(k, v)
+		s := newTypeMap(k, v)
 		return s
 	case *ast.ChanType:
 		v := r.EvalType(t.Value)
-		s := NewTypeChan(v, ChanDir(t.Dir))
+		s := newTypeChan(v, ChanDir(t.Dir))
 		return s
 	}
 	return nil

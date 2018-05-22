@@ -1,26 +1,26 @@
 package gotype
 
-func NewTypeChan(v Type, dir ChanDir) Type {
-	return &TypeChan{
+func newTypeChan(v Type, dir ChanDir) Type {
+	return &typeChan{
 		val: v,
 		dir: dir,
 	}
 }
 
-type TypeChan struct {
+type typeChan struct {
 	typeBase
 	dir ChanDir
 	val Type
 }
 
-func (t *TypeChan) Kind() Kind {
+func (t *typeChan) Kind() Kind {
 	return Chan
 }
 
-func (t *TypeChan) Elem() Type {
+func (t *typeChan) Elem() Type {
 	return t.val
 }
 
-func (t *TypeChan) ChanDir() ChanDir {
+func (t *typeChan) ChanDir() ChanDir {
 	return t.dir
 }

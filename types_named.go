@@ -1,31 +1,31 @@
 package gotype
 
-func NewTypeNamed(name string, typ Type, parser *Parser) Type {
-	return &TypeNamed{
+func newTypeNamed(name string, typ Type, parser *astParser) Type {
+	return &typeNamed{
 		name:   name,
 		Type:   typ,
 		parser: parser,
 	}
 }
 
-type TypeNamed struct {
+type typeNamed struct {
 	name   string
-	parser *Parser
+	parser *astParser
 	Type
 }
 
-func (t *TypeNamed) ToChild() Type {
+func (t *typeNamed) ToChild() Type {
 	if t.Type == nil {
 		t.Type = t.parser.Search(t.Name())
 	}
 	return t.Type
 }
 
-func (t *TypeNamed) Name() string {
+func (t *typeNamed) Name() string {
 	return t.name
 }
 
-func (t *TypeNamed) Kind() Kind {
+func (t *typeNamed) Kind() Kind {
 	child := t.ToChild()
 	if child == nil {
 		return Invalid
@@ -33,7 +33,7 @@ func (t *TypeNamed) Kind() Kind {
 	return child.Kind()
 }
 
-func (t *TypeNamed) Key() Type {
+func (t *typeNamed) Key() Type {
 	child := t.ToChild()
 	if child == nil {
 		return nil
@@ -41,7 +41,7 @@ func (t *TypeNamed) Key() Type {
 	return child.Key()
 }
 
-func (t *TypeNamed) Elem() Type {
+func (t *typeNamed) Elem() Type {
 	child := t.ToChild()
 	if child == nil {
 		return nil
@@ -49,7 +49,7 @@ func (t *TypeNamed) Elem() Type {
 	return child.Elem()
 }
 
-func (t *TypeNamed) NumField() int {
+func (t *typeNamed) NumField() int {
 	child := t.ToChild()
 	if child == nil {
 		return 0
@@ -57,7 +57,7 @@ func (t *TypeNamed) NumField() int {
 	return child.NumField()
 }
 
-func (t *TypeNamed) Field(i int) Type {
+func (t *typeNamed) Field(i int) Type {
 	child := t.ToChild()
 	if child == nil {
 		return nil
@@ -65,7 +65,7 @@ func (t *TypeNamed) Field(i int) Type {
 	return child.Field(i)
 }
 
-func (t *TypeNamed) FieldByName(name string) Type {
+func (t *typeNamed) FieldByName(name string) Type {
 	child := t.ToChild()
 	if child == nil {
 		return nil
@@ -73,7 +73,7 @@ func (t *TypeNamed) FieldByName(name string) Type {
 	return child.FieldByName(name)
 }
 
-func (t *TypeNamed) Len() int {
+func (t *typeNamed) Len() int {
 	child := t.ToChild()
 	if child == nil {
 		return 0
@@ -81,7 +81,7 @@ func (t *TypeNamed) Len() int {
 	return child.Len()
 }
 
-func (t *TypeNamed) NumOut() int {
+func (t *typeNamed) NumOut() int {
 	child := t.ToChild()
 	if child == nil {
 		return 0
@@ -89,7 +89,7 @@ func (t *TypeNamed) NumOut() int {
 	return child.NumOut()
 }
 
-func (t *TypeNamed) Out(i int) Type {
+func (t *typeNamed) Out(i int) Type {
 	child := t.ToChild()
 	if child == nil {
 		return nil
@@ -97,7 +97,7 @@ func (t *TypeNamed) Out(i int) Type {
 	return child.Out(i)
 }
 
-func (t *TypeNamed) NumIn() int {
+func (t *typeNamed) NumIn() int {
 	child := t.ToChild()
 	if child == nil {
 		return 0
@@ -105,7 +105,7 @@ func (t *TypeNamed) NumIn() int {
 	return child.NumIn()
 }
 
-func (t *TypeNamed) In(i int) Type {
+func (t *typeNamed) In(i int) Type {
 	child := t.ToChild()
 	if child == nil {
 		return nil
@@ -113,7 +113,7 @@ func (t *TypeNamed) In(i int) Type {
 	return child.In(i)
 }
 
-func (t *TypeNamed) NumMethods() int {
+func (t *typeNamed) NumMethods() int {
 	if t.parser == nil {
 		return 0
 	}
@@ -121,7 +121,7 @@ func (t *TypeNamed) NumMethods() int {
 	return b.Len()
 }
 
-func (t *TypeNamed) Methods(i int) Type {
+func (t *typeNamed) Methods(i int) Type {
 	if t.parser == nil {
 		return nil
 	}
@@ -132,7 +132,7 @@ func (t *TypeNamed) Methods(i int) Type {
 	return b.Index(i)
 }
 
-func (t *TypeNamed) MethodsByName(name string) Type {
+func (t *typeNamed) MethodsByName(name string) Type {
 	if t.parser == nil {
 		return nil
 	}

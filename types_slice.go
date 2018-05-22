@@ -1,20 +1,20 @@
 package gotype
 
-func NewTypeSlice(v Type) Type {
-	return &TypeSlice{
+func newTypeSlice(v Type) Type {
+	return &typeSlice{
 		val: v,
 	}
 }
 
-type TypeSlice struct {
+type typeSlice struct {
 	typeBase
 	val Type
 }
 
-func (t *TypeSlice) Kind() Kind {
+func (t *typeSlice) Kind() Kind {
 	return Slice
 }
 
-func (t *TypeSlice) Elem() Type {
+func (t *typeSlice) Elem() Type {
 	return t.val
 }

@@ -69,9 +69,9 @@ func (i *Importer) Import(path string) (Type, error) {
 	}
 
 	for name, v := range p {
-		np := NewParser(i)
+		np := newParser(i)
 		np.ParserPackage(v)
-		t := NewTypeScope(name, np)
+		t := newTypeScope(name, np)
 		i.bufType[path] = t
 		return t, nil
 	}

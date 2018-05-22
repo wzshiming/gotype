@@ -2,15 +2,15 @@ package gotype
 
 import ffmt "gopkg.in/ffmt.v1"
 
-func NewTypeImport(name, path string, imp *Importer) Type {
-	return &TypeImport{
+func newTypeImport(name, path string, imp *Importer) Type {
+	return &typeImport{
 		name: name,
 		path: path,
 		imp:  imp,
 	}
 }
 
-type TypeImport struct {
+type typeImport struct {
 	typeBase
 	name  string
 	path  string
@@ -18,7 +18,7 @@ type TypeImport struct {
 	scope Type
 }
 
-func (t *TypeImport) check() {
+func (t *typeImport) check() {
 	if t.scope != nil {
 		return
 	}
@@ -32,7 +32,7 @@ func (t *TypeImport) check() {
 	t.scope = s
 }
 
-func (t *TypeImport) Name() string {
+func (t *typeImport) Name() string {
 	if t.name == "" {
 		name, _, err := t.imp.ImportName(t.path)
 		if err != nil {
@@ -44,11 +44,11 @@ func (t *TypeImport) Name() string {
 	return t.name
 }
 
-func (t *TypeImport) Kind() Kind {
+func (t *typeImport) Kind() Kind {
 	return Scope
 }
 
-func (t *TypeImport) ChildByName(name string) Type {
+func (t *typeImport) ChildByName(name string) Type {
 	t.check()
 	if t.scope == nil {
 		return nil
@@ -56,7 +56,7 @@ func (t *TypeImport) ChildByName(name string) Type {
 	return t.scope.ChildByName(name)
 }
 
-func (t *TypeImport) Child(i int) Type {
+func (t *typeImport) Child(i int) Type {
 	t.check()
 	if t.scope == nil {
 		return nil
@@ -64,7 +64,7 @@ func (t *TypeImport) Child(i int) Type {
 	return t.scope.Child(i)
 }
 
-func (t *TypeImport) NumChild() int {
+func (t *typeImport) NumChild() int {
 	t.check()
 	if t.scope == nil {
 		return 0

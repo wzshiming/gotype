@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-type Parser struct {
+type astParser struct {
 	importer *Importer
 	DotImp   Types            // 尝试用点导入的包
 	Method   map[string]Types // 方法
@@ -14,8 +14,8 @@ type Parser struct {
 }
 
 // NewParser
-func NewParser(i *Importer) *Parser {
-	r := &Parser{
+func newParser(i *Importer) *astParser {
+	r := &astParser{
 		importer: i,
 		Method:   map[string]Types{},
 		Nameds:   Types{},
@@ -24,21 +24,21 @@ func NewParser(i *Importer) *Parser {
 }
 
 // ParserFile 解析文件
-func (r *Parser) ParserFile(src *ast.File) {
+func (r *astParser) ParserFile(src *ast.File) {
 	// 解析全部顶级关键字
 	for _, decl := range src.Decls {
 		r.ParserDecl(decl)
 	}
 }
 
-func (r *Parser) ParserPackage(pkg *ast.Package) {
+func (r *astParser) ParserPackage(pkg *ast.Package) {
 	for _, file := range pkg.Files {
 		r.ParserFile(file)
 	}
 }
 
 // ParserDecl 解析顶级关键字
-func (r *Parser) ParserDecl(decl ast.Decl) {
+func (r *astParser) ParserDecl(decl ast.Decl) {
 	switch d := decl.(type) {
 	case *ast.FuncDecl:
 		f := r.EvalType(d.Type)
@@ -48,14 +48,14 @@ func (r *Parser) ParserDecl(decl ast.Decl) {
 				return
 			}
 
-			t := NewTypeNamed(d.Name.Name, f, r)
+			t := newTypeNamed(d.Name.Name, f, r)
 			b := r.Method[name]
 			b.Add(t)
 			r.Method[name] = b
 			return
 		}
 
-		t := NewTypeNamed(d.Name.Name, f, r)
+		t := newTypeNamed(d.Name.Name, f, r)
 		r.Nameds.Add(t)
 		return
 	case *ast.GenDecl:
@@ -78,17 +78,17 @@ func (r *Parser) ParserDecl(decl ast.Decl) {
 				}
 
 				if s.Name == nil {
-					p := NewTypeImport("", path, r.importer)
+					p := newTypeImport("", path, r.importer)
 					r.Nameds.Add(p)
 				} else {
 					switch s.Name.Name {
 					case "_":
 					case ".":
-					// TODO
+					// TODO: import . "package"
 					//r.DotImp = append(r.DotImp, p)
 					default:
 
-						t := NewTypeImport(s.Name.Name, path, r.importer)
+						t := newTypeImport(s.Name.Name, path, r.importer)
 						r.Nameds.Add(t)
 					}
 				}
@@ -102,9 +102,9 @@ func (r *Parser) ParserDecl(decl ast.Decl) {
 
 				tt := r.EvalType(s.Type)
 				if s.Assign == 0 {
-					tt = NewTypeNamed(s.Name.Name, tt, r)
+					tt = newTypeNamed(s.Name.Name, tt, r)
 				} else {
-					tt = NewTypeAlias(s.Name.Name, tt)
+					tt = newTypeAlias(s.Name.Name, tt)
 				}
 				r.Nameds.Add(tt)
 			}
@@ -113,7 +113,7 @@ func (r *Parser) ParserDecl(decl ast.Decl) {
 }
 
 // ParserValue 解析
-func (r *Parser) ParserValue(decl *ast.GenDecl) {
+func (r *astParser) ParserValue(decl *ast.GenDecl) {
 	var prev, val Type
 	for _, spec := range decl.Specs {
 		prev = val
@@ -130,16 +130,14 @@ func (r *Parser) ParserValue(decl *ast.GenDecl) {
 			}
 		} else {
 			// TODO: 还需要考虑多种情况
-
 			val = r.EvalType(s.Values[0])
-			//ffmt.P(s.Values)
 		}
 		for _, v := range s.Names {
 			if v.Name == "" || v.Name == "_" {
 				continue
 			}
 
-			t := NewTypeVar(v.Name, val)
+			t := newTypeVar(v.Name, val)
 			r.Nameds.Add(t)
 		}
 	}

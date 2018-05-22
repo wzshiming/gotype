@@ -1,26 +1,26 @@
 package gotype
 
-func NewTypeArray(v Type, l int) Type {
-	return &TypeArray{
+func newTypeArray(v Type, l int) Type {
+	return &typeArray{
 		val: v,
 		le:  l,
 	}
 }
 
-type TypeArray struct {
+type typeArray struct {
 	typeBase
 	le  int
 	val Type
 }
 
-func (t *TypeArray) Kind() Kind {
+func (t *typeArray) Kind() Kind {
 	return Array
 }
 
-func (t *TypeArray) Elem() Type {
+func (t *typeArray) Elem() Type {
 	return t.val
 }
 
-func (t *TypeArray) Len() int {
+func (t *typeArray) Len() int {
 	return t.le
 }

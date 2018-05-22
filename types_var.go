@@ -1,25 +1,25 @@
 package gotype
 
-func NewTypeVar(name string, typ Type) *TypeVar {
-	return &TypeVar{
+func newTypeVar(name string, typ Type) *typeVar {
+	return &typeVar{
 		name: name,
 		Type: typ,
 	}
 }
 
-type TypeVar struct {
+type typeVar struct {
 	Type
 	name string
 }
 
-func (t *TypeVar) Name() string {
+func (t *typeVar) Name() string {
 	return t.name
 }
 
-func (t *TypeVar) Kind() Kind {
+func (t *typeVar) Kind() Kind {
 	return Var
 }
 
-func (t *TypeVar) Elem() Type {
+func (t *typeVar) Elem() Type {
 	return t.Type
 }

@@ -1,17 +1,17 @@
 package gotype
 
-func NewTypeAlias(name string, typ Type) Type {
-	return &TypeAlias{
+func newTypeAlias(name string, typ Type) Type {
+	return &typeAlias{
 		name: name,
 		Type: typ,
 	}
 }
 
-type TypeAlias struct {
+type typeAlias struct {
 	name string
 	Type
 }
 
-func (t *TypeAlias) Name() string {
+func (t *typeAlias) Name() string {
 	return t.name
 }

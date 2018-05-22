@@ -1,25 +1,25 @@
 package gotype
 
-func NewTypeMap(k, v Type) Type {
-	return &TypeMap{
+func newTypeMap(k, v Type) Type {
+	return &typeMap{
 		key: k,
 		val: v,
 	}
 }
 
-type TypeMap struct {
+type typeMap struct {
 	typeBase
 	key, val Type
 }
 
-func (t *TypeMap) Kind() Kind {
+func (t *typeMap) Kind() Kind {
 	return Map
 }
 
-func (t *TypeMap) Key() Type {
+func (t *typeMap) Key() Type {
 	return t.key
 }
 
-func (t *TypeMap) Elem() Type {
+func (t *typeMap) Elem() Type {
 	return t.val
 }

@@ -1,13 +1,13 @@
 package gotype
 
-func (r *Parser) Search(name string) Type {
+func (r *astParser) Search(name string) Type {
 	return r.Nameds.Search(name)
 }
 
-func (r *Parser) Child(i int) Type {
+func (r *astParser) Child(i int) Type {
 	return r.Nameds.Index(i)
 }
 
-func (r *Parser) NumChild() int {
+func (r *astParser) NumChild() int {
 	return len(r.Nameds)
 }

@@ -1,20 +1,20 @@
 package gotype
 
-func NewTypeBuiltin(kind Kind) Type {
-	return &TypeBuiltin{
+func newTypeBuiltin(kind Kind) Type {
+	return &typeBuiltin{
 		kind: kind,
 	}
 }
 
-type TypeBuiltin struct {
+type typeBuiltin struct {
 	typeBase
 	kind Kind
 }
 
-func (t *TypeBuiltin) Name() string {
+func (t *typeBuiltin) Name() string {
 	return t.kind.String()
 }
 
-func (t *TypeBuiltin) Kind() Kind {
+func (t *typeBuiltin) Kind() Kind {
 	return t.kind
 }

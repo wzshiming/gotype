@@ -4,25 +4,25 @@ import (
 	"reflect"
 )
 
-type TypeStructField struct {
+type typeStructField struct {
 	typeBase
 	name string
 	typ  Type              // 字段类型
 	tag  reflect.StructTag // 字段标签
 }
 
-func (t *TypeStructField) Name() string {
+func (t *typeStructField) Name() string {
 	return t.name
 }
 
-func (t *TypeStructField) Elem() Type {
+func (t *typeStructField) Elem() Type {
 	return t.typ
 }
 
-func (t *TypeStructField) Kind() Kind {
+func (t *typeStructField) Kind() Kind {
 	return Field
 }
 
-func (t *TypeStructField) Tag() reflect.StructTag {
+func (t *typeStructField) Tag() reflect.StructTag {
 	return t.tag
 }

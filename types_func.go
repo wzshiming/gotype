@@ -1,27 +1,27 @@
 package gotype
 
-type TypeFunc struct {
+type typeFunc struct {
 	typeBase
 	params  Types
 	results Types
 }
 
-func (t *TypeFunc) Kind() Kind {
+func (t *typeFunc) Kind() Kind {
 	return Func
 }
 
-func (t *TypeFunc) NumOut() int {
+func (t *typeFunc) NumOut() int {
 	return t.results.Len()
 }
 
-func (t *TypeFunc) Out(i int) Type {
+func (t *typeFunc) Out(i int) Type {
 	return t.results.Index(i)
 }
 
-func (t *TypeFunc) NumIn() int {
+func (t *typeFunc) NumIn() int {
 	return t.params.Len()
 }
 
-func (t *TypeFunc) In(i int) Type {
+func (t *typeFunc) In(i int) Type {
 	return t.params.Index(i)
 }
