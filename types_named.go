@@ -26,7 +26,7 @@ func (t *TypeNamed) Name() string {
 }
 
 func (t *TypeNamed) Kind() Kind {
-	return Named
+	return t.ToChild().Kind()
 }
 
 func (t *TypeNamed) Key() Type {

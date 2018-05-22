@@ -10,10 +10,8 @@ type Parser struct {
 	importer *Importer
 	DotImp   Types            // 尝试用点导入的包
 	Imports  Types            // 导入的包
-	Values   Types            // 变量
-	Funcs    Types            // 函数
 	Method   map[string]Types // 方法
-	Types    Types            // 类型
+	Nameds   Types            // 变量 函数 类型
 }
 
 // NewParser
@@ -21,10 +19,8 @@ func NewParser(i *Importer) *Parser {
 	r := &Parser{
 		importer: i,
 		Imports:  Types{},
-		Values:   Types{},
-		Funcs:    Types{},
 		Method:   map[string]Types{},
-		Types:    Types{},
+		Nameds:   Types{},
 	}
 	return r
 }
@@ -62,7 +58,7 @@ func (r *Parser) ParserDecl(decl ast.Decl) {
 		}
 
 		t := NewTypeNamed(d.Name.Name, f, r)
-		r.Funcs.Add(t)
+		r.Nameds.Add(t)
 		return
 	case *ast.GenDecl:
 		switch d.Tok {
@@ -112,7 +108,7 @@ func (r *Parser) ParserDecl(decl ast.Decl) {
 				} else {
 					tt = NewTypeAlias(s.Name.Name, tt)
 				}
-				r.Types.Add(tt)
+				r.Nameds.Add(tt)
 			}
 		}
 	}
@@ -146,7 +142,7 @@ func (r *Parser) ParserValue(decl *ast.GenDecl) {
 			}
 
 			t := NewTypeVar(v.Name, val)
-			r.Values.Add(t)
+			r.Nameds.Add(t)
 		}
 	}
 }
