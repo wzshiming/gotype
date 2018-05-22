@@ -77,7 +77,12 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 
 		b := r.EvalType(t.Fun)
 		if b.Kind() == Func {
-			return b.Out(0)
+			l := b.NumOut()
+			ts := make(Types, 0, l)
+			for i := 0; i != l; i++ {
+				ts = append(ts, b.Out(i))
+			}
+			return newTypeTuple(ts)
 		}
 		return b
 	case *ast.StarExpr:

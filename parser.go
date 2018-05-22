@@ -135,8 +135,22 @@ func (r *astParser) ParserValue(decl *ast.GenDecl) {
 				val = prev
 			}
 		} else {
-			// TODO: 还需要考虑多种情况
 			val = r.EvalType(s.Values[0])
+			if tup, ok := val.(*typeTuple); ok {
+
+				l := tup.all.Len()
+				for i, v := range s.Names {
+					if v.Name == "" || v.Name == "_" {
+						continue
+					}
+					if i == l {
+						break
+					}
+					t := newTypeVar(v.Name, tup.all.Index(i))
+					r.nameds.Add(t)
+				}
+				continue
+			}
 		}
 		if val == nil {
 			continue
