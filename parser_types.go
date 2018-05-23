@@ -59,6 +59,9 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 		}
 
 		b := r.EvalType(t.Fun)
+		for b.Kind() == Var {
+			b = b.Elem()
+		}
 		if b.Kind() == Func {
 			l := b.NumOut()
 			ts := make(Types, 0, l)
