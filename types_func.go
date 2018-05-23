@@ -16,25 +16,28 @@ func (t *typeFunc) String() string {
 		if i != 0 {
 			buf.WriteString(", ")
 		}
+		if t.variadic && i+1 == len(t.results) {
+			if d, ok := v.(*typeVar); ok {
+				if d0, ok := d.typ.(*typeSlice); ok {
+					buf.WriteString(d.name)
+					buf.WriteString(" ...")
+					buf.WriteString(d0.val.String())
+					continue
+				}
+			}
+		}
 		buf.WriteString(v.String())
-	}
-	buf.WriteString(")")
 
-	if len(t.results) > 1 {
-		buf.WriteString(" (")
 	}
+	buf.WriteString(") (")
+
 	for i, v := range t.results {
 		if i != 0 {
 			buf.WriteString(", ")
 		}
-		if t.variadic && i+1 == len(t.results) {
-			buf.WriteString("...")
-		}
 		buf.WriteString(v.String())
 	}
-	if len(t.results) > 1 {
-		buf.WriteString(")")
-	}
+	buf.WriteString(")")
 	return buf.String()
 }
 
