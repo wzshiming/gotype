@@ -31,6 +31,14 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 		return r.EvalType(t.X)
 	case *ast.SelectorExpr:
 		s := r.EvalType(t.X)
+		for {
+			k := s.Kind()
+			if k != Var && k != Ptr {
+				break
+			}
+			s = s.Elem()
+
+		}
 		name := t.Sel.Name
 
 		if s == nil {

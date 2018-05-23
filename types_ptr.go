@@ -2,12 +2,13 @@ package gotype
 
 func newTypePtr(elem Type) Type {
 	return &typePtr{
-		Type: elem,
+		typ: elem,
 	}
 }
 
 type typePtr struct {
-	Type
+	typeBase
+	typ Type
 }
 
 func (y *typePtr) Kind() Kind {
@@ -15,5 +16,5 @@ func (y *typePtr) Kind() Kind {
 }
 
 func (t *typePtr) Elem() Type {
-	return t.Type
+	return t.typ
 }

@@ -5,17 +5,18 @@ func newTypeVar(name string, typ Type) *typeVar {
 	if ok {
 		return &typeVar{
 			name: name,
-			Type: v.Type,
+			typ:  v.typ,
 		}
 	}
 	return &typeVar{
 		name: name,
-		Type: typ,
+		typ:  typ,
 	}
 }
 
 type typeVar struct {
-	Type
+	typeBase
+	typ  Type
 	name string
 }
 
@@ -28,5 +29,5 @@ func (t *typeVar) Kind() Kind {
 }
 
 func (t *typeVar) Elem() Type {
-	return t.Type
+	return t.typ
 }
