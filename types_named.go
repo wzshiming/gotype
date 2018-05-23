@@ -113,6 +113,14 @@ func (t *typeNamed) In(i int) Type {
 	return child.In(i)
 }
 
+func (t *typeNamed) IsVariadic() bool {
+	child := t.ToChild()
+	if child == nil {
+		return false
+	}
+	return child.IsVariadic()
+}
+
 func (t *typeNamed) NumMethods() int {
 	if t.parser == nil {
 		return 0

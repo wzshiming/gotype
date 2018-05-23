@@ -148,6 +148,9 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 		s := &typeFunc{}
 		if t.Params != nil {
 			for _, v := range t.Params.List {
+				if _, ok := v.Type.(*ast.Ellipsis); ok {
+					s.variadic = true
+				}
 				ty := r.EvalType(v.Type)
 				if ty == nil {
 					continue

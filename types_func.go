@@ -2,8 +2,9 @@ package gotype
 
 type typeFunc struct {
 	typeBase
-	params  Types
-	results Types
+	variadic bool
+	params   Types
+	results  Types
 }
 
 func (t *typeFunc) Kind() Kind {
@@ -24,4 +25,8 @@ func (t *typeFunc) NumIn() int {
 
 func (t *typeFunc) In(i int) Type {
 	return t.params.Index(i)
+}
+
+func (t *typeFunc) IsVariadic() bool {
+	return t.variadic
 }

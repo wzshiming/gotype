@@ -17,6 +17,7 @@ type Type interface {
 	NumOut() int               // func
 	In(int) Type               // func
 	NumIn() int                // func
+	IsVariadic() bool          // func
 	Field(int) Type            // struct
 	FieldByName(string) Type   // struct
 	NumField() int             // struct
@@ -109,6 +110,7 @@ func (t *typeBase) Out(int) Type              { return nil }
 func (t *typeBase) NumOut() int               { return 0 }
 func (t *typeBase) In(int) Type               { return nil }
 func (t *typeBase) NumIn() int                { return 0 }
+func (t *typeBase) IsVariadic() bool          { return false }
 func (t *typeBase) Field(int) Type            { return nil }
 func (t *typeBase) FieldByName(string) Type   { return nil }
 func (t *typeBase) NumField() int             { return 0 }
