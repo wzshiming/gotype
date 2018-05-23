@@ -18,33 +18,33 @@ func (t *typeStruct) Field(i int) Type {
 	return t.fields.Index(i)
 }
 
-func (t *typeStruct) FieldByName(name string) Type {
-	b := t.fields.Search(name)
-	if b != nil {
-		return b
+func (t *typeStruct) FieldByName(name string) (Type, bool) {
+	b, ok := t.fields.Search(name)
+	if ok {
+		return b, true
 	}
-	b = t.anonymo.Search(name)
-	if b != nil {
-		return b
+	b, ok = t.anonymo.Search(name)
+	if ok {
+		return b, true
 	}
 
 	for _, v := range t.anonymo {
-		b = v.FieldByName(name)
-		if b != nil {
-			return b
+		b, ok = v.FieldByName(name)
+		if ok {
+			return b, true
 		}
 	}
-	return nil
+	return nil, false
 }
 
-func (t *typeStruct) MethodsByName(name string) Type {
+func (t *typeStruct) MethodsByName(name string) (Type, bool) {
 	for _, v := range t.anonymo {
-		b := v.MethodsByName(name)
-		if b != nil {
-			return b
+		b, ok := v.MethodsByName(name)
+		if ok {
+			return b, true
 		}
 	}
-	return nil
+	return nil, false
 }
 
 func (t *typeStruct) NumAnonymo() int {
@@ -55,6 +55,6 @@ func (t *typeStruct) Anonymo(i int) Type {
 	return t.anonymo.Index(i)
 }
 
-func (t *typeStruct) AnonymoByName(name string) Type {
+func (t *typeStruct) AnonymoByName(name string) (Type, bool) {
 	return t.anonymo.Search(name)
 }

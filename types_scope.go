@@ -13,7 +13,7 @@ type typeScope struct {
 	parser *astParser
 }
 
-func (t *typeScope) ChildByName(name string) Type {
+func (t *typeScope) ChildByName(name string) (Type, bool) {
 	return t.parser.nameds.Search(name)
 }
 

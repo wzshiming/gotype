@@ -85,7 +85,7 @@ type Type interface {
 
 	// FieldByName returns the struct field with the given name
 	// and a boolean indicating if the field was found.
-	FieldByName(string) Type
+	FieldByName(string) (Type, bool)
 
 	// NumField returns a struct type's field count.
 	// Not contain anonymo
@@ -111,7 +111,7 @@ type Type interface {
 	//
 	// For an interface type, the returned Method's Type field gives the
 	// method signature, without a receiver, and the Func field is nil.
-	MethodsByName(string) Type
+	MethodsByName(string) (Type, bool)
 
 	// NumMethod returns the number of exported methods in the type's method set.
 	// Not contain anonymo
@@ -124,7 +124,7 @@ type Type interface {
 
 	// ChildByName returns the scope with the given name
 	// and a boolean indicating if the field was found.
-	ChildByName(string) Type
+	ChildByName(string) (Type, bool)
 
 	// NumChild returns a scope type's field count.
 	// It panics if the type's Kind is not Scope.
@@ -137,7 +137,7 @@ type Type interface {
 
 	// AnonymoByName returns the anonymo type with the given name
 	// and a boolean indicating if the field was found.
-	AnonymoByName(string) Type
+	AnonymoByName(string) (Type, bool)
 
 	// NumChild returns a anonymo type's field count.
 	// It panics if the type's Kind is not Interface or Struct.
@@ -175,16 +175,16 @@ func (t *Types) AddNoRepeat(n Type) {
 	return
 }
 
-func (t *Types) Search(name string) Type {
+func (t *Types) Search(name string) (Type, bool) {
 	i := t.SearchIndex(name)
 	if i == 0 {
-		return nil
+		return nil, false
 	}
 	tt := t.Index(i - 1)
 	if tt == nil || tt.Name() != name {
-		return nil
+		return nil, false
 	}
-	return tt
+	return tt, true
 }
 
 func (t *Types) SearchIndex(name string) int {
@@ -211,27 +211,27 @@ func (t *Types) Len() int {
 
 type typeBase struct{}
 
-func (t *typeBase) Name() string              { return "" }
-func (t *typeBase) Kind() Kind                { return Invalid }
-func (t *typeBase) Key() Type                 { return nil }
-func (t *typeBase) Elem() Type                { return nil }
-func (t *typeBase) Tag() reflect.StructTag    { return reflect.StructTag("") }
-func (t *typeBase) Len() int                  { return 0 }
-func (t *typeBase) ChanDir() ChanDir          { return 0 }
-func (t *typeBase) Out(int) Type              { return nil }
-func (t *typeBase) NumOut() int               { return 0 }
-func (t *typeBase) In(int) Type               { return nil }
-func (t *typeBase) NumIn() int                { return 0 }
-func (t *typeBase) IsVariadic() bool          { return false }
-func (t *typeBase) Field(int) Type            { return nil }
-func (t *typeBase) FieldByName(string) Type   { return nil }
-func (t *typeBase) NumField() int             { return 0 }
-func (t *typeBase) Methods(int) Type          { return nil }
-func (t *typeBase) MethodsByName(string) Type { return nil }
-func (t *typeBase) NumMethods() int           { return 0 }
-func (t *typeBase) Child(int) Type            { return nil }
-func (t *typeBase) ChildByName(string) Type   { return nil }
-func (t *typeBase) NumChild() int             { return 0 }
-func (t *typeBase) Anonymo(int) Type          { return nil }
-func (t *typeBase) AnonymoByName(string) Type { return nil }
-func (t *typeBase) NumAnonymo() int           { return 0 }
+func (t *typeBase) Name() string                      { return "" }
+func (t *typeBase) Kind() Kind                        { return Invalid }
+func (t *typeBase) Key() Type                         { return nil }
+func (t *typeBase) Elem() Type                        { return nil }
+func (t *typeBase) Tag() reflect.StructTag            { return reflect.StructTag("") }
+func (t *typeBase) Len() int                          { return 0 }
+func (t *typeBase) ChanDir() ChanDir                  { return 0 }
+func (t *typeBase) Out(int) Type                      { return nil }
+func (t *typeBase) NumOut() int                       { return 0 }
+func (t *typeBase) In(int) Type                       { return nil }
+func (t *typeBase) NumIn() int                        { return 0 }
+func (t *typeBase) IsVariadic() bool                  { return false }
+func (t *typeBase) Field(int) Type                    { return nil }
+func (t *typeBase) FieldByName(string) (Type, bool)   { return nil, false }
+func (t *typeBase) NumField() int                     { return 0 }
+func (t *typeBase) Methods(int) Type                  { return nil }
+func (t *typeBase) MethodsByName(string) (Type, bool) { return nil, false }
+func (t *typeBase) NumMethods() int                   { return 0 }
+func (t *typeBase) Child(int) Type                    { return nil }
+func (t *typeBase) ChildByName(string) (Type, bool)   { return nil, false }
+func (t *typeBase) NumChild() int                     { return 0 }
+func (t *typeBase) Anonymo(int) Type                  { return nil }
+func (t *typeBase) AnonymoByName(string) (Type, bool) { return nil, false }
+func (t *typeBase) NumAnonymo() int                   { return 0 }

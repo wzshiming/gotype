@@ -45,16 +45,16 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 			return nil
 		}
 
-		b := s.ChildByName(name)
-		if b != nil {
+		b, ok := s.ChildByName(name)
+		if ok {
 			return b
 		}
-		b = s.MethodsByName(name)
-		if b != nil {
+		b, ok = s.MethodsByName(name)
+		if ok {
 			return b
 		}
-		b = s.FieldByName(name)
-		if b != nil {
+		b, ok = s.FieldByName(name)
+		if ok {
 			return b
 		}
 		return nil

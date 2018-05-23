@@ -18,18 +18,18 @@ func (t *typeInterface) Methods(i int) Type {
 	return t.methods.Index(i)
 }
 
-func (t *typeInterface) MethodsByName(name string) Type {
-	b := t.methods.Search(name)
-	if b != nil {
-		return b
+func (t *typeInterface) MethodsByName(name string) (Type, bool) {
+	b, ok := t.methods.Search(name)
+	if ok {
+		return b, true
 	}
 	for _, v := range t.anonymo {
-		b = v.MethodsByName(name)
-		if b != nil {
-			return b
+		b, ok := v.MethodsByName(name)
+		if ok {
+			return b, true
 		}
 	}
-	return nil
+	return nil, false
 }
 
 func (t *typeInterface) NumAnonymo() int {
@@ -40,6 +40,6 @@ func (t *typeInterface) Anonymo(i int) Type {
 	return t.anonymo.Index(i)
 }
 
-func (t *typeInterface) AnonymoByName(name string) Type {
+func (t *typeInterface) AnonymoByName(name string) (Type, bool) {
 	return t.anonymo.Search(name)
 }

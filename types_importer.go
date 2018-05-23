@@ -39,10 +39,10 @@ func (t *typeImport) Kind() Kind {
 	return Scope
 }
 
-func (t *typeImport) ChildByName(name string) Type {
+func (t *typeImport) ChildByName(name string) (Type, bool) {
 	t.check()
 	if t.scope == nil {
-		return nil
+		return nil, false
 	}
 	return t.scope.ChildByName(name)
 }

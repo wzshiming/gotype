@@ -14,11 +14,13 @@ type typeNamed struct {
 	Type
 }
 
-func (t *typeNamed) ToChild() Type {
+func (t *typeNamed) ToChild() (Type, bool) {
 	if t.Type == nil {
-		t.Type = t.parser.nameds.Search(t.Name())
+		var ok bool
+		t.Type, ok = t.parser.nameds.Search(t.Name())
+		return t.Type, ok
 	}
-	return t.Type
+	return t.Type, true
 }
 
 func (t *typeNamed) Name() string {
@@ -26,96 +28,96 @@ func (t *typeNamed) Name() string {
 }
 
 func (t *typeNamed) Kind() Kind {
-	child := t.ToChild()
-	if child == nil {
+	child, ok := t.ToChild()
+	if !ok {
 		return Invalid
 	}
 	return child.Kind()
 }
 
 func (t *typeNamed) Key() Type {
-	child := t.ToChild()
-	if child == nil {
+	child, ok := t.ToChild()
+	if !ok {
 		return nil
 	}
 	return child.Key()
 }
 
 func (t *typeNamed) Elem() Type {
-	child := t.ToChild()
-	if child == nil {
+	child, ok := t.ToChild()
+	if !ok {
 		return nil
 	}
 	return child.Elem()
 }
 
 func (t *typeNamed) NumField() int {
-	child := t.ToChild()
-	if child == nil {
+	child, ok := t.ToChild()
+	if !ok {
 		return 0
 	}
 	return child.NumField()
 }
 
 func (t *typeNamed) Field(i int) Type {
-	child := t.ToChild()
-	if child == nil {
+	child, ok := t.ToChild()
+	if !ok {
 		return nil
 	}
 	return child.Field(i)
 }
 
-func (t *typeNamed) FieldByName(name string) Type {
-	child := t.ToChild()
-	if child == nil {
-		return nil
+func (t *typeNamed) FieldByName(name string) (Type, bool) {
+	child, ok := t.ToChild()
+	if !ok {
+		return nil, false
 	}
 	return child.FieldByName(name)
 }
 
 func (t *typeNamed) Len() int {
-	child := t.ToChild()
-	if child == nil {
+	child, ok := t.ToChild()
+	if !ok {
 		return 0
 	}
 	return child.Len()
 }
 
 func (t *typeNamed) NumOut() int {
-	child := t.ToChild()
-	if child == nil {
+	child, ok := t.ToChild()
+	if !ok {
 		return 0
 	}
 	return child.NumOut()
 }
 
 func (t *typeNamed) Out(i int) Type {
-	child := t.ToChild()
-	if child == nil {
+	child, ok := t.ToChild()
+	if !ok {
 		return nil
 	}
 	return child.Out(i)
 }
 
 func (t *typeNamed) NumIn() int {
-	child := t.ToChild()
-	if child == nil {
+	child, ok := t.ToChild()
+	if !ok {
 		return 0
 	}
 	return child.NumIn()
 }
 
 func (t *typeNamed) In(i int) Type {
-	child := t.ToChild()
-	if child == nil {
+	child, ok := t.ToChild()
+	if !ok {
 		return nil
 	}
 	return child.In(i)
 }
 
 func (t *typeNamed) IsVariadic() bool {
-	child := t.ToChild()
-	if child == nil {
+	child, ok := t.ToChild()
+	if !ok {
 		return false
 	}
 	return child.IsVariadic()
@@ -140,65 +142,65 @@ func (t *typeNamed) Methods(i int) Type {
 	return b.Index(i)
 }
 
-func (t *typeNamed) MethodsByName(name string) Type {
+func (t *typeNamed) MethodsByName(name string) (Type, bool) {
 	if t.parser == nil {
-		return nil
+		return nil, false
 	}
 	b := t.parser.method[t.Name()]
-	m := b.Search(name)
-	if m != nil {
-		return m
+	m, ok := b.Search(name)
+	if ok {
+		return m, true
 	}
-	child := t.ToChild()
-	if child == nil {
-		return nil
+	child, ok := t.ToChild()
+	if ok {
+		return child.MethodsByName(name)
 	}
-	return child.MethodsByName(name)
+	return nil, false
 }
 
 func (t *typeNamed) Child(i int) Type {
-	child := t.ToChild()
-	if child == nil {
+	child, ok := t.ToChild()
+	if !ok {
 		return nil
 	}
 	return child.Child(i)
 }
 
-func (t *typeNamed) ChildByName(name string) Type {
-	child := t.ToChild()
-	if child == nil {
-		return nil
+func (t *typeNamed) ChildByName(name string) (Type, bool) {
+	child, ok := t.ToChild()
+	if !ok {
+		return nil, false
 	}
 	return child.ChildByName(name)
 }
 
 func (t *typeNamed) NumChild() int {
-	child := t.ToChild()
-	if child == nil {
+	child, ok := t.ToChild()
+	if !ok {
 		return 0
 	}
 	return child.NumChild()
 }
 
 func (t *typeNamed) Anonymo(i int) Type {
-	child := t.ToChild()
-	if child == nil {
+	child, ok := t.ToChild()
+	if !ok {
 		return nil
 	}
 	return child.Anonymo(i)
 }
 
-func (t *typeNamed) AnonymoByName(name string) Type {
-	child := t.ToChild()
-	if child == nil {
-		return nil
+func (t *typeNamed) AnonymoByName(name string) (Type, bool) {
+	child, ok := t.ToChild()
+	if !ok {
+		return nil, false
 	}
 	return child.AnonymoByName(name)
 }
 
 func (t *typeNamed) NumAnonymo() int {
-	child := t.ToChild()
-	if child == nil {
+	child, ok := t.ToChild()
+	if !ok {
 		return 0
 	}
 	return child.NumAnonymo()
