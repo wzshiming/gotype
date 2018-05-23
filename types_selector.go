@@ -1,6 +1,16 @@
 package gotype
 
-import "reflect"
+import (
+	"fmt"
+	"reflect"
+)
+
+func newSelector(x Type, sel string) *typeSelector {
+	return &typeSelector{
+		x:   x,
+		sel: sel,
+	}
+}
 
 type typeSelector struct {
 	x   Type
@@ -9,20 +19,30 @@ type typeSelector struct {
 }
 
 func (t *typeSelector) ToChild() (Type, bool) {
-	if t.typ == nil {
-		s := t.x
-		name := t.sel
+	if t.typ != nil {
+		return t.typ, true
+	}
+	s := t.x
+	for {
+		k := s.Kind()
+		if k != Var && k != Ptr {
+			break
+		}
+		s = s.Elem()
+	}
+	name := t.sel
 
-		b, ok := s.ChildByName(name)
-		if ok {
-			t.typ = b
-			return b, true
-		}
-		b, ok = s.MethodsByName(name)
-		if ok {
-			t.typ = b
-			return b, true
-		}
+	b, ok := s.ChildByName(name)
+	if ok {
+		t.typ = b
+		return b, true
+	}
+	b, ok = s.MethodsByName(name)
+	if ok {
+		t.typ = b
+		return b, true
+	}
+	if s.Kind() == Struct {
 		b, ok = s.FieldByName(name)
 		if ok {
 			t.typ = b
@@ -30,6 +50,10 @@ func (t *typeSelector) ToChild() (Type, bool) {
 		}
 	}
 	return nil, false
+}
+
+func (t *typeSelector) String() string {
+	return fmt.Sprintf("%v.%v", t.x, t.sel)
 }
 
 func (t *typeSelector) Name() string {

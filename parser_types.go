@@ -31,33 +31,8 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 		return r.EvalType(t.X)
 	case *ast.SelectorExpr:
 		s := r.EvalType(t.X)
-		for {
-			k := s.Kind()
-			if k != Var && k != Ptr {
-				break
-			}
-			s = s.Elem()
-
-		}
 		name := t.Sel.Name
-
-		if s == nil {
-			return nil
-		}
-
-		b, ok := s.ChildByName(name)
-		if ok {
-			return b
-		}
-		b, ok = s.MethodsByName(name)
-		if ok {
-			return b
-		}
-		b, ok = s.FieldByName(name)
-		if ok {
-			return b
-		}
-		return nil
+		return newSelector(s, name)
 	case *ast.IndexExpr:
 		return r.EvalType(t.X).Elem()
 	case *ast.SliceExpr:
@@ -203,7 +178,7 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 			}
 
 			for _, name := range v.Names {
-				t := newTypeNamed(name.Name, ty, r)
+				t := newTypeVar(name.Name, ty)
 				s.methods.Add(t)
 			}
 		}
