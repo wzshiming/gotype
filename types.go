@@ -118,7 +118,6 @@ type Type interface {
 	NumMethods() int
 
 	// Field returns a scope type's i'th field.
-	// It panics if the type's Kind is not Scope.
 	// It panics if i is not in the range [0, NumChild()).
 	Child(int) Type
 
@@ -127,7 +126,6 @@ type Type interface {
 	ChildByName(string) (Type, bool)
 
 	// NumChild returns a scope type's field count.
-	// It panics if the type's Kind is not Scope.
 	NumChild() int
 
 	// Anonymo returns the i'th type in the type's anonymo set.
@@ -211,27 +209,116 @@ func (t *Types) Len() int {
 
 type typeBase struct{}
 
-func (t *typeBase) Name() string                      { return "" }
-func (t *typeBase) Kind() Kind                        { return Invalid }
-func (t *typeBase) Key() Type                         { return nil }
-func (t *typeBase) Elem() Type                        { return nil }
-func (t *typeBase) Tag() reflect.StructTag            { return reflect.StructTag("") }
-func (t *typeBase) Len() int                          { return 0 }
-func (t *typeBase) ChanDir() ChanDir                  { return 0 }
-func (t *typeBase) Out(int) Type                      { return nil }
-func (t *typeBase) NumOut() int                       { return 0 }
-func (t *typeBase) In(int) Type                       { return nil }
-func (t *typeBase) NumIn() int                        { return 0 }
-func (t *typeBase) IsVariadic() bool                  { return false }
-func (t *typeBase) Field(int) Type                    { return nil }
-func (t *typeBase) FieldByName(string) (Type, bool)   { return nil, false }
-func (t *typeBase) NumField() int                     { return 0 }
-func (t *typeBase) Methods(int) Type                  { return nil }
-func (t *typeBase) MethodsByName(string) (Type, bool) { return nil, false }
-func (t *typeBase) NumMethods() int                   { return 0 }
-func (t *typeBase) Child(int) Type                    { return nil }
-func (t *typeBase) ChildByName(string) (Type, bool)   { return nil, false }
-func (t *typeBase) NumChild() int                     { return 0 }
-func (t *typeBase) Anonymo(int) Type                  { return nil }
-func (t *typeBase) AnonymoByName(string) (Type, bool) { return nil, false }
-func (t *typeBase) NumAnonymo() int                   { return 0 }
+func (t *typeBase) Name() string {
+	return ""
+}
+
+func (t *typeBase) Kind() Kind {
+	return Invalid
+}
+
+func (t *typeBase) Key() Type {
+	panic("Key of non-map type")
+	return nil
+}
+
+func (t *typeBase) Elem() Type {
+	panic("Elem of invalid type")
+	return nil
+}
+
+func (t *typeBase) Tag() reflect.StructTag {
+	panic("Tag of non-field type")
+	return reflect.StructTag("")
+}
+
+func (t *typeBase) Len() int {
+	panic("Len of non-array type")
+	return 0
+}
+
+func (t *typeBase) ChanDir() ChanDir {
+	panic("ChanDir of non-chan type")
+	return 0
+}
+
+func (t *typeBase) Out(int) Type {
+	panic("Out of non-func type")
+	return nil
+}
+
+func (t *typeBase) NumOut() int {
+	panic("NumOut of non-func type")
+	return 0
+}
+
+func (t *typeBase) In(int) Type {
+	panic("In of non-func type")
+	return nil
+}
+
+func (t *typeBase) NumIn() int {
+	panic("NumIn of non-func type")
+	return 0
+}
+
+func (t *typeBase) IsVariadic() bool {
+	panic("IsVariadic of non-func type")
+	return false
+}
+func (t *typeBase) Field(int) Type {
+	panic("Field of non-struct type")
+	return nil
+}
+func (t *typeBase) FieldByName(string) (Type, bool) {
+	panic("FieldByName of non-struct type")
+	return nil, false
+}
+func (t *typeBase) NumField() int {
+	panic("NumField of non-struct type")
+	return 0
+}
+func (t *typeBase) Methods(int) Type {
+	//panic("Methods of invalid type")
+	return nil
+}
+
+func (t *typeBase) MethodsByName(string) (Type, bool) {
+	//panic("MethodsByName of invalid type")
+	return nil, false
+}
+
+func (t *typeBase) NumMethods() int {
+	//panic("NumMethods of invalid type")
+	return 0
+}
+
+func (t *typeBase) Child(int) Type {
+	//panic("Child of invalid type")
+	return nil
+}
+
+func (t *typeBase) ChildByName(string) (Type, bool) {
+	//panic("ChildByName of invalid type")
+	return nil, false
+}
+
+func (t *typeBase) NumChild() int {
+	//panic("NumChild of invalid type")
+	return 0
+}
+
+func (t *typeBase) Anonymo(int) Type {
+	panic("Anonymo of invalid type")
+	return nil
+}
+
+func (t *typeBase) AnonymoByName(string) (Type, bool) {
+	panic("AnonymoByName of invalid type")
+	return nil, false
+}
+
+func (t *typeBase) NumAnonymo() int {
+	panic("NumAnonymo of invalid type")
+	return 0
+}
