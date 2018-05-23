@@ -1,9 +1,29 @@
 package gotype
 
+import "bytes"
+
 type typeInterface struct {
 	typeBase
 	methods Types // 这个类型的方法集合
 	anonymo Types // 组合的接口
+}
+
+func (t *typeInterface) String() string {
+	buf := bytes.NewBuffer(nil)
+	buf.WriteString("interface {")
+	if len(t.anonymo)+len(t.methods) != 0 {
+		buf.WriteByte('\n')
+	}
+	for _, v := range t.anonymo {
+		buf.WriteString(v.String())
+		buf.WriteByte('\n')
+	}
+	for _, v := range t.methods {
+		buf.WriteString(v.String())
+		buf.WriteByte('\n')
+	}
+	buf.WriteString("}\n")
+	return buf.String()
 }
 
 func (t *typeInterface) Kind() Kind {

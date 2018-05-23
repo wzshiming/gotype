@@ -1,9 +1,31 @@
 package gotype
 
+import (
+	"bytes"
+)
+
 type typeStruct struct {
 	typeBase
 	fields  Types // 字段
 	anonymo Types // 组合的类型
+}
+
+func (t *typeStruct) String() string {
+	buf := bytes.NewBuffer(nil)
+	buf.WriteString("struct {")
+	if len(t.anonymo)+len(t.fields) != 0 {
+		buf.WriteByte('\n')
+	}
+	for _, v := range t.anonymo {
+		buf.WriteString(v.String())
+		buf.WriteByte('\n')
+	}
+	for _, v := range t.fields {
+		buf.WriteString(v.String())
+		buf.WriteByte('\n')
+	}
+	buf.WriteString("}\n")
+	return buf.String()
 }
 
 func (t *typeStruct) Kind() Kind {

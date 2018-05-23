@@ -1,9 +1,13 @@
 package gotype
 
+import (
+	"reflect"
+)
+
 func newTypeNamed(name string, typ Type, parser *astParser) Type {
 	return &typeNamed{
 		name:   name,
-		Type:   typ,
+		typ:    typ,
 		parser: parser,
 	}
 }
@@ -11,19 +15,23 @@ func newTypeNamed(name string, typ Type, parser *astParser) Type {
 type typeNamed struct {
 	name   string
 	parser *astParser
-	Type
+	typ    Type
 }
 
 func (t *typeNamed) ToChild() (Type, bool) {
-	if t.Type == nil {
+	if t.typ == nil {
 		var ok bool
-		t.Type, ok = t.parser.nameds.Search(t.Name())
-		return t.Type, ok
+		t.typ, ok = t.parser.nameds.Search(t.Name())
+		return t.typ, ok
 	}
-	return t.Type, true
+	return t.typ, true
 }
 
 func (t *typeNamed) Name() string {
+	return t.name
+}
+
+func (t *typeNamed) String() string {
 	return t.name
 }
 
@@ -75,12 +83,28 @@ func (t *typeNamed) FieldByName(name string) (Type, bool) {
 	return child.FieldByName(name)
 }
 
+func (t *typeNamed) Tag() reflect.StructTag {
+	child, ok := t.ToChild()
+	if !ok {
+		return ""
+	}
+	return child.Tag()
+}
+
 func (t *typeNamed) Len() int {
 	child, ok := t.ToChild()
 	if !ok {
 		return 0
 	}
 	return child.Len()
+}
+
+func (t *typeNamed) ChanDir() ChanDir {
+	child, ok := t.ToChild()
+	if !ok {
+		return 0
+	}
+	return child.ChanDir()
 }
 
 func (t *typeNamed) NumOut() int {

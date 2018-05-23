@@ -20,6 +20,10 @@ type typeVar struct {
 	name string
 }
 
+func (t *typeVar) String() string {
+	return t.name
+}
+
 func (t *typeVar) Name() string {
 	return t.name
 }

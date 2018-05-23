@@ -1,5 +1,7 @@
 package gotype
 
+import "fmt"
+
 func newTypePtr(elem Type) Type {
 	return &typePtr{
 		typ: elem,
@@ -9,6 +11,10 @@ func newTypePtr(elem Type) Type {
 type typePtr struct {
 	typeBase
 	typ Type
+}
+
+func (t *typePtr) String() string {
+	return fmt.Sprintf("*%v", t.typ)
 }
 
 func (y *typePtr) Kind() Kind {

@@ -18,6 +18,13 @@ import (
 // Two Type values are equal if they represent identical types.
 type Type interface {
 
+	// String returns a string representation of the type.
+	// The string representation may use shortened package names
+	// (e.g., base64 instead of "encoding/base64") and is not
+	// guaranteed to be unique among types. To test for type identity,
+	// compare the Types directly.
+	String() string
+
 	// Name returns the type's name within its package.
 	// It returns an empty string for unnamed types.
 	Name() string
@@ -229,7 +236,7 @@ func (t *typeBase) Elem() Type {
 
 func (t *typeBase) Tag() reflect.StructTag {
 	panic("Tag of non-field type")
-	return reflect.StructTag("")
+	return ""
 }
 
 func (t *typeBase) Len() int {

@@ -27,6 +27,10 @@ func (t *typeImport) check() {
 	t.scope = s
 }
 
+func (t *typeImport) String() string {
+	return t.name
+}
+
 func (t *typeImport) Name() string {
 	if t.name == "" {
 		name, _ := t.imp.importName(t.path, t.src)
