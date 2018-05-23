@@ -5,31 +5,143 @@ import (
 	"sort"
 )
 
+// Type is the representation of a Go type.
+//
+// Not all methods apply to all kinds of types. Restrictions,
+// if any, are noted in the documentation for each method.
+// Use the Kind method to find out the kind of type before
+// calling kind-specific methods. Calling a method
+// inappropriate to the kind of type causes a run-time panic.
+//
+// Type values are comparable, such as with the == operator,
+// so they can be used as map keys.
+// Two Type values are equal if they represent identical types.
 type Type interface {
+
+	// Name returns the type's name within its package.
+	// It returns an empty string for unnamed types.
 	Name() string
+
+	// Kind returns the specific kind of this type.
 	Kind() Kind
-	Key() Type                 // map key
-	Elem() Type                // map value, ptr, slice, array, chan
-	Tag() reflect.StructTag    // field
-	Len() int                  // array
-	ChanDir() ChanDir          // chan
-	Out(int) Type              // func
-	NumOut() int               // func
-	In(int) Type               // func
-	NumIn() int                // func
-	IsVariadic() bool          // func
-	Field(int) Type            // struct
-	FieldByName(string) Type   // struct
-	NumField() int             // struct
-	Methods(int) Type          // named, alias, interface
-	MethodsByName(string) Type // named, alias, interface
-	NumMethods() int           // named, alias, interface
-	Child(int) Type            // scope
-	ChildByName(string) Type   // scope
-	NumChild() int             // scope
-	Anonymo(int) Type          // struct, interface
-	AnonymoByName(string) Type // struct, interface
-	NumAnonymo() int           // struct, interface
+
+	// Key returns a map type's key type.
+	// It panics if the type's Kind is not Map.
+	Key() Type
+
+	// Elem returns a type's element type.
+	// It panics if the type's Kind is not Var, Array, Chan, Map, Ptr, or Slice.
+	Elem() Type
+
+	// Tag returns a field type's tag.
+	// It panics if the type's Kind is not Field.
+	Tag() reflect.StructTag
+
+	// Len returns an array type's length.
+	// It panics if the type's Kind is not Array.
+	Len() int
+
+	// ChanDir returns a channel type's direction.
+	// It panics if the type's Kind is not Chan.
+	ChanDir() ChanDir
+
+	// Out returns the type of a function type's i'th output parameter.
+	// It panics if the type's Kind is not Func.
+	// It panics if i is not in the range [0, NumOut()).
+	Out(int) Type
+
+	// NumOut returns a function type's output parameter count.
+	// It panics if the type's Kind is not Func.
+	NumOut() int
+
+	// In returns the type of a function type's i'th input parameter.
+	// It panics if the type's Kind is not Func.
+	// It panics if i is not in the range [0, NumIn()).
+	In(int) Type
+
+	// NumIn returns a function type's input parameter count.
+	// It panics if the type's Kind is not Func.
+	NumIn() int
+
+	// IsVariadic reports whether a function type's final input parameter
+	// is a "..." parameter. If so, t.In(t.NumIn() - 1) returns the parameter's
+	// implicit actual type []T.
+	//
+	// For concreteness, if t represents func(x int, y ... float64), then
+	//
+	//	t.NumIn() == 2
+	//	t.In(0) is the reflect.Type for "int"
+	//	t.In(1) is the reflect.Type for "[]float64"
+	//	t.IsVariadic() == true
+	//
+	// IsVariadic panics if the type's Kind is not Func.
+	IsVariadic() bool
+
+	// Field returns a struct type's i'th field.
+	// Not contain anonymo
+	// It panics if the type's Kind is not Struct.
+	// It panics if i is not in the range [0, NumField()).
+	Field(int) Type
+
+	// FieldByName returns the struct field with the given name
+	// and a boolean indicating if the field was found.
+	FieldByName(string) Type
+
+	// NumField returns a struct type's field count.
+	// Not contain anonymo
+	// It panics if the type's Kind is not Struct.
+	NumField() int
+
+	// Method returns the i'th method in the type's method set.
+	// Not contain anonymo
+	// It panics if i is not in the range [0, NumMethod()).
+	//
+	// For a non-interface type T or *T, the returned Method's Type and Func
+	// fields describe a function whose first argument is the receiver.
+	//
+	// For an interface type, the returned Method's Type field gives the
+	// method signature, without a receiver, and the Func field is nil.
+	Methods(int) Type
+
+	// MethodByName returns the method with that name in the type's
+	// method set and a boolean indicating if the method was found.
+	//
+	// For a non-interface type T or *T, the returned Method's Type and Func
+	// fields describe a function whose first argument is the receiver.
+	//
+	// For an interface type, the returned Method's Type field gives the
+	// method signature, without a receiver, and the Func field is nil.
+	MethodsByName(string) Type
+
+	// NumMethod returns the number of exported methods in the type's method set.
+	// Not contain anonymo
+	NumMethods() int
+
+	// Field returns a scope type's i'th field.
+	// It panics if the type's Kind is not Scope.
+	// It panics if i is not in the range [0, NumChild()).
+	Child(int) Type
+
+	// ChildByName returns the scope with the given name
+	// and a boolean indicating if the field was found.
+	ChildByName(string) Type
+
+	// NumChild returns a scope type's field count.
+	// It panics if the type's Kind is not Scope.
+	NumChild() int
+
+	// Anonymo returns the i'th type in the type's anonymo set.
+	// It panics if i is not in the range [0, NumAnonymo()).
+	// It panics if the type's Kind is not Interface or Struct.
+	Anonymo(int) Type
+
+	// AnonymoByName returns the anonymo type with the given name
+	// and a boolean indicating if the field was found.
+	AnonymoByName(string) Type
+
+	// NumChild returns a anonymo type's field count.
+	// It panics if the type's Kind is not Interface or Struct.
+	NumAnonymo() int
 }
 
 type Types []Type
