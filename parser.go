@@ -121,6 +121,7 @@ func (r *astParser) ParserDecl(decl ast.Decl) {
 // ParserValue 解析
 func (r *astParser) ParserValue(decl *ast.GenDecl) {
 	var prev, val Type
+loop:
 	for _, spec := range decl.Specs {
 		prev = val
 		s, ok := spec.(*ast.ValueSpec)
@@ -130,15 +131,31 @@ func (r *astParser) ParserValue(decl *ast.GenDecl) {
 		val = nil
 		if s.Type != nil { // 有类型声明
 			val = r.EvalType(s.Type)
-		} else if len(s.Values) == 0 { // 没有类型声明 但是一个常量  使用之前的类型
-			if decl.Tok == token.CONST {
-				val = prev
-			}
 		} else {
-			val = r.EvalType(s.Values[0])
-			if tup, ok := val.(*typeTuple); ok {
+			switch l := len(s.Values); l {
+			case 0:
+				if decl.Tok == token.CONST {
+					val = prev
+				}
+			case 1:
+				val = r.EvalType(s.Values[0])
+				if tup, ok := val.(*typeTuple); ok {
 
-				l := tup.all.Len()
+					l := tup.all.Len()
+					for i, v := range s.Names {
+						if v.Name == "" || v.Name == "_" {
+							continue
+						}
+						if i == l {
+							break
+						}
+						t := newTypeVar(v.Name, tup.all.Index(i))
+						r.nameds.Add(t)
+					}
+					continue loop
+				}
+			default:
+				l := len(s.Values)
 				for i, v := range s.Names {
 					if v.Name == "" || v.Name == "_" {
 						continue
@@ -146,12 +163,14 @@ func (r *astParser) ParserValue(decl *ast.GenDecl) {
 					if i == l {
 						break
 					}
-					t := newTypeVar(v.Name, tup.all.Index(i))
+					val := r.EvalType(s.Values[i])
+					t := newTypeVar(v.Name, val)
 					r.nameds.Add(t)
 				}
-				continue
+				continue loop
 			}
 		}
+
 		if val == nil {
 			continue
 		}
