@@ -8,8 +8,8 @@ import (
 
 type astParser struct {
 	importer *Importer
-	method   map[string]Types // 方法
-	nameds   Types            // 变量 函数 类型 导入的包
+	method   map[string]Types // type method
+	nameds   Types            // var, func, type, packgae
 	src      string
 }
 
@@ -24,102 +24,113 @@ func newParser(i *Importer, src string) *astParser {
 	return r
 }
 
-// ParserFile 解析文件
-func (r *astParser) ParserFile(src *ast.File) {
-	// 解析全部顶级关键字
-	for _, decl := range src.Decls {
-		r.ParserDecl(decl)
-	}
-}
-
+// ParserFile parser package
 func (r *astParser) ParserPackage(pkg *ast.Package) {
 	for _, file := range pkg.Files {
 		r.ParserFile(file)
 	}
 }
 
-// ParserDecl 解析顶级关键字
+// ParserFile parser file
+func (r *astParser) ParserFile(src *ast.File) {
+	for _, decl := range src.Decls {
+		r.ParserDecl(decl)
+	}
+}
+
+// ParserDecl parser declaration
 func (r *astParser) ParserDecl(decl ast.Decl) {
 	switch d := decl.(type) {
 	case *ast.FuncDecl:
-		f := r.EvalType(d.Type)
-		if d.Recv != nil {
-			name, ok := typeName(d.Recv.List[0].Type)
-			if ok { // 不是当前包的方法
-				return
-			}
-
-			t := newTypeAlias(d.Name.Name, f)
-			b := r.method[name]
-			b.Add(t)
-			r.method[name] = b
-			return
-		}
-
-		t := newTypeAlias(d.Name.Name, f)
-		r.nameds.Add(t)
-		return
+		r.ParserFunc(d)
 	case *ast.GenDecl:
 		switch d.Tok {
 		case token.CONST, token.VAR:
-			r.ParserValue(d)
+			r.parserValue(d)
 		case token.IMPORT:
-			for _, spec := range d.Specs {
-				s, ok := spec.(*ast.ImportSpec)
-				if !ok {
-					continue
-				}
-				path, err := strconv.Unquote(s.Path.Value)
-				if err != nil {
-					continue
-				}
-
-				if r.importer == nil {
-					continue
-				}
-
-				if s.Name == nil {
-					p := newTypeImport("", path, r.src, r.importer)
-					r.nameds.AddNoRepeat(p)
-				} else {
-					switch s.Name.Name {
-					case "_":
-					case ".":
-						p := r.importer.impor(path, r.src)
-						if p == nil {
-							continue
-						}
-						l := p.NumChild()
-						for i := 0; i != l; i++ {
-							r.nameds.AddNoRepeat(p.Child(i))
-						}
-					default:
-						t := newTypeImport(s.Name.Name, path, r.src, r.importer)
-						r.nameds.AddNoRepeat(t)
-					}
-				}
-			}
+			r.parserImport(d)
 		case token.TYPE:
-			for _, spec := range d.Specs {
-				s, ok := spec.(*ast.TypeSpec)
-				if !ok {
+			r.parserType(d)
+		}
+	}
+}
+
+func (r *astParser) ParserFunc(decl *ast.FuncDecl) {
+	f := r.EvalType(decl.Type)
+	if decl.Recv != nil {
+		name, ok := typeName(decl.Recv.List[0].Type)
+		if ok {
+			return
+		}
+
+		t := newTypeAlias(decl.Name.Name, f)
+		b := r.method[name]
+		b.Add(t)
+		r.method[name] = b
+		return
+	}
+
+	t := newTypeAlias(decl.Name.Name, f)
+	r.nameds.Add(t)
+	return
+}
+
+func (r *astParser) parserType(decl *ast.GenDecl) {
+	for _, spec := range decl.Specs {
+		s, ok := spec.(*ast.TypeSpec)
+		if !ok {
+			continue
+		}
+
+		tt := r.EvalType(s.Type)
+		if s.Assign == 0 && tt.Kind() != Interface {
+			tt = newTypeNamed(s.Name.Name, tt, r)
+		} else {
+			tt = newTypeAlias(s.Name.Name, tt)
+		}
+		r.nameds.Add(tt)
+	}
+}
+
+func (r *astParser) parserImport(decl *ast.GenDecl) {
+	for _, spec := range decl.Specs {
+		s, ok := spec.(*ast.ImportSpec)
+		if !ok {
+			continue
+		}
+		path, err := strconv.Unquote(s.Path.Value)
+		if err != nil {
+			continue
+		}
+
+		if r.importer == nil {
+			continue
+		}
+
+		if s.Name == nil {
+			p := newTypeImport("", path, r.src, r.importer)
+			r.nameds.AddNoRepeat(p)
+		} else {
+			switch s.Name.Name {
+			case "_":
+			case ".":
+				p := r.importer.impor(path, r.src)
+				if p == nil {
 					continue
 				}
-
-				tt := r.EvalType(s.Type)
-				if s.Assign == 0 && tt.Kind() != Interface {
-					tt = newTypeNamed(s.Name.Name, tt, r)
-				} else {
-					tt = newTypeAlias(s.Name.Name, tt)
+				l := p.NumChild()
+				for i := 0; i != l; i++ {
+					r.nameds.AddNoRepeat(p.Child(i))
 				}
-				r.nameds.Add(tt)
+			default:
+				t := newTypeImport(s.Name.Name, path, r.src, r.importer)
+				r.nameds.AddNoRepeat(t)
 			}
 		}
 	}
 }
 
-// ParserValue 解析
-func (r *astParser) ParserValue(decl *ast.GenDecl) {
+func (r *astParser) parserValue(decl *ast.GenDecl) {
 	var prev, val Type
 loop:
 	for _, spec := range decl.Specs {
@@ -129,7 +140,7 @@ loop:
 			continue
 		}
 		val = nil
-		if s.Type != nil { // 有类型声明
+		if s.Type != nil { // Type definition
 			val = r.EvalType(s.Type)
 		} else {
 			switch l := len(s.Values); l {
