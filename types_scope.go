@@ -1,6 +1,6 @@
 package gotype
 
-func newTypeScope(name string, parser *astParser) Type {
+func newTypeScope(name string, parser *parser) Type {
 	return &typeScope{
 		name:   name,
 		parser: parser,
@@ -10,7 +10,7 @@ func newTypeScope(name string, parser *astParser) Type {
 type typeScope struct {
 	typeBase
 	name   string
-	parser *astParser
+	parser *parser
 }
 
 func (t *typeScope) String() string {

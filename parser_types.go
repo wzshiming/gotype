@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func (r *astParser) EvalType(expr ast.Expr) Type {
+func (r *parser) EvalType(expr ast.Expr) Type {
 	switch t := expr.(type) {
 	case *ast.BadExpr:
 		return nil

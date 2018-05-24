@@ -4,7 +4,7 @@ import (
 	"reflect"
 )
 
-func newTypeNamed(name string, typ Type, parser *astParser) Type {
+func newTypeNamed(name string, typ Type, parser *parser) Type {
 	return &typeNamed{
 		name:   name,
 		typ:    typ,
@@ -14,7 +14,7 @@ func newTypeNamed(name string, typ Type, parser *astParser) Type {
 
 type typeNamed struct {
 	name   string
-	parser *astParser
+	parser *parser
 	typ    Type
 }
 

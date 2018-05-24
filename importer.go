@@ -2,7 +2,7 @@ package gotype
 
 import (
 	"go/build"
-	"go/parser"
+	goparser "go/parser"
 	"go/token"
 	"os"
 )
@@ -10,7 +10,7 @@ import (
 // Importer Go source type analyzer
 type Importer struct {
 	fset         *token.FileSet
-	mode         parser.Mode
+	mode         goparser.Mode
 	bufType      map[string]Type
 	bufBuild     map[string]*build.Package
 	errorHandler func(error)
@@ -20,7 +20,7 @@ type Importer struct {
 func NewImporter(options ...option) *Importer {
 	i := &Importer{
 		fset:     token.NewFileSet(),
-		mode:     parser.ParseComments,
+		mode:     goparser.ParseComments,
 		bufType:  map[string]Type{},
 		bufBuild: map[string]*build.Package{},
 		errorHandler: func(err error) {
@@ -79,7 +79,7 @@ func (i *Importer) impor(path string, src string) Type {
 		m[v] = true
 	}
 
-	p, err := parser.ParseDir(i.fset, dir, func(fi os.FileInfo) bool {
+	p, err := goparser.ParseDir(i.fset, dir, func(fi os.FileInfo) bool {
 		return m[fi.Name()]
 	}, i.mode)
 
