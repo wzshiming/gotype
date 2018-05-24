@@ -15,3 +15,7 @@ type typeAlias struct {
 func (t *typeAlias) Name() string {
 	return t.name
 }
+
+func (t *typeAlias) String() string {
+	return t.name
+}

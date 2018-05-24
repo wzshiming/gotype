@@ -107,7 +107,7 @@ func (r *astParser) ParserDecl(decl ast.Decl) {
 				}
 
 				tt := r.EvalType(s.Type)
-				if s.Assign == 0 {
+				if s.Assign == 0 && tt.Kind() != Interface {
 					tt = newTypeNamed(s.Name.Name, tt, r)
 				} else {
 					tt = newTypeAlias(s.Name.Name, tt)
