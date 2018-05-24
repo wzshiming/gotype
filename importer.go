@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+// Importer Go source type analyzer
 type Importer struct {
 	fset         *token.FileSet
 	mode         parser.Mode
@@ -15,6 +16,7 @@ type Importer struct {
 	errorHandler func(error)
 }
 
+// NewImporter creates a new importer
 func NewImporter(options ...option) *Importer {
 	i := &Importer{
 		fset:     token.NewFileSet(),
@@ -29,6 +31,11 @@ func NewImporter(options ...option) *Importer {
 		v(i)
 	}
 	return i
+}
+
+// Import returns go package scope
+func (i *Importer) Import(path string) Type {
+	return i.impor(path, ".")
 }
 
 func (i *Importer) importBuild(path string, src string) (*build.Package, bool) {
@@ -52,10 +59,6 @@ func (i *Importer) importName(path string, src string) (name string, goroot bool
 		return "", false
 	}
 	return imp.Name, imp.Goroot
-}
-
-func (i *Importer) Import(path string) Type {
-	return i.impor(path, ".")
 }
 
 func (i *Importer) impor(path string, src string) Type {
