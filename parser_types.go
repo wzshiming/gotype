@@ -64,7 +64,7 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 		}
 		if b.Kind() == Func {
 			l := b.NumOut()
-			ts := make(Types, 0, l)
+			ts := make(types, 0, l)
 			for i := 0; i != l; i++ {
 				ts = append(ts, b.Out(i))
 			}

@@ -4,8 +4,8 @@ import "bytes"
 
 type typeInterface struct {
 	typeBase
-	methods Types // 这个类型的方法集合
-	anonymo Types // 组合的接口
+	methods types // 这个类型的方法集合
+	anonymo types // 组合的接口
 }
 
 func (t *typeInterface) String() string {

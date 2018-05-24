@@ -8,8 +8,8 @@ import (
 
 type astParser struct {
 	importer *Importer
-	method   map[string]Types // type method
-	nameds   Types            // var, func, type, packgae
+	method   map[string]types // type method
+	nameds   types            // var, func, type, packgae
 	src      string
 }
 
@@ -17,8 +17,8 @@ type astParser struct {
 func newParser(i *Importer, src string) *astParser {
 	r := &astParser{
 		importer: i,
-		method:   map[string]Types{},
-		nameds:   Types{},
+		method:   map[string]types{},
+		nameds:   types{},
 		src:      src,
 	}
 	return r

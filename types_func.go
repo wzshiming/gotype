@@ -5,8 +5,8 @@ import "bytes"
 type typeFunc struct {
 	typeBase
 	variadic bool
-	params   Types
-	results  Types
+	params   types
+	results  types
 }
 
 func (t *typeFunc) String() string {

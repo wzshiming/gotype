@@ -6,8 +6,8 @@ import (
 
 type typeStruct struct {
 	typeBase
-	fields  Types // 字段
-	anonymo Types // 组合的类型
+	fields  types // 字段
+	anonymo types // 组合的类型
 }
 
 func (t *typeStruct) String() string {

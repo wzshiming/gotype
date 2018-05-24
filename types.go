@@ -149,16 +149,16 @@ type Type interface {
 	NumAnonymo() int
 }
 
-type Types []Type
+type types []Type
 
-func (t *Types) add(i int, n Type) {
+func (t *types) add(i int, n Type) {
 	*t = append(*t, n)
 	l := len(*t)
 	copy((*t)[i+1:l], (*t)[i:l-1])
 	(*t)[i] = n
 }
 
-func (t *Types) Add(n Type) {
+func (t *types) Add(n Type) {
 	if n == nil {
 		return
 	}
@@ -167,7 +167,7 @@ func (t *Types) Add(n Type) {
 	t.add(i, n)
 }
 
-func (t *Types) AddNoRepeat(n Type) {
+func (t *types) AddNoRepeat(n Type) {
 	if n == nil {
 		return
 	}
@@ -180,7 +180,7 @@ func (t *Types) AddNoRepeat(n Type) {
 	return
 }
 
-func (t *Types) Search(name string) (Type, bool) {
+func (t *types) Search(name string) (Type, bool) {
 	i := t.SearchIndex(name)
 	if i == 0 {
 		return nil, false
@@ -192,7 +192,7 @@ func (t *Types) Search(name string) (Type, bool) {
 	return tt, true
 }
 
-func (t *Types) SearchIndex(name string) int {
+func (t *types) SearchIndex(name string) int {
 	i := sort.Search(t.Len(), func(i int) bool {
 		d := t.Index(i)
 		if d == nil {
@@ -203,14 +203,14 @@ func (t *Types) SearchIndex(name string) int {
 	return i
 }
 
-func (t *Types) Index(i int) Type {
+func (t *types) Index(i int) Type {
 	if i >= t.Len() || i < 0 {
 		return nil
 	}
 	return (*t)[i]
 }
 
-func (t *Types) Len() int {
+func (t *types) Len() int {
 	return len(*t)
 }
 

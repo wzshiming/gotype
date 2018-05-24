@@ -1,6 +1,6 @@
 package gotype
 
-func newTypeTuple(all Types) Type {
+func newTypeTuple(all types) Type {
 	switch len(all) {
 	case 0:
 		return nil
@@ -17,5 +17,5 @@ func newTypeTuple(all Types) Type {
 
 type typeTuple struct {
 	Type       // [0]
-	all  Types // [:]
+	all  types // [:]
 }
