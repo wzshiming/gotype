@@ -6,7 +6,7 @@ type Kind uint8
 const (
 	Invalid Kind = iota
 
-	// 内置基础类型
+	// Built-in base type
 	predeclaredTypesBeg
 	Bool
 	Int
@@ -30,7 +30,7 @@ const (
 	Error
 	predeclaredTypesEnd
 
-	// 内置组合类型
+	// Built-in combination
 	Array
 	Chan
 	Func
@@ -40,8 +40,8 @@ const (
 	Slice
 	Struct
 
-	// 特殊
+	// Special
 	Field // Struct Field
-	Var   // 变量名
-	Scope // 包名 和 函数内作用域
+	Var   //
+	Scope // package or func body
 )
