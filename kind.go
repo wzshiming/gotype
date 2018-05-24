@@ -42,7 +42,6 @@ const (
 
 	// 特殊
 	Field // Struct Field
-	Alias // type 别名
 	Var   // 变量名
 	Scope // 包名 和 函数内作用域
 )
