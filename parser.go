@@ -49,14 +49,14 @@ func (r *astParser) ParserDecl(decl ast.Decl) {
 				return
 			}
 
-			t := newTypeNamed(d.Name.Name, f, r)
+			t := newTypeAlias(d.Name.Name, f)
 			b := r.method[name]
 			b.Add(t)
 			r.method[name] = b
 			return
 		}
 
-		t := newTypeNamed(d.Name.Name, f, r)
+		t := newTypeAlias(d.Name.Name, f)
 		r.nameds.Add(t)
 		return
 	case *ast.GenDecl:

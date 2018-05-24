@@ -181,7 +181,7 @@ func (r *astParser) EvalType(expr ast.Expr) Type {
 			}
 
 			for _, name := range v.Names {
-				t := newTypeVar(name.Name, ty)
+				t := newTypeAlias(name.Name, ty)
 				s.methods.Add(t)
 			}
 		}
