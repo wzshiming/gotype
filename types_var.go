@@ -1,9 +1,5 @@
 package gotype
 
-import (
-	"fmt"
-)
-
 func newTypeVar(name string, typ Type) *typeVar {
 	v, ok := typ.(*typeVar)
 	if ok {
@@ -25,7 +21,7 @@ type typeVar struct {
 }
 
 func (t *typeVar) String() string {
-	return fmt.Sprintf("%v %v", t.name, t.typ)
+	return t.name
 }
 
 func (t *typeVar) Name() string {
