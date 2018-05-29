@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-func newSelector(x Type, sel string) *typeSelector {
+func newSelector(x Type, sel string) Type {
 	return &typeSelector{
 		x:   x,
 		sel: sel,
