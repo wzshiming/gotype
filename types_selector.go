@@ -124,6 +124,14 @@ func (t *typeSelector) Len() int {
 	return child.Len()
 }
 
+func (t *typeSelector) Value() string {
+	child, ok := t.ToChild()
+	if !ok {
+		return ""
+	}
+	return child.Value()
+}
+
 func (t *typeSelector) ChanDir() ChanDir {
 	child, ok := t.ToChild()
 	if !ok {

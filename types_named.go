@@ -99,6 +99,14 @@ func (t *typeNamed) Len() int {
 	return child.Len()
 }
 
+func (t *typeNamed) Value() string {
+	child, ok := t.ToChild()
+	if !ok {
+		return ""
+	}
+	return child.Value()
+}
+
 func (t *typeNamed) ChanDir() ChanDir {
 	child, ok := t.ToChild()
 	if !ok {

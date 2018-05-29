@@ -12,14 +12,14 @@ func (r *parser) EvalType(expr ast.Expr) Type {
 		return nil
 	case *ast.Ident:
 		if k := predeclaredTypes[t.Name]; k != 0 {
-			s := newTypeBuiltin(k)
+			s := newTypeBuiltin(k, "")
 			return s
 		}
 		s := newTypeNamed(t.Name, nil, r)
 		return s
 	case *ast.BasicLit:
 		if k := tokenTypes[t.Kind]; k != 0 {
-			s := newTypeBuiltin(k)
+			s := newTypeBuiltin(k, t.Value)
 			return s
 		}
 		return nil
@@ -45,15 +45,15 @@ func (r *parser) EvalType(expr ast.Expr) Type {
 			if bf, ok := builtinFunc[b.Name]; ok {
 				switch bf {
 				case builtinfuncInt:
-					return newTypeBuiltin(Int)
+					return newTypeBuiltin(Int, "")
 				case builtinfuncPtrItem:
 					return newTypePtr(r.EvalType(t.Args[0]))
 				case builtinfuncItem:
 					return r.EvalType(t.Args[0])
 				case builtinfuncInterface:
-					return newTypeBuiltin(Interface)
+					return newTypeBuiltin(Interface, "")
 				case builtinfuncVoid:
-					return newTypeBuiltin(Invalid)
+					return newTypeBuiltin(Invalid, "")
 				}
 			}
 		}

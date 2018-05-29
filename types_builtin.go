@@ -4,15 +4,17 @@ import (
 	"strings"
 )
 
-func newTypeBuiltin(kind Kind) Type {
+func newTypeBuiltin(kind Kind, value string) Type {
 	return &typeBuiltin{
-		kind: kind,
+		kind:  kind,
+		value: value,
 	}
 }
 
 type typeBuiltin struct {
 	typeBase
-	kind Kind
+	kind  Kind
+	value string
 }
 
 func (t *typeBuiltin) String() string {
@@ -25,4 +27,8 @@ func (t *typeBuiltin) Name() string {
 
 func (t *typeBuiltin) Kind() Kind {
 	return t.kind
+}
+
+func (t *typeBuiltin) Value() string {
+	return t.value
 }

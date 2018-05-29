@@ -48,6 +48,10 @@ type Type interface {
 	// It panics if the type's Kind is not Array.
 	Len() int
 
+	// Value returns a type's value.
+	// Only get constants
+	Value() string
+
 	// ChanDir returns a channel type's direction.
 	// It panics if the type's Kind is not Chan.
 	ChanDir() ChanDir
@@ -242,6 +246,10 @@ func (t *typeBase) Tag() reflect.StructTag {
 func (t *typeBase) Len() int {
 	panic("Len of non-array type")
 	return 0
+}
+
+func (t *typeBase) Value() string {
+	return ""
 }
 
 func (t *typeBase) ChanDir() ChanDir {
