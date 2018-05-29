@@ -1,6 +1,6 @@
 package gotype
 
-func newTypeVar(name string, typ Type) *typeVar {
+func newTypeVar(name string, typ Type) Type {
 	v, ok := typ.(*typeVar)
 	if ok {
 		return &typeVar{

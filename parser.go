@@ -139,34 +139,23 @@ loop:
 		if !ok {
 			continue
 		}
-		val = nil
-		if s.Type != nil { // Type definition
-			val = r.EvalType(s.Type)
-		} else {
-			switch l := len(s.Values); l {
-			case 0:
-				if decl.Tok == token.CONST {
-					val = prev
-				}
-			case 1:
-				val = r.EvalType(s.Values[0])
-				if tup, ok := val.(*typeTuple); ok {
 
-					l := tup.all.Len()
-					for i, v := range s.Names {
-						if v.Name == "" || v.Name == "_" {
-							continue
-						}
-						if i == l {
-							break
-						}
-						t := newTypeVar(v.Name, tup.all.Index(i))
-						r.nameds.Add(t)
-					}
-					continue loop
-				}
-			default:
-				l := len(s.Values)
+		var typ Type
+		if s.Type != nil { // Type definition
+			typ = r.EvalType(s.Type)
+		}
+		val = nil
+
+		switch l := len(s.Values); l {
+		case 0:
+			if decl.Tok == token.CONST {
+				val = prev
+			}
+		case 1:
+			val = r.EvalType(s.Values[0])
+			if tup, ok := val.(*typeTuple); ok {
+
+				l := tup.all.Len()
 				for i, v := range s.Names {
 					if v.Name == "" || v.Name == "_" {
 						continue
@@ -174,12 +163,25 @@ loop:
 					if i == l {
 						break
 					}
-					val := r.EvalType(s.Values[i])
-					t := newTypeVar(v.Name, val)
+					t := newTypeVar(v.Name, tup.all.Index(i))
 					r.nameds.Add(t)
 				}
 				continue loop
 			}
+		default:
+			l := len(s.Values)
+			for i, v := range s.Names {
+				if v.Name == "" || v.Name == "_" {
+					continue
+				}
+				if i == l {
+					break
+				}
+				val := r.EvalType(s.Values[i])
+				t := newTypeVar(v.Name, val)
+				r.nameds.Add(t)
+			}
+			continue loop
 		}
 
 		if val == nil {
@@ -190,8 +192,24 @@ loop:
 				continue
 			}
 
-			t := newTypeVar(v.Name, val)
-			r.nameds.Add(t)
+			if typ == nil {
+				if val != nil {
+					t := newTypeVar(v.Name, val)
+					r.nameds.Add(t)
+				} else {
+					// No action
+				}
+			} else {
+				if val == nil {
+					t := newTypeVar(v.Name, typ)
+					r.nameds.Add(t)
+				} else {
+					t := newTypeVar(v.Name, typ)
+					t = newTypeValueBind(t, val)
+					r.nameds.Add(t)
+				}
+			}
+
 		}
 	}
 }

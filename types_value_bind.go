@@ -1,7 +1,8 @@
 package gotype
 
 func newTypeValueBind(typ, val Type) Type {
-	if typ.Kind() == Struct {
+	switch typ.Kind() {
+	case Struct:
 		if v, ok := val.(*typeValuePairs); ok {
 			nt := &typeStruct{}
 			fl := typ.NumField()
@@ -26,6 +27,10 @@ func newTypeValueBind(typ, val Type) Type {
 			}
 			return nt
 		}
+	case Var:
+		name := typ.Name()
+		typ = newTypeValueBind(typ.Elem(), val)
+		return newTypeVar(name, typ)
 	}
 
 	return &typeValueBind{
