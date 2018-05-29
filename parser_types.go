@@ -26,7 +26,17 @@ func (r *parser) EvalType(expr ast.Expr) Type {
 	case *ast.FuncLit:
 		return r.EvalType(t.Type)
 	case *ast.CompositeLit:
-		return r.EvalType(t.Type)
+		typ := r.EvalType(t.Type)
+		if typ.Kind() != Struct {
+			return typ
+		}
+
+		pairs := &typeValuePairs{}
+		for _, v := range t.Elts {
+			d := r.EvalType(v)
+			pairs.li.Add(d)
+		}
+		return newTypeValueBind(typ, pairs)
 	case *ast.ParenExpr:
 		return r.EvalType(t.X)
 	case *ast.SelectorExpr:
@@ -77,8 +87,10 @@ func (r *parser) EvalType(expr ast.Expr) Type {
 		return r.EvalType(t.X)
 	case *ast.BinaryExpr:
 		return r.EvalType(t.X)
-	// case *ast.KeyValueExpr:
-
+	case *ast.KeyValueExpr:
+		k := r.EvalType(t.Key)
+		v := r.EvalType(t.Value)
+		return newTypeValuePair(k, v)
 	case *ast.ArrayType:
 		if t.Len == nil {
 			return newTypeSlice(r.EvalType(t.Elt))

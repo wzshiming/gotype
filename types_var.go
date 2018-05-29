@@ -35,3 +35,7 @@ func (t *typeVar) Kind() Kind {
 func (t *typeVar) Elem() Type {
 	return t.elem
 }
+
+func (t *typeVar) Value() string {
+	return t.elem.Value()
+}
