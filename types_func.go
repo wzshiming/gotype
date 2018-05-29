@@ -18,10 +18,10 @@ func (t *typeFunc) String() string {
 		}
 		if t.variadic && i+1 == len(t.results) {
 			if d, ok := v.(*typeVar); ok {
-				if d0, ok := d.typ.(*typeSlice); ok {
+				if d0, ok := d.elem.(*typeSlice); ok {
 					buf.WriteString(d.name)
 					buf.WriteString(" ...")
-					buf.WriteString(d0.val.String())
+					buf.WriteString(d0.elem.String())
 					continue
 				}
 			}

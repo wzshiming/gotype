@@ -4,18 +4,18 @@ import "fmt"
 
 func newTypeMap(k, v Type) Type {
 	return &typeMap{
-		key: k,
-		val: v,
+		key:  k,
+		elem: v,
 	}
 }
 
 type typeMap struct {
 	typeBase
-	key, val Type
+	key, elem Type
 }
 
 func (t *typeMap) String() string {
-	return fmt.Sprintf("map[%v]%v", t.key, t.val)
+	return fmt.Sprintf("map[%v]%v", t.key, t.elem)
 }
 
 func (t *typeMap) Kind() Kind {
@@ -27,5 +27,5 @@ func (t *typeMap) Key() Type {
 }
 
 func (t *typeMap) Elem() Type {
-	return t.val
+	return t.elem
 }

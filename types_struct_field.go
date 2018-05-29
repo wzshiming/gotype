@@ -8,12 +8,12 @@ import (
 type typeStructField struct {
 	typeBase
 	name string
-	typ  Type              // 字段类型
+	elem Type              // 字段类型
 	tag  reflect.StructTag // 字段标签
 }
 
 func (t *typeStructField) String() string {
-	return fmt.Sprintf("%v %v %v", t.name, t.typ, t.tag)
+	return fmt.Sprintf("%v %v %v", t.name, t.elem, t.tag)
 }
 
 func (t *typeStructField) Name() string {
@@ -21,7 +21,7 @@ func (t *typeStructField) Name() string {
 }
 
 func (t *typeStructField) Elem() Type {
-	return t.typ
+	return t.elem
 }
 
 func (t *typeStructField) Kind() Kind {

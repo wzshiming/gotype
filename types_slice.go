@@ -6,17 +6,17 @@ import (
 
 func newTypeSlice(v Type) Type {
 	return &typeSlice{
-		val: v,
+		elem: v,
 	}
 }
 
 type typeSlice struct {
 	typeBase
-	val Type
+	elem Type
 }
 
 func (t *typeSlice) String() string {
-	return fmt.Sprintf("[]%v", t.val.String())
+	return fmt.Sprintf("[]%v", t.elem.String())
 }
 
 func (t *typeSlice) Kind() Kind {
@@ -24,5 +24,5 @@ func (t *typeSlice) Kind() Kind {
 }
 
 func (t *typeSlice) Elem() Type {
-	return t.val
+	return t.elem
 }

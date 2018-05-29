@@ -4,19 +4,19 @@ import "fmt"
 
 func newTypeArray(v Type, l int) Type {
 	return &typeArray{
-		val: v,
-		le:  l,
+		elem: v,
+		le:   l,
 	}
 }
 
 type typeArray struct {
 	typeBase
-	le  int
-	val Type
+	le   int
+	elem Type
 }
 
 func (t *typeArray) String() string {
-	return fmt.Sprintf("[%v]%v", t.le, t.val)
+	return fmt.Sprintf("[%v]%v", t.le, t.elem)
 }
 
 func (t *typeArray) Kind() Kind {
@@ -24,7 +24,7 @@ func (t *typeArray) Kind() Kind {
 }
 
 func (t *typeArray) Elem() Type {
-	return t.val
+	return t.elem
 }
 
 func (t *typeArray) Len() int {

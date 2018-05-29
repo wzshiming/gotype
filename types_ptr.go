@@ -4,17 +4,17 @@ import "fmt"
 
 func newTypePtr(elem Type) Type {
 	return &typePtr{
-		typ: elem,
+		elem: elem,
 	}
 }
 
 type typePtr struct {
 	typeBase
-	typ Type
+	elem Type
 }
 
 func (t *typePtr) String() string {
-	return fmt.Sprintf("*%v", t.typ)
+	return fmt.Sprintf("*%v", t.elem)
 }
 
 func (y *typePtr) Kind() Kind {
@@ -22,5 +22,5 @@ func (y *typePtr) Kind() Kind {
 }
 
 func (t *typePtr) Elem() Type {
-	return t.typ
+	return t.elem
 }

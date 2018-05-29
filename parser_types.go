@@ -106,7 +106,7 @@ func (r *parser) EvalType(expr ast.Expr) Type {
 			if v.Names == nil {
 				t := &typeStructField{
 					name: ty.Name(),
-					typ:  ty,
+					elem: ty,
 					tag:  tag,
 				}
 				s.anonymo.Add(t)
@@ -115,7 +115,7 @@ func (r *parser) EvalType(expr ast.Expr) Type {
 			for _, name := range v.Names {
 				t := &typeStructField{
 					name: name.Name,
-					typ:  ty,
+					elem: ty,
 					tag:  tag,
 				}
 				s.fields.Add(t)
