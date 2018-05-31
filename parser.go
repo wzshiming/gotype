@@ -136,8 +136,9 @@ func (r *parser) parserImport(decl *ast.GenDecl) {
 			switch s.Name.Name {
 			case "_":
 			case ".":
-				p := r.importer.impor(path, r.src)
-				if p == nil {
+				p, err := r.importer.impor(path, r.src)
+				if err != nil {
+					r.importer.errorHandler(err)
 					continue
 				}
 				l := p.NumChild()

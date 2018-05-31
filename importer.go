@@ -1,6 +1,7 @@
 package gotype
 
 import (
+	"fmt"
 	"go/build"
 	goparser "go/parser"
 	"go/token"
@@ -34,17 +35,17 @@ func NewImporter(options ...option) *Importer {
 }
 
 // Import returns go package scope
-func (i *Importer) Import(path string) Type {
+func (i *Importer) Import(path string) (Type, error) {
 	return i.impor(path, ".")
 }
 
-// ImportBuild returns go package build.Package
-func (i *Importer) ImportBuild(path string) *build.Package {
-	imp, ok := i.importBuild(path, ".")
-	if !ok {
-		return nil
+// ImportBuild returns details about the Go package named by the import path.
+func (i *Importer) ImportBuild(path string) (*build.Package, error) {
+	imp, err := i.importBuild(path, ".")
+	if err != nil {
+		return nil, err
 	}
-	return imp
+	return imp, nil
 }
 
 // FileSet returns the FileSet
@@ -52,40 +53,38 @@ func (i *Importer) FileSet() *token.FileSet {
 	return i.fset
 }
 
-func (i *Importer) importBuild(path string, src string) (*build.Package, bool) {
+func (i *Importer) importBuild(path string, src string) (*build.Package, error) {
 	k := path + " " + src
 	if v, ok := i.bufBuild[k]; ok {
-		return v, true
+		return v, nil
 	}
 
 	imp, err := build.Import(path, src, 0)
 	if err != nil {
-		i.errorHandler(err)
-		return nil, false
+		return nil, err
 	}
 	i.bufBuild[k] = imp
-	return imp, true
+	return imp, nil
 }
 
 func (i *Importer) importName(path string, src string) (name string, goroot bool) {
-	imp, ok := i.importBuild(path, src)
-	if !ok {
+	imp, err := i.importBuild(path, src)
+	if err != nil {
 		return "", false
 	}
 	return imp.Name, imp.Goroot
 }
 
-func (i *Importer) impor(path string, src string) Type {
-
-	imp, ok := i.importBuild(path, src)
-	if !ok {
-		return nil
+func (i *Importer) impor(path string, src string) (Type, error) {
+	imp, err := i.importBuild(path, src)
+	if err != nil {
+		return nil, err
 	}
 	dir := imp.Dir
 
 	tt, ok := i.bufType[dir]
 	if ok {
-		return tt
+		return tt, nil
 	}
 
 	m := map[string]bool{}
@@ -98,15 +97,14 @@ func (i *Importer) impor(path string, src string) Type {
 	}, i.mode)
 
 	if err != nil {
-		i.errorHandler(err)
-		return nil
+		return nil, err
 	}
 
 	for _, v := range p {
 		np := newParser(i, dir)
 		t := np.ParserPackage(v)
 		i.bufType[dir] = t
-		return t
+		return t, nil
 	}
-	return nil
+	return nil, fmt.Errorf(`No go source code was found under the package path "%s"`, path)
 }

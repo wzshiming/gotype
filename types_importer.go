@@ -23,7 +23,10 @@ func (t *typeImport) check() {
 		return
 	}
 
-	s := t.imp.impor(t.path, t.src)
+	s, err := t.imp.impor(t.path, t.src)
+	if err != nil {
+		t.imp.errorHandler(err)
+	}
 	t.scope = s
 }
 
