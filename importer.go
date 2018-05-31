@@ -38,6 +38,20 @@ func (i *Importer) Import(path string) Type {
 	return i.impor(path, ".")
 }
 
+// ImportBuild returns go package build.Package
+func (i *Importer) ImportBuild(path string) *build.Package {
+	imp, ok := i.importBuild(path, ".")
+	if !ok {
+		return nil
+	}
+	return imp
+}
+
+// FileSet returns the FileSet
+func (i *Importer) FileSet() *token.FileSet {
+	return i.fset
+}
+
 func (i *Importer) importBuild(path string, src string) (*build.Package, bool) {
 	k := path + " " + src
 	if v, ok := i.bufBuild[k]; ok {
