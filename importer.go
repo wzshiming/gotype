@@ -88,10 +88,9 @@ func (i *Importer) impor(path string, src string) Type {
 		return nil
 	}
 
-	for name, v := range p {
+	for _, v := range p {
 		np := newParser(i, dir)
-		np.ParserPackage(v)
-		t := newTypeScope(name, np)
+		t := np.ParserPackage(v)
 		i.bufType[dir] = t
 		return t
 	}

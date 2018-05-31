@@ -6,7 +6,12 @@ import (
 	"strconv"
 )
 
-func (r *parser) EvalType(expr ast.Expr) Type {
+func (r *parser) EvalType(expr ast.Expr) (ret Type) {
+	defer func() {
+		if ret != nil {
+			ret = newTypeOrigin(ret, expr, nil, nil)
+		}
+	}()
 	switch t := expr.(type) {
 	case *ast.BadExpr:
 		return nil
@@ -114,14 +119,14 @@ func (r *parser) EvalType(expr ast.Expr) Type {
 			if ty == nil {
 				continue
 			}
-
 			if v.Names == nil {
 				t := &typeStructField{
 					name: ty.Name(),
 					elem: ty,
 					tag:  tag,
 				}
-				s.anonymo.Add(t)
+				tt := newTypeOrigin(t, v, v.Doc, v.Comment)
+				s.anonymo.Add(tt)
 				continue
 			}
 			for _, name := range v.Names {
@@ -130,7 +135,8 @@ func (r *parser) EvalType(expr ast.Expr) Type {
 					elem: ty,
 					tag:  tag,
 				}
-				s.fields.Add(t)
+				tt := newTypeOrigin(t, v, v.Doc, v.Comment)
+				s.fields.Add(tt)
 			}
 		}
 		return s
@@ -153,7 +159,8 @@ func (r *parser) EvalType(expr ast.Expr) Type {
 				}
 				for _, name := range v.Names {
 					t := newTypeVar(name.Name, ty)
-					s.params = append(s.params, t)
+					tt := newTypeOrigin(t, v, v.Doc, v.Comment)
+					s.params = append(s.params, tt)
 				}
 			}
 		}
@@ -171,10 +178,12 @@ func (r *parser) EvalType(expr ast.Expr) Type {
 				}
 				for _, name := range v.Names {
 					t := newTypeVar(name.Name, ty)
-					s.results = append(s.results, t)
+					tt := newTypeOrigin(t, v, v.Doc, v.Comment)
+					s.results = append(s.results, tt)
 				}
 			}
 		}
+
 		return s
 	case *ast.InterfaceType:
 		s := &typeInterface{}
@@ -194,7 +203,8 @@ func (r *parser) EvalType(expr ast.Expr) Type {
 
 			for _, name := range v.Names {
 				t := newTypeAlias(name.Name, ty)
-				s.methods.Add(t)
+				tt := newTypeOrigin(t, v, v.Doc, v.Comment)
+				s.methods.Add(tt)
 			}
 		}
 		return s

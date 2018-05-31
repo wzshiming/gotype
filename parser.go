@@ -25,21 +25,24 @@ func newParser(i *Importer, src string) *parser {
 }
 
 // ParserFile parser package
-func (r *parser) ParserPackage(pkg *ast.Package) {
+func (r *parser) ParserPackage(pkg *ast.Package) Type {
 	for _, file := range pkg.Files {
-		r.ParserFile(file)
+		r.parserFile(file)
 	}
+	tt := newTypeScope(pkg.Name, r)
+	tt = newTypeOrigin(tt, pkg, nil, nil)
+	return tt
 }
 
 // ParserFile parser file
-func (r *parser) ParserFile(src *ast.File) {
+func (r *parser) parserFile(src *ast.File) {
 	for _, decl := range src.Decls {
-		r.ParserDecl(decl)
+		r.parserDecl(decl)
 	}
 }
 
 // ParserDecl parser declaration
-func (r *parser) ParserDecl(decl ast.Decl) {
+func (r *parser) parserDecl(decl ast.Decl) {
 	switch d := decl.(type) {
 	case *ast.FuncDecl:
 		r.ParserFunc(d)
@@ -56,6 +59,7 @@ func (r *parser) ParserDecl(decl ast.Decl) {
 }
 
 func (r *parser) ParserFunc(decl *ast.FuncDecl) {
+	doc := decl.Doc
 	f := r.EvalType(decl.Type)
 	if decl.Recv != nil {
 		name, ok := typeName(decl.Recv.List[0].Type)
@@ -64,6 +68,7 @@ func (r *parser) ParserFunc(decl *ast.FuncDecl) {
 		}
 
 		t := newTypeAlias(decl.Name.Name, f)
+		t = newTypeOrigin(t, decl, doc, nil)
 		b := r.method[name]
 		b.Add(t)
 		r.method[name] = b
@@ -71,6 +76,7 @@ func (r *parser) ParserFunc(decl *ast.FuncDecl) {
 	}
 
 	t := newTypeAlias(decl.Name.Name, f)
+	t = newTypeOrigin(t, decl, doc, nil)
 	r.nameds.Add(t)
 	return
 }
@@ -82,12 +88,20 @@ func (r *parser) parserType(decl *ast.GenDecl) {
 			continue
 		}
 
+		doc := s.Doc
+		if decl.Lparen == 0 {
+			doc = decl.Doc
+		}
+		comment := s.Comment
+
 		tt := r.EvalType(s.Type)
 		if s.Assign == 0 && tt.Kind() != Interface {
 			tt = newTypeNamed(s.Name.Name, tt, r)
 		} else {
 			tt = newTypeAlias(s.Name.Name, tt)
 		}
+
+		tt = newTypeOrigin(tt, s, doc, comment)
 		r.nameds.Add(tt)
 	}
 }
@@ -98,6 +112,13 @@ func (r *parser) parserImport(decl *ast.GenDecl) {
 		if !ok {
 			continue
 		}
+
+		doc := s.Doc
+		if decl.Lparen == 0 {
+			doc = decl.Doc
+		}
+		comment := s.Comment
+
 		path, err := strconv.Unquote(s.Path.Value)
 		if err != nil {
 			continue
@@ -108,8 +129,9 @@ func (r *parser) parserImport(decl *ast.GenDecl) {
 		}
 
 		if s.Name == nil {
-			p := newTypeImport("", path, r.src, r.importer)
-			r.nameds.AddNoRepeat(p)
+			tt := newTypeImport("", path, r.src, r.importer)
+			tt = newTypeOrigin(tt, s, doc, comment)
+			r.nameds.AddNoRepeat(tt)
 		} else {
 			switch s.Name.Name {
 			case "_":
@@ -120,11 +142,14 @@ func (r *parser) parserImport(decl *ast.GenDecl) {
 				}
 				l := p.NumChild()
 				for i := 0; i != l; i++ {
-					r.nameds.AddNoRepeat(p.Child(i))
+					tt := p.Child(i)
+					tt = newTypeOrigin(tt, s, doc, comment)
+					r.nameds.AddNoRepeat(tt)
 				}
 			default:
-				t := newTypeImport(s.Name.Name, path, r.src, r.importer)
-				r.nameds.AddNoRepeat(t)
+				tt := newTypeImport(s.Name.Name, path, r.src, r.importer)
+				tt = newTypeOrigin(tt, s, doc, comment)
+				r.nameds.AddNoRepeat(tt)
 			}
 		}
 	}
@@ -139,6 +164,11 @@ loop:
 		if !ok {
 			continue
 		}
+		doc := s.Doc
+		if decl.Lparen == 0 {
+			doc = decl.Doc
+		}
+		comment := s.Comment
 
 		var typ Type
 		if s.Type != nil { // Type definition
@@ -163,8 +193,9 @@ loop:
 					if i == l {
 						break
 					}
-					t := newTypeVar(v.Name, tup.all.Index(i))
-					r.nameds.Add(t)
+					tt := newTypeVar(v.Name, tup.all.Index(i))
+					tt = newTypeOrigin(tt, s, doc, comment)
+					r.nameds.Add(tt)
 				}
 				continue loop
 			}
@@ -178,8 +209,9 @@ loop:
 					break
 				}
 				val := r.EvalType(s.Values[i])
-				t := newTypeVar(v.Name, val)
-				r.nameds.Add(t)
+				tt := newTypeVar(v.Name, val)
+				tt = newTypeOrigin(tt, s, doc, comment)
+				r.nameds.Add(tt)
 			}
 			continue loop
 		}
@@ -194,19 +226,22 @@ loop:
 
 			if typ == nil {
 				if val != nil {
-					t := newTypeVar(v.Name, val)
-					r.nameds.Add(t)
+					tt := newTypeVar(v.Name, val)
+					tt = newTypeOrigin(tt, s, doc, comment)
+					r.nameds.Add(tt)
 				} else {
 					// No action
 				}
 			} else {
 				if val == nil {
-					t := newTypeVar(v.Name, typ)
-					r.nameds.Add(t)
+					tt := newTypeVar(v.Name, typ)
+					tt = newTypeOrigin(tt, s, doc, comment)
+					r.nameds.Add(tt)
 				} else {
-					t := newTypeVar(v.Name, typ)
-					t = newTypeValueBind(t, val)
-					r.nameds.Add(t)
+					tt := newTypeVar(v.Name, typ)
+					tt = newTypeOrigin(tt, s, doc, comment)
+					tt = newTypeValueBind(tt, val)
+					r.nameds.Add(tt)
 				}
 			}
 

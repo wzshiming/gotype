@@ -29,8 +29,11 @@ func newTypeValueBind(typ, val Type) Type {
 		}
 	case Var:
 		name := typ.Name()
-		typ = newTypeValueBind(typ.Elem(), val)
-		return newTypeVar(name, typ)
+		t := newTypeValueBind(typ.Elem(), val)
+		if typ.Origin() != nil {
+			t = newTypeOrigin(t, typ.Origin(), typ.Doc(), typ.Comment())
+		}
+		return newTypeVar(name, t)
 	}
 
 	return &typeValueBind{

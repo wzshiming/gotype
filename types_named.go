@@ -1,6 +1,7 @@
 package gotype
 
 import (
+	"go/ast"
 	"reflect"
 )
 
@@ -236,4 +237,28 @@ func (t *typeNamed) NumAnonymo() int {
 		return 0
 	}
 	return child.NumAnonymo()
+}
+
+func (t *typeNamed) Origin() ast.Node {
+	child, ok := t.ToChild()
+	if !ok {
+		return nil
+	}
+	return child.Origin()
+}
+
+func (t *typeNamed) Doc() *ast.CommentGroup {
+	child, ok := t.ToChild()
+	if !ok {
+		return nil
+	}
+	return child.Doc()
+}
+
+func (t *typeNamed) Comment() *ast.CommentGroup {
+	child, ok := t.ToChild()
+	if !ok {
+		return nil
+	}
+	return child.Comment()
 }

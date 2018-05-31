@@ -2,6 +2,7 @@ package gotype
 
 import (
 	"fmt"
+	"go/ast"
 	"reflect"
 )
 
@@ -250,4 +251,28 @@ func (t *typeSelector) NumAnonymo() int {
 		return 0
 	}
 	return child.NumAnonymo()
+}
+
+func (t *typeSelector) Origin() ast.Node {
+	child, ok := t.ToChild()
+	if !ok {
+		return nil
+	}
+	return child.Origin()
+}
+
+func (t *typeSelector) Doc() *ast.CommentGroup {
+	child, ok := t.ToChild()
+	if !ok {
+		return nil
+	}
+	return child.Doc()
+}
+
+func (t *typeSelector) Comment() *ast.CommentGroup {
+	child, ok := t.ToChild()
+	if !ok {
+		return nil
+	}
+	return child.Comment()
 }

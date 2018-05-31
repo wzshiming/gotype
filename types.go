@@ -1,6 +1,7 @@
 package gotype
 
 import (
+	"go/ast"
 	"reflect"
 	"sort"
 )
@@ -151,6 +152,15 @@ type Type interface {
 	// NumChild returns a anonymo type's field count.
 	// It panics if the type's Kind is not Interface or Struct.
 	NumAnonymo() int
+
+	// Origin returns the type's origin data within its package.
+	Origin() ast.Node
+
+	// Doc returns the type's doc within its package.
+	Doc() *ast.CommentGroup
+
+	// Comment returns the type's comment within its package.
+	Comment() *ast.CommentGroup
 }
 
 type types []Type
@@ -336,4 +346,16 @@ func (t *typeBase) AnonymoByName(string) (Type, bool) {
 func (t *typeBase) NumAnonymo() int {
 	panic("NumAnonymo of invalid type")
 	return 0
+}
+
+func (t *typeBase) Origin() ast.Node {
+	return nil
+}
+
+func (t *typeBase) Doc() *ast.CommentGroup {
+	return nil
+}
+
+func (t *typeBase) Comment() *ast.CommentGroup {
+	return nil
 }
