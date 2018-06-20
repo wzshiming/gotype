@@ -4,6 +4,7 @@ import (
 	"go/ast"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 func (r *parser) EvalType(expr ast.Expr) (ret Type) {
@@ -114,11 +115,15 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 			ty := r.EvalType(v.Type)
 			var tag reflect.StructTag
 			if v.Tag != nil {
-				tag = reflect.StructTag(v.Tag.Value)
+				tv := v.Tag.Value
+				tv = strings.Trim(tv, "`")
+				tag = reflect.StructTag(tv)
 			}
+
 			if ty == nil {
 				continue
 			}
+
 			if v.Names == nil {
 				t := &typeStructField{
 					name: ty.Name(),

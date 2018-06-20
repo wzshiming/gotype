@@ -13,7 +13,7 @@ type typeStructField struct {
 }
 
 func (t *typeStructField) String() string {
-	return fmt.Sprintf("%v %v %v", t.name, t.elem, t.tag)
+	return fmt.Sprintf("%v %v `%v`", t.name, t.elem, t.tag)
 }
 
 func (t *typeStructField) Name() string {
