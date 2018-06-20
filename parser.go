@@ -24,41 +24,42 @@ func newParser(i *Importer, src string) *parser {
 	return r
 }
 
-// ParserFile parser package
-func (r *parser) ParserPackage(pkg *ast.Package) Type {
+// ParsePackage parse package
+func (r *parser) ParsePackage(pkg *ast.Package) Type {
 	for _, file := range pkg.Files {
-		r.parserFile(file)
+		r.parseFile(file)
 	}
 	tt := newTypeScope(pkg.Name, r)
 	tt = newTypeOrigin(tt, pkg, nil, nil)
 	return tt
 }
 
-// ParserFile parser file
-func (r *parser) parserFile(src *ast.File) {
+// parseFile parse file
+func (r *parser) parseFile(src *ast.File) {
 	for _, decl := range src.Decls {
-		r.parserDecl(decl)
+		r.parseDecl(decl)
 	}
 }
 
-// ParserDecl parser declaration
-func (r *parser) parserDecl(decl ast.Decl) {
+// parseDecl parse declaration
+func (r *parser) parseDecl(decl ast.Decl) {
 	switch d := decl.(type) {
 	case *ast.FuncDecl:
-		r.ParserFunc(d)
+		r.parseFunc(d)
 	case *ast.GenDecl:
 		switch d.Tok {
 		case token.CONST, token.VAR:
-			r.parserValue(d)
+			r.parseValue(d)
 		case token.IMPORT:
-			r.parserImport(d)
+			r.parseImport(d)
 		case token.TYPE:
-			r.parserType(d)
+			r.parseType(d)
 		}
 	}
 }
 
-func (r *parser) ParserFunc(decl *ast.FuncDecl) {
+// parseFunc parse function
+func (r *parser) parseFunc(decl *ast.FuncDecl) {
 	doc := decl.Doc
 	f := r.EvalType(decl.Type)
 	if decl.Recv != nil {
@@ -81,7 +82,8 @@ func (r *parser) ParserFunc(decl *ast.FuncDecl) {
 	return
 }
 
-func (r *parser) parserType(decl *ast.GenDecl) {
+// parseType parse type
+func (r *parser) parseType(decl *ast.GenDecl) {
 	for _, spec := range decl.Specs {
 		s, ok := spec.(*ast.TypeSpec)
 		if !ok {
@@ -106,7 +108,8 @@ func (r *parser) parserType(decl *ast.GenDecl) {
 	}
 }
 
-func (r *parser) parserImport(decl *ast.GenDecl) {
+// parserImport parser import
+func (r *parser) parseImport(decl *ast.GenDecl) {
 	for _, spec := range decl.Specs {
 		s, ok := spec.(*ast.ImportSpec)
 		if !ok {
@@ -156,7 +159,8 @@ func (r *parser) parserImport(decl *ast.GenDecl) {
 	}
 }
 
-func (r *parser) parserValue(decl *ast.GenDecl) {
+// parseValue parse value
+func (r *parser) parseValue(decl *ast.GenDecl) {
 	var prev, val Type
 loop:
 	for _, spec := range decl.Specs {
