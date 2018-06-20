@@ -36,7 +36,7 @@ func NewImporter(options ...option) *Importer {
 
 // Import returns go package scope
 func (i *Importer) Import(path string) (Type, error) {
-	return i.impor(path, ".")
+	return i.importParse(path, ".")
 }
 
 // ImportBuild returns details about the Go package named by the import path.
@@ -75,7 +75,7 @@ func (i *Importer) importName(path string, src string) (name string, goroot bool
 	return imp.Name, imp.Goroot
 }
 
-func (i *Importer) impor(path string, src string) (Type, error) {
+func (i *Importer) importParse(path string, src string) (Type, error) {
 	imp, err := i.importBuild(path, src)
 	if err != nil {
 		return nil, err
