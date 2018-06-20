@@ -32,6 +32,9 @@ type Type interface {
 	// the package path will be the empty string.
 	PkgPath() string
 
+	// IsGoroot returns package is found in Go root
+	IsGoroot() bool
+
 	// Name returns the type's name within its package.
 	// It returns an empty string for unnamed types.
 	Name() string
@@ -235,6 +238,10 @@ func (t *types) Len() int {
 }
 
 type typeBase struct{}
+
+func (t *typeBase) IsGoroot() bool {
+	return false
+}
 
 func (t *typeBase) PkgPath() string {
 	return ""

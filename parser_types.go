@@ -10,7 +10,7 @@ import (
 func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 	defer func() {
 		if ret != nil {
-			ret = newTypeOrigin(ret, expr, r.pkg, nil, nil)
+			ret = newTypeOrigin(ret, expr, r.pkg, r.goroot, nil, nil)
 		}
 	}()
 	switch t := expr.(type) {
@@ -42,7 +42,7 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 			d := r.EvalType(v)
 			pairs.li.Add(d)
 		}
-		return newTypeValueBind(typ, pairs, r.pkg)
+		return newTypeValueBind(typ, pairs, r.pkg, r.goroot)
 	case *ast.ParenExpr:
 		return r.EvalType(t.X)
 	case *ast.SelectorExpr:
@@ -130,7 +130,7 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 					elem: ty,
 					tag:  tag,
 				}
-				tt := newTypeOrigin(t, v, r.pkg, v.Doc, v.Comment)
+				tt := newTypeOrigin(t, v, r.pkg, r.goroot, v.Doc, v.Comment)
 				s.anonymo.Add(tt)
 				continue
 			}
@@ -140,7 +140,7 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 					elem: ty,
 					tag:  tag,
 				}
-				tt := newTypeOrigin(t, v, r.pkg, v.Doc, v.Comment)
+				tt := newTypeOrigin(t, v, r.pkg, r.goroot, v.Doc, v.Comment)
 				s.fields.Add(tt)
 			}
 		}
@@ -164,7 +164,7 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 				}
 				for _, name := range v.Names {
 					t := newTypeVar(name.Name, ty)
-					tt := newTypeOrigin(t, v, r.pkg, v.Doc, v.Comment)
+					tt := newTypeOrigin(t, v, r.pkg, r.goroot, v.Doc, v.Comment)
 					s.params = append(s.params, tt)
 				}
 			}
@@ -183,7 +183,7 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 				}
 				for _, name := range v.Names {
 					t := newTypeVar(name.Name, ty)
-					tt := newTypeOrigin(t, v, r.pkg, v.Doc, v.Comment)
+					tt := newTypeOrigin(t, v, r.pkg, r.goroot, v.Doc, v.Comment)
 					s.results = append(s.results, tt)
 				}
 			}
@@ -208,7 +208,7 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 
 			for _, name := range v.Names {
 				t := newTypeAlias(name.Name, ty)
-				tt := newTypeOrigin(t, v, r.pkg, v.Doc, v.Comment)
+				tt := newTypeOrigin(t, v, r.pkg, r.goroot, v.Doc, v.Comment)
 				s.methods.Add(tt)
 			}
 		}

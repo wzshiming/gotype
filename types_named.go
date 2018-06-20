@@ -36,6 +36,14 @@ func (t *typeNamed) PkgPath() string {
 	return child.PkgPath()
 }
 
+func (t *typeNamed) IsGoroot() bool {
+	child, ok := t.ToChild()
+	if !ok {
+		return false
+	}
+	return child.IsGoroot()
+}
+
 func (t *typeNamed) Name() string {
 	return t.name
 }

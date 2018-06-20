@@ -101,7 +101,7 @@ func (i *Importer) impor(path string, src string) (Type, error) {
 	}
 
 	for _, v := range p {
-		np := newParser(i, imp.ImportPath)
+		np := newParser(i, imp.ImportPath, imp.Goroot)
 		t := np.ParsePackage(v)
 		i.bufType[dir] = t
 		return t, nil

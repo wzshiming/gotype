@@ -11,15 +11,17 @@ type parser struct {
 	method   map[string]types // type method
 	nameds   types            // var, func, type, packgae
 	pkg      string
+	goroot   bool
 }
 
 // NewParser
-func newParser(i *Importer, pkg string) *parser {
+func newParser(i *Importer, pkg string, goroot bool) *parser {
 	r := &parser{
 		importer: i,
 		method:   map[string]types{},
 		nameds:   types{},
 		pkg:      pkg,
+		goroot:   goroot,
 	}
 	return r
 }
@@ -30,7 +32,7 @@ func (r *parser) ParsePackage(pkg *ast.Package) Type {
 		r.parseFile(file)
 	}
 	tt := newTypeScope(pkg.Name, r)
-	tt = newTypeOrigin(tt, pkg, r.pkg, nil, nil)
+	tt = newTypeOrigin(tt, pkg, r.pkg, r.goroot, nil, nil)
 	return tt
 }
 
@@ -69,7 +71,7 @@ func (r *parser) parseFunc(decl *ast.FuncDecl) {
 		}
 
 		t := newTypeAlias(decl.Name.Name, f)
-		t = newTypeOrigin(t, decl, r.pkg, doc, nil)
+		t = newTypeOrigin(t, decl, r.pkg, r.goroot, doc, nil)
 		b := r.method[name]
 		b.Add(t)
 		r.method[name] = b
@@ -77,7 +79,7 @@ func (r *parser) parseFunc(decl *ast.FuncDecl) {
 	}
 
 	t := newTypeAlias(decl.Name.Name, f)
-	t = newTypeOrigin(t, decl, r.pkg, doc, nil)
+	t = newTypeOrigin(t, decl, r.pkg, r.goroot, doc, nil)
 	r.nameds.Add(t)
 	return
 }
@@ -103,7 +105,7 @@ func (r *parser) parseType(decl *ast.GenDecl) {
 			tt = newTypeAlias(s.Name.Name, tt)
 		}
 
-		tt = newTypeOrigin(tt, s, r.pkg, doc, comment)
+		tt = newTypeOrigin(tt, s, r.pkg, r.goroot, doc, comment)
 		r.nameds.Add(tt)
 	}
 }
@@ -133,7 +135,7 @@ func (r *parser) parseImport(decl *ast.GenDecl) {
 
 		if s.Name == nil {
 			tt := newTypeImport("", path, r.pkg, r.importer)
-			tt = newTypeOrigin(tt, s, r.pkg, doc, comment)
+			tt = newTypeOrigin(tt, s, r.pkg, r.goroot, doc, comment)
 			r.nameds.AddNoRepeat(tt)
 		} else {
 			switch s.Name.Name {
@@ -147,12 +149,12 @@ func (r *parser) parseImport(decl *ast.GenDecl) {
 				l := p.NumChild()
 				for i := 0; i != l; i++ {
 					tt := p.Child(i)
-					tt = newTypeOrigin(tt, s, r.pkg, doc, comment)
+					tt = newTypeOrigin(tt, s, r.pkg, r.goroot, doc, comment)
 					r.nameds.AddNoRepeat(tt)
 				}
 			default:
 				tt := newTypeImport(s.Name.Name, path, r.pkg, r.importer)
-				tt = newTypeOrigin(tt, s, r.pkg, doc, comment)
+				tt = newTypeOrigin(tt, s, r.pkg, r.goroot, doc, comment)
 				r.nameds.AddNoRepeat(tt)
 			}
 		}
@@ -199,7 +201,7 @@ loop:
 						break
 					}
 					tt := newTypeVar(v.Name, tup.all.Index(i))
-					tt = newTypeOrigin(tt, s, r.pkg, doc, comment)
+					tt = newTypeOrigin(tt, s, r.pkg, r.goroot, doc, comment)
 					r.nameds.Add(tt)
 				}
 				continue loop
@@ -215,7 +217,7 @@ loop:
 				}
 				val := r.EvalType(s.Values[i])
 				tt := newTypeVar(v.Name, val)
-				tt = newTypeOrigin(tt, s, r.pkg, doc, comment)
+				tt = newTypeOrigin(tt, s, r.pkg, r.goroot, doc, comment)
 				r.nameds.Add(tt)
 			}
 			continue loop
@@ -232,7 +234,7 @@ loop:
 			if typ == nil {
 				if val != nil {
 					tt := newTypeVar(v.Name, val)
-					tt = newTypeOrigin(tt, s, r.pkg, doc, comment)
+					tt = newTypeOrigin(tt, s, r.pkg, r.goroot, doc, comment)
 					r.nameds.Add(tt)
 				} else {
 					// No action
@@ -240,12 +242,12 @@ loop:
 			} else {
 				if val == nil {
 					tt := newTypeVar(v.Name, typ)
-					tt = newTypeOrigin(tt, s, r.pkg, doc, comment)
+					tt = newTypeOrigin(tt, s, r.pkg, r.goroot, doc, comment)
 					r.nameds.Add(tt)
 				} else {
 					tt := newTypeVar(v.Name, typ)
-					tt = newTypeOrigin(tt, s, r.pkg, doc, comment)
-					tt = newTypeValueBind(tt, val, r.pkg)
+					tt = newTypeOrigin(tt, s, r.pkg, r.goroot, doc, comment)
+					tt = newTypeValueBind(tt, val, r.pkg, r.goroot)
 					r.nameds.Add(tt)
 				}
 			}

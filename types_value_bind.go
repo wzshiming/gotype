@@ -1,6 +1,6 @@
 package gotype
 
-func newTypeValueBind(typ, val Type, pkg string) Type {
+func newTypeValueBind(typ, val Type, pkg string, goroot bool) Type {
 	switch typ.Kind() {
 	case Struct:
 		if v, ok := val.(*typeValuePairs); ok {
@@ -11,7 +11,7 @@ func newTypeValueBind(typ, val Type, pkg string) Type {
 				name := f.Name()
 				b := f
 				if val, ok := v.li.Search(name); ok {
-					b = newTypeValueBind(f, val, pkg)
+					b = newTypeValueBind(f, val, pkg, goroot)
 				}
 				nt.fields = append(nt.fields, b)
 			}
@@ -21,7 +21,7 @@ func newTypeValueBind(typ, val Type, pkg string) Type {
 				name := f.Name()
 				b := f
 				if val, ok := v.li.Search(name); ok {
-					b = newTypeValueBind(f, val, pkg)
+					b = newTypeValueBind(f, val, pkg, goroot)
 				}
 				nt.anonymo = append(nt.anonymo, b)
 			}
@@ -29,9 +29,9 @@ func newTypeValueBind(typ, val Type, pkg string) Type {
 		}
 	case Var:
 		name := typ.Name()
-		t := newTypeValueBind(typ.Elem(), val, pkg)
+		t := newTypeValueBind(typ.Elem(), val, pkg, goroot)
 		if typ.Origin() != nil {
-			t = newTypeOrigin(t, typ.Origin(), pkg, typ.Doc(), typ.Comment())
+			t = newTypeOrigin(t, typ.Origin(), pkg, goroot, typ.Doc(), typ.Comment())
 		}
 		return newTypeVar(name, t)
 	}

@@ -65,6 +65,14 @@ func (t *typeSelector) PkgPath() string {
 	return child.PkgPath()
 }
 
+func (t *typeSelector) IsGoroot() bool {
+	child, ok := t.ToChild()
+	if !ok {
+		return false
+	}
+	return child.IsGoroot()
+}
+
 func (t *typeSelector) Name() string {
 	return t.sel
 }
