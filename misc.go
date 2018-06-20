@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+type importParseFunc func(path string, src string) (Type, error)
+
 func constValue(x ast.Expr) string {
 	switch t := x.(type) {
 	case *ast.BasicLit:

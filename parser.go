@@ -7,12 +7,12 @@ import (
 )
 
 type parser struct {
-	importer *Importer
+	importer importParseFunc
 	info     *info
 }
 
 // NewParser
-func newParser(i *Importer, pkg string, goroot bool) *parser {
+func newParser(i importParseFunc, pkg string, goroot bool) *parser {
 	r := &parser{
 		importer: i,
 		info:     newInfo(pkg, goroot),
@@ -135,9 +135,8 @@ func (r *parser) parseImport(decl *ast.GenDecl) {
 			switch s.Name.Name {
 			case "_":
 			case ".":
-				p, err := r.importer.importParse(path, r.info.PkgPath)
+				p, err := r.importer(path, r.info.PkgPath)
 				if err != nil {
-					r.importer.errorHandler(err)
 					continue
 				}
 				l := p.NumChild()

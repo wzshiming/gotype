@@ -1,6 +1,6 @@
 package gotype
 
-func newTypeImport(name, path string, src string, imp *Importer) Type {
+func newTypeImport(name, path string, src string, imp importParseFunc) Type {
 	return &typeImport{
 		name: name,
 		path: path,
@@ -14,7 +14,7 @@ type typeImport struct {
 	name  string
 	path  string
 	src   string
-	imp   *Importer
+	imp   importParseFunc
 	scope Type
 }
 
@@ -23,10 +23,7 @@ func (t *typeImport) check() {
 		return
 	}
 
-	s, err := t.imp.importParse(t.path, t.src)
-	if err != nil {
-		t.imp.errorHandler(err)
-	}
+	s, _ := t.imp(t.path, t.src)
 	t.scope = s
 }
 
@@ -35,11 +32,11 @@ func (t *typeImport) String() string {
 }
 
 func (t *typeImport) Name() string {
-	if t.name == "" {
-		name, _ := t.imp.importName(t.path, t.src)
-		t.name = name
+	t.check()
+	if t.scope == nil {
+		return ""
 	}
-	return t.name
+	return t.scope.Name()
 }
 
 func (t *typeImport) Kind() Kind {
