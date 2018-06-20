@@ -4,7 +4,9 @@ import (
 	"go/ast"
 )
 
-func newTypeOrigin(v Type, ori ast.Node, pkg string, goroot bool, doc, comment *ast.CommentGroup) Type {
+func newTypeOrigin(v Type, ori ast.Node, info *info, doc, comment *ast.CommentGroup) Type {
+	pkg := info.PkgPath
+	goroot := info.Goroot
 	if p := v.PkgPath(); p != "" {
 		pkg = p
 	}

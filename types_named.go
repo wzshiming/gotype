@@ -5,24 +5,24 @@ import (
 	"reflect"
 )
 
-func newTypeNamed(name string, typ Type, parser *parser) Type {
+func newTypeNamed(name string, typ Type, info *info) Type {
 	return &typeNamed{
-		name:   name,
-		typ:    typ,
-		parser: parser,
+		name: name,
+		typ:  typ,
+		info: info,
 	}
 }
 
 type typeNamed struct {
-	name   string
-	parser *parser
-	typ    Type
+	name string
+	info *info
+	typ  Type
 }
 
 func (t *typeNamed) ToChild() (Type, bool) {
 	if t.typ == nil {
 		var ok bool
-		t.typ, ok = t.parser.nameds.Search(t.Name())
+		t.typ, ok = t.info.Named.Search(t.Name())
 		return t.typ, ok
 	}
 	return t.typ, true
@@ -173,18 +173,18 @@ func (t *typeNamed) IsVariadic() bool {
 }
 
 func (t *typeNamed) NumMethods() int {
-	if t.parser == nil {
+	if t.info == nil {
 		return 0
 	}
-	b := t.parser.method[t.Name()]
+	b := t.info.Methods[t.Name()]
 	return b.Len()
 }
 
 func (t *typeNamed) Methods(i int) Type {
-	if t.parser == nil {
+	if t.info == nil {
 		return nil
 	}
-	b := t.parser.method[t.Name()]
+	b := t.info.Methods[t.Name()]
 	if b.Len() <= i {
 		return nil
 	}
@@ -192,10 +192,10 @@ func (t *typeNamed) Methods(i int) Type {
 }
 
 func (t *typeNamed) MethodsByName(name string) (Type, bool) {
-	if t.parser == nil {
+	if t.info == nil {
 		return nil, false
 	}
-	b := t.parser.method[t.Name()]
+	b := t.info.Methods[t.Name()]
 	m, ok := b.Search(name)
 	if ok {
 		return m, true
