@@ -57,6 +57,14 @@ func (t *typeSelector) String() string {
 	return fmt.Sprintf("%v.%v", t.x, t.sel)
 }
 
+func (t *typeSelector) PkgPath() string {
+	child, ok := t.ToChild()
+	if !ok {
+		return ""
+	}
+	return child.PkgPath()
+}
+
 func (t *typeSelector) Name() string {
 	return t.sel
 }

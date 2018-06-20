@@ -28,6 +28,14 @@ func (t *typeNamed) ToChild() (Type, bool) {
 	return t.typ, true
 }
 
+func (t *typeNamed) PkgPath() string {
+	child, ok := t.ToChild()
+	if !ok {
+		return ""
+	}
+	return child.PkgPath()
+}
+
 func (t *typeNamed) Name() string {
 	return t.name
 }

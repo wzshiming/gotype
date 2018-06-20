@@ -26,6 +26,12 @@ type Type interface {
 	// compare the Types directly.
 	String() string
 
+	// PkgPath returns a named type's package path, that is, the import path
+	// that uniquely identifies the package, such as "encoding/base64".
+	// If the type was predeclared (string, error) or unnamed (*T, struct{}, []int),
+	// the package path will be the empty string.
+	PkgPath() string
+
 	// Name returns the type's name within its package.
 	// It returns an empty string for unnamed types.
 	Name() string
@@ -229,6 +235,10 @@ func (t *types) Len() int {
 }
 
 type typeBase struct{}
+
+func (t *typeBase) PkgPath() string {
+	return ""
+}
 
 func (t *typeBase) Name() string {
 	return ""
