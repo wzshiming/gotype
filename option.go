@@ -8,3 +8,10 @@ func ErrorHandler(f func(error)) option {
 		i.errorHandler = f
 	}
 }
+
+// WithCommentLocator sets comment locator
+func WithCommentLocator() option {
+	return func(i *Importer) {
+		i.isCommentLocator = true
+	}
+}

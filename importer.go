@@ -11,11 +11,12 @@ import (
 
 // Importer Go source type analyzer
 type Importer struct {
-	fset         *token.FileSet
-	mode         goparser.Mode
-	bufType      map[string]Type
-	bufBuild     map[string]*build.Package
-	errorHandler func(error)
+	fset             *token.FileSet
+	mode             goparser.Mode
+	bufType          map[string]Type
+	bufBuild         map[string]*build.Package
+	errorHandler     func(error)
+	isCommentLocator bool
 }
 
 // NewImporter creates a new importer
@@ -42,7 +43,7 @@ func (i *Importer) Import(path string) (Type, error) {
 
 // ImportPackage returns go package scope
 func (i *Importer) ImportPackage(path string, pkg *ast.Package) (Type, error) {
-	np := newParser(i.importParse, path, false)
+	np := newParser(i.importParse, i.isCommentLocator, path, false)
 	t := np.ParsePackage(pkg)
 	i.bufType[path] = t
 	return t, nil
@@ -50,7 +51,7 @@ func (i *Importer) ImportPackage(path string, pkg *ast.Package) (Type, error) {
 
 // ImportFile returns go package scope
 func (i *Importer) ImportFile(path string, f *ast.File) (Type, error) {
-	np := newParser(i.importParse, path, false)
+	np := newParser(i.importParse, i.isCommentLocator, path, false)
 	t := np.ParseFile(f)
 	i.bufType[path] = t
 	return t, nil
@@ -127,7 +128,7 @@ func (i *Importer) importParse(path string, src string) (Type, error) {
 	}
 
 	for _, v := range p {
-		np := newParser(i.importParse, imp.ImportPath, imp.Goroot)
+		np := newParser(i.importParse, i.isCommentLocator, imp.ImportPath, imp.Goroot)
 		t := np.ParsePackage(v)
 		i.bufType[dir] = t
 		return t, nil

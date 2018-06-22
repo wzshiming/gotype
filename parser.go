@@ -7,15 +7,18 @@ import (
 )
 
 type parser struct {
-	importer importParseFunc
-	info     *info
+	importer         importParseFunc
+	isCommentLocator bool
+	info             *info
+	comments         []*ast.CommentGroup
 }
 
 // NewParser
-func newParser(i importParseFunc, pkg string, goroot bool) *parser {
+func newParser(i importParseFunc, c bool, pkg string, goroot bool) *parser {
 	r := &parser{
-		importer: i,
-		info:     newInfo(pkg, goroot),
+		importer:         i,
+		isCommentLocator: c,
+		info:             newInfo(pkg, goroot),
 	}
 	return r
 }
@@ -30,11 +33,21 @@ func (r *parser) ParsePackage(pkg *ast.Package) Type {
 	return tt
 }
 
+// ParseFile parse file
+func (r *parser) ParseFile(file *ast.File) Type {
+	r.parseFile(file)
+	tt := newTypeScope(file.Name.String(), r.info)
+	tt = newTypeOrigin(tt, file, r.info, nil, nil)
+	return tt
+}
+
 // parseFile parse file
-func (r *parser) parseFile(src *ast.File) {
-	for _, decl := range src.Decls {
+func (r *parser) parseFile(file *ast.File) {
+	r.comments = file.Comments
+	for _, decl := range file.Decls {
 		r.parseDecl(decl)
 	}
+	r.comments = nil
 }
 
 // parseDecl parse declaration

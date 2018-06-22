@@ -2,6 +2,7 @@ package gotype
 
 import (
 	"go/ast"
+	"go/token"
 	"reflect"
 	"strconv"
 	"strings"
@@ -148,7 +149,8 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 	case *ast.FuncType:
 		s := &typeFunc{}
 		if t.Params != nil {
-			for _, v := range t.Params.List {
+			list := t.Params.List
+			for pk, v := range list {
 				if _, ok := v.Type.(*ast.Ellipsis); ok {
 					s.variadic = true
 				}
@@ -162,15 +164,33 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 					s.params = append(s.params, t)
 					continue
 				}
-				for _, name := range v.Names {
-					t := newTypeVar(name.Name, ty)
-					tt := newTypeOrigin(t, v, r.info, v.Doc, v.Comment)
+				for nk, name := range v.Names {
+					tv := newTypeVar(name.Name, ty)
+					tt := newTypeOrigin(tv, v, r.info, v.Doc, v.Comment)
+
+					// Parameter comment, Because the default criteria are not handled.
+					if r.isCommentLocator {
+						var beg, end token.Pos
+						if nk != len(v.Names)-1 {
+							beg = name.End()
+						} else {
+							beg = v.Type.End()
+						}
+						if pk != len(list)-1 {
+							end = list[pk+1].Pos()
+						} else {
+							end = t.Params.End()
+						}
+						tt = newTypeCommentLocatorComment(tt, beg, end, r.comments)
+					}
+
 					s.params = append(s.params, tt)
 				}
 			}
 		}
 		if t.Results != nil {
-			for _, v := range t.Results.List {
+			list := t.Results.List
+			for pk, v := range list {
 				ty := r.EvalType(v.Type)
 				if ty == nil {
 					continue
@@ -181,9 +201,26 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 					s.results = append(s.results, t)
 					continue
 				}
-				for _, name := range v.Names {
-					t := newTypeVar(name.Name, ty)
-					tt := newTypeOrigin(t, v, r.info, v.Doc, v.Comment)
+				for nk, name := range v.Names {
+					tv := newTypeVar(name.Name, ty)
+					tt := newTypeOrigin(tv, v, r.info, v.Doc, v.Comment)
+
+					// Parameter comment, Because the default criteria are not handled.
+					if r.isCommentLocator {
+						var beg, end token.Pos
+						if nk != len(v.Names)-1 {
+							beg = name.End()
+						} else {
+							beg = v.Type.End()
+						}
+						if pk != len(list)-1 {
+							end = list[pk+1].Pos()
+						} else {
+							end = t.Results.End()
+						}
+						tt = newTypeCommentLocatorComment(tt, beg, end, r.comments)
+					}
+
 					s.results = append(s.results, tt)
 				}
 			}
