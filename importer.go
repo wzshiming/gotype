@@ -2,6 +2,7 @@ package gotype
 
 import (
 	"fmt"
+	"go/ast"
 	"go/build"
 	goparser "go/parser"
 	"go/token"
@@ -37,6 +38,31 @@ func NewImporter(options ...option) *Importer {
 // Import returns go package scope
 func (i *Importer) Import(path string) (Type, error) {
 	return i.importParse(path, ".")
+}
+
+// ImportPackage returns go package scope
+func (i *Importer) ImportPackage(path string, pkg *ast.Package) (Type, error) {
+	np := newParser(i.importParse, path, false)
+	t := np.ParsePackage(pkg)
+	i.bufType[path] = t
+	return t, nil
+}
+
+// ImportFile returns go package scope
+func (i *Importer) ImportFile(path string, f *ast.File) (Type, error) {
+	np := newParser(i.importParse, path, false)
+	t := np.ParseFile(f)
+	i.bufType[path] = t
+	return t, nil
+}
+
+// ImportSource returns go package scope
+func (i *Importer) ImportSource(path string, src []byte) (Type, error) {
+	f, err := goparser.ParseFile(i.fset, path, src, i.mode)
+	if err != nil {
+		return nil, err
+	}
+	return i.ImportFile(path, f)
 }
 
 // ImportBuild returns details about the Go package named by the import path.
