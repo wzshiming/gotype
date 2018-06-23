@@ -169,10 +169,11 @@ func (r *parser) parseImport(decl *ast.GenDecl) {
 
 // parseValue parse value
 func (r *parser) parseValue(decl *ast.GenDecl) {
-	var prev, val Type
+	var prevVal ast.Expr
+	var prevTyp ast.Expr
+
 loop:
-	for _, spec := range decl.Specs {
-		prev = val
+	for index, spec := range decl.Specs {
 		s, ok := spec.(*ast.ValueSpec)
 		if !ok {
 			continue
@@ -183,25 +184,38 @@ loop:
 		}
 		comment := s.Comment
 
-		var typ Type
-		if s.Type != nil { // Type definition
-			typ = r.EvalType(s.Type)
+		ctyp := s.Type
+		values := s.Values
+
+		if decl.Tok == token.CONST && s.Type == nil && len(values) == 0 {
+			values = append(values, prevVal)
+			ctyp = prevTyp
 		}
-		val = nil
 
-		switch l := len(s.Values); l {
-		case 0:
+		var typ Type
+		if ctyp != nil { // Type definition
+			typ = r.EvalType(ctyp)
 			if decl.Tok == token.CONST {
-				val = prev
+				prevTyp = ctyp
 			}
-		case 1:
-			val = r.EvalType(s.Values[0])
-			if tup, ok := val.(*typeTuple); ok {
+		}
 
+		var val Type
+
+		switch l := len(values); l {
+		case 0:
+			continue loop
+		case 1:
+			val = r.EvalType(values[0])
+			if decl.Tok == token.CONST {
+				prevVal = values[0]
+				val = newEvalBind(val, int64(index), r.info)
+			}
+			if tup, ok := val.(*typeTuple); ok {
 				l := tup.all.Len()
 				for i, v := range s.Names {
 					if v.Name == "" {
-
+						continue
 					}
 					if i == l {
 						break
@@ -214,7 +228,7 @@ loop:
 				continue loop
 			}
 		default:
-			l := len(s.Values)
+			l := len(values)
 			for i, v := range s.Names {
 				if v.Name == "" {
 					continue
@@ -222,7 +236,10 @@ loop:
 				if i == l {
 					break
 				}
-				val = r.EvalType(s.Values[i])
+				val = r.EvalType(values[i])
+				if decl.Tok == token.CONST {
+					val = newEvalBind(val, int64(index), r.info)
+				}
 				tt := newTypeVar(v.Name, val)
 				tt = newTypeOrigin(tt, s, r.info, doc, comment)
 				r.info.Named.Add(tt)
@@ -257,7 +274,6 @@ loop:
 					tt = newTypeValueBind(tt, val, r.info)
 					r.info.Named.Add(tt)
 				}
-				val = typ
 			}
 		}
 	}
