@@ -43,7 +43,7 @@ func (i *Importer) Import(path string) (Type, error) {
 
 // ImportPackage returns go package scope
 func (i *Importer) ImportPackage(path string, pkg *ast.Package) (Type, error) {
-	np := newParser(i.importParse, i.isCommentLocator, path, false)
+	np := newParser(i.importParseErrorHandler, i.isCommentLocator, path, false)
 	t := np.ParsePackage(pkg)
 	i.bufType[path] = t
 	return t, nil
@@ -51,7 +51,7 @@ func (i *Importer) ImportPackage(path string, pkg *ast.Package) (Type, error) {
 
 // ImportFile returns go package scope
 func (i *Importer) ImportFile(path string, f *ast.File) (Type, error) {
-	np := newParser(i.importParse, i.isCommentLocator, path, false)
+	np := newParser(i.importParseErrorHandler, i.isCommentLocator, path, false)
 	t := np.ParseFile(f)
 	i.bufType[path] = t
 	return t, nil
@@ -102,6 +102,14 @@ func (i *Importer) importName(path string, src string) (name string, goroot bool
 	return imp.Name, imp.Goroot
 }
 
+func (i *Importer) importParseErrorHandler(path string, src string) (Type, error) {
+	t, err := i.importParse(path, src)
+	if err != nil {
+		i.errorHandler(err)
+	}
+	return t, err
+}
+
 func (i *Importer) importParse(path string, src string) (Type, error) {
 	imp, err := i.importBuild(path, src)
 	if err != nil {
@@ -128,7 +136,7 @@ func (i *Importer) importParse(path string, src string) (Type, error) {
 	}
 
 	for _, v := range p {
-		np := newParser(i.importParse, i.isCommentLocator, imp.ImportPath, imp.Goroot)
+		np := newParser(i.importParseErrorHandler, i.isCommentLocator, imp.ImportPath, imp.Goroot)
 		t := np.ParsePackage(v)
 		i.bufType[dir] = t
 		return t, nil
