@@ -200,13 +200,14 @@ loop:
 
 				l := tup.all.Len()
 				for i, v := range s.Names {
-					if v.Name == "" || v.Name == "_" {
-						continue
+					if v.Name == "" {
+
 					}
 					if i == l {
 						break
 					}
-					tt := newTypeVar(v.Name, tup.all.Index(i))
+					val = tup.all.Index(i)
+					tt := newTypeVar(v.Name, val)
 					tt = newTypeOrigin(tt, s, r.info, doc, comment)
 					r.info.Named.Add(tt)
 				}
@@ -215,13 +216,13 @@ loop:
 		default:
 			l := len(s.Values)
 			for i, v := range s.Names {
-				if v.Name == "" || v.Name == "_" {
+				if v.Name == "" {
 					continue
 				}
 				if i == l {
 					break
 				}
-				val := r.EvalType(s.Values[i])
+				val = r.EvalType(s.Values[i])
 				tt := newTypeVar(v.Name, val)
 				tt = newTypeOrigin(tt, s, r.info, doc, comment)
 				r.info.Named.Add(tt)
@@ -233,7 +234,7 @@ loop:
 			continue
 		}
 		for _, v := range s.Names {
-			if v.Name == "" || v.Name == "_" {
+			if v.Name == "" {
 				continue
 			}
 
@@ -256,8 +257,8 @@ loop:
 					tt = newTypeValueBind(tt, val, r.info)
 					r.info.Named.Add(tt)
 				}
+				val = typ
 			}
-
 		}
 	}
 }
