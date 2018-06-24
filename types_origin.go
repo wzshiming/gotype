@@ -6,14 +6,20 @@ import (
 
 func newTypeOrigin(v Type, ori ast.Node, info *info, doc, comment *ast.CommentGroup) Type {
 	pkg := info.PkgPath
-	goroot := info.Goroot
+	goroot := info.Goroot || v.IsGoroot()
 	if p := v.PkgPath(); p != "" {
 		pkg = p
+	}
+	if doc == nil {
+		doc = v.Doc()
+	}
+	if comment == nil {
+		comment = v.Comment()
 	}
 	return &typeOrigin{
 		Type:    v,
 		pkgPath: pkg,
-		goroot:  goroot || v.IsGoroot(),
+		goroot:  goroot,
 		ori:     ori,
 		doc:     doc,
 		comment: comment,
