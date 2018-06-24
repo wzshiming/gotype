@@ -127,12 +127,13 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 
 			if v.Names == nil {
 				t := &typeStructField{
-					name: ty.Name(),
-					elem: ty,
-					tag:  tag,
+					name:      ty.Name(),
+					elem:      ty,
+					tag:       tag,
+					anonymous: true,
 				}
 				tt := newTypeOrigin(t, v, r.info, v.Doc, v.Comment)
-				s.anonymo.Add(tt)
+				s.fields = append(s.fields, tt)
 				continue
 			}
 			for _, name := range v.Names {
@@ -142,7 +143,7 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 					tag:  tag,
 				}
 				tt := newTypeOrigin(t, v, r.info, v.Doc, v.Comment)
-				s.fields.Add(tt)
+				s.fields = append(s.fields, tt)
 			}
 		}
 		return s

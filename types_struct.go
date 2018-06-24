@@ -6,18 +6,13 @@ import (
 
 type typeStruct struct {
 	typeBase
-	fields  types // 字段
-	anonymo types // 组合的类型
+	fields types // fields
 }
 
 func (t *typeStruct) String() string {
 	buf := bytes.NewBuffer(nil)
 	buf.WriteString("struct {")
-	if len(t.anonymo)+len(t.fields) != 0 {
-		buf.WriteByte('\n')
-	}
-	for _, v := range t.anonymo {
-		buf.WriteString(v.String())
+	if len(t.fields) != 0 {
 		buf.WriteByte('\n')
 	}
 	for _, v := range t.fields {
@@ -41,42 +36,35 @@ func (t *typeStruct) Field(i int) Type {
 }
 
 func (t *typeStruct) FieldByName(name string) (Type, bool) {
-	b, ok := t.fields.Search(name)
-	if ok {
-		return b, true
-	}
-	b, ok = t.anonymo.Search(name)
-	if ok {
-		return b, true
+	anonymo := []int{}
+	for i, v := range t.fields {
+		fieldName := v.Name()
+		if fieldName == name {
+			return v, true
+		}
+		if v.IsAnonymous() {
+			anonymo = append(anonymo, i)
+		}
 	}
 
-	for _, v := range t.anonymo {
-		b, ok = v.FieldByName(name)
+	for _, i := range anonymo {
+		v := t.fields[i]
+		t, ok := v.FieldByName(name)
 		if ok {
-			return b, true
+			return t, true
 		}
 	}
 	return nil, false
 }
 
 func (t *typeStruct) MethodsByName(name string) (Type, bool) {
-	for _, v := range t.anonymo {
-		b, ok := v.MethodsByName(name)
-		if ok {
-			return b, true
+	for _, v := range t.fields {
+		if v.IsAnonymous() {
+			b, ok := v.MethodsByName(name)
+			if ok {
+				return b, true
+			}
 		}
 	}
 	return nil, false
-}
-
-func (t *typeStruct) NumAnonymo() int {
-	return t.anonymo.Len()
-}
-
-func (t *typeStruct) Anonymo(i int) Type {
-	return t.anonymo.Index(i)
-}
-
-func (t *typeStruct) AnonymoByName(name string) (Type, bool) {
-	return t.anonymo.Search(name)
 }

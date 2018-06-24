@@ -125,6 +125,14 @@ func (t *typeSelector) FieldByName(name string) (Type, bool) {
 	return child.FieldByName(name)
 }
 
+func (t *typeSelector) IsAnonymous() bool {
+	child, ok := t.ToChild()
+	if !ok {
+		return false
+	}
+	return child.IsAnonymous()
+}
+
 func (t *typeSelector) Tag() reflect.StructTag {
 	child, ok := t.ToChild()
 	if !ok {
@@ -243,30 +251,6 @@ func (t *typeSelector) NumChild() int {
 		return 0
 	}
 	return child.NumChild()
-}
-
-func (t *typeSelector) Anonymo(i int) Type {
-	child, ok := t.ToChild()
-	if !ok {
-		return nil
-	}
-	return child.Anonymo(i)
-}
-
-func (t *typeSelector) AnonymoByName(name string) (Type, bool) {
-	child, ok := t.ToChild()
-	if !ok {
-		return nil, false
-	}
-	return child.AnonymoByName(name)
-}
-
-func (t *typeSelector) NumAnonymo() int {
-	child, ok := t.ToChild()
-	if !ok {
-		return 0
-	}
-	return child.NumAnonymo()
 }
 
 func (t *typeSelector) Origin() ast.Node {

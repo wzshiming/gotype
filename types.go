@@ -99,7 +99,6 @@ type Type interface {
 	IsVariadic() bool
 
 	// Field returns a struct type's i'th field.
-	// Not contain anonymo
 	// It panics if the type's Kind is not Struct.
 	// It panics if i is not in the range [0, NumField()).
 	Field(int) Type
@@ -109,9 +108,12 @@ type Type interface {
 	FieldByName(string) (Type, bool)
 
 	// NumField returns a struct type's field count.
-	// Not contain anonymo
 	// It panics if the type's Kind is not Struct.
 	NumField() int
+
+	// IsAnonymous returns is an embedded field
+	// It panics if the type's Kind is not Field.
+	IsAnonymous() bool
 
 	// Method returns the i'th method in the type's method set.
 	// Not contain anonymo
@@ -148,19 +150,6 @@ type Type interface {
 
 	// NumChild returns a scope type's field count.
 	NumChild() int
-
-	// Anonymo returns the i'th type in the type's anonymo set.
-	// It panics if i is not in the range [0, NumAnonymo()).
-	// It panics if the type's Kind is not Interface or Struct.
-	Anonymo(int) Type
-
-	// AnonymoByName returns the anonymo type with the given name
-	// and a boolean indicating if the field was found.
-	AnonymoByName(string) (Type, bool)
-
-	// NumChild returns a anonymo type's field count.
-	// It panics if the type's Kind is not Interface or Struct.
-	NumAnonymo() int
 
 	// Origin returns the type's origin data within its package.
 	Origin() ast.Node
@@ -308,18 +297,27 @@ func (t *typeBase) IsVariadic() bool {
 	panic("IsVariadic of non-func type")
 	return false
 }
+
 func (t *typeBase) Field(int) Type {
 	panic("Field of non-struct type")
 	return nil
 }
+
 func (t *typeBase) FieldByName(string) (Type, bool) {
 	panic("FieldByName of non-struct type")
 	return nil, false
 }
+
 func (t *typeBase) NumField() int {
 	panic("NumField of non-struct type")
 	return 0
 }
+
+func (t *typeBase) IsAnonymous() bool {
+	panic("IsAnonymous of non-field type")
+	return false
+}
+
 func (t *typeBase) Methods(int) Type {
 	//panic("Methods of invalid type")
 	return nil
@@ -347,21 +345,6 @@ func (t *typeBase) ChildByName(string) (Type, bool) {
 
 func (t *typeBase) NumChild() int {
 	//panic("NumChild of invalid type")
-	return 0
-}
-
-func (t *typeBase) Anonymo(int) Type {
-	panic("Anonymo of invalid type")
-	return nil
-}
-
-func (t *typeBase) AnonymoByName(string) (Type, bool) {
-	panic("AnonymoByName of invalid type")
-	return nil, false
-}
-
-func (t *typeBase) NumAnonymo() int {
-	panic("NumAnonymo of invalid type")
 	return 0
 }
 

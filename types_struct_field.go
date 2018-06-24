@@ -7,9 +7,10 @@ import (
 
 type typeStructField struct {
 	typeBase
-	name string
-	elem Type              // 字段类型
-	tag  reflect.StructTag // 字段标签
+	name      string
+	elem      Type
+	tag       reflect.StructTag
+	anonymous bool
 }
 
 func (t *typeStructField) String() string {
@@ -30,4 +31,8 @@ func (t *typeStructField) Kind() Kind {
 
 func (t *typeStructField) Tag() reflect.StructTag {
 	return t.tag
+}
+
+func (t *typeStructField) IsAnonymous() bool {
+	return t.anonymous
 }

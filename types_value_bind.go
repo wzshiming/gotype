@@ -15,16 +15,6 @@ func newTypeValueBind(typ, val Type, info *info) Type {
 				}
 				nt.fields = append(nt.fields, b)
 			}
-			al := typ.NumAnonymo()
-			for i := 0; i != al; i++ {
-				f := typ.Field(i)
-				name := f.Name()
-				b := f
-				if val, ok := v.li.Search(name); ok {
-					b = newTypeValueBind(f, val, info)
-				}
-				nt.anonymo = append(nt.anonymo, b)
-			}
 			return nt
 		}
 	case Var:
