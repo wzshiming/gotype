@@ -34,7 +34,7 @@ func commentLocator(pos, end token.Pos, comments []*ast.CommentGroup) *ast.Comme
 	i := sort.Search(len(comments), func(i int) bool {
 		return pos < comments[i].Pos()
 	})
-	if i == -1 {
+	if i == -1 || i >= len(comments) {
 		return nil
 	}
 	if comments[i].End() < end {
