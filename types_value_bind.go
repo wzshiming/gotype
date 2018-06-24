@@ -36,36 +36,40 @@ func newTypeValueBind(typ, val Type, info *info) Type {
 		return newTypeVar(name, t)
 	}
 
-	return newValueBind(typ, val.Value())
+	return newValueBind(typ, val.Value)
 }
 
-func newValueBind(typ Type, val string) *typeValueBind {
+func newValueBind(typ Type, valfunc func() string) *typeValueBind {
 	if tv, ok := typ.(*typeValueBind); ok {
-		return newValueBind(tv.Type, val)
+		return newValueBind(tv.Type, tv.Value)
 	}
 	return &typeValueBind{
-		Type: typ,
-		val:  val,
+		Type:    typ,
+		valfunc: valfunc,
 	}
 }
 
 func newEvalBind(val Type, index int64, info *info) Type {
-	v, err := constantEval(val.Origin(), int64(index), info)
-	if err != nil {
-		return val
-	}
-	str := v.ExactString()
-	if str != "" {
-		val = newValueBind(val, str)
-	}
+	ori := val.Origin()
+	val = newValueBind(val, func() string {
+		v, err := constantEval(ori, int64(index), info)
+		if err != nil {
+			return ""
+		}
+		return v.ExactString()
+	})
 	return val
 }
 
 type typeValueBind struct {
 	Type
-	val string
+	valfunc func() string
+	val     string
 }
 
 func (t *typeValueBind) Value() string {
+	if t.val == "" {
+		t.val = t.valfunc()
+	}
 	return t.val
 }
