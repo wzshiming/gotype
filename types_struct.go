@@ -57,10 +57,10 @@ func (t *typeStruct) FieldByName(name string) (Type, bool) {
 	return nil, false
 }
 
-func (t *typeStruct) MethodsByName(name string) (Type, bool) {
+func (t *typeStruct) MethodByName(name string) (Type, bool) {
 	for _, v := range t.fields {
 		if v.IsAnonymous() {
-			b, ok := v.MethodsByName(name)
+			b, ok := v.MethodByName(name)
 			if ok {
 				return b, true
 			}

@@ -38,7 +38,7 @@ func (t *typeSelector) ToChild() (Type, bool) {
 		t.typ = b
 		return b, true
 	}
-	b, ok = s.MethodsByName(name)
+	b, ok = s.MethodByName(name)
 	if ok {
 		t.typ = b
 		return b, true
@@ -205,28 +205,28 @@ func (t *typeSelector) IsVariadic() bool {
 	return child.IsVariadic()
 }
 
-func (t *typeSelector) NumMethods() int {
+func (t *typeSelector) NumMethod() int {
 	child, ok := t.ToChild()
 	if !ok {
 		return 0
 	}
-	return child.NumMethods()
+	return child.NumMethod()
 }
 
-func (t *typeSelector) Methods(i int) Type {
+func (t *typeSelector) Method(i int) Type {
 	child, ok := t.ToChild()
 	if !ok {
 		return nil
 	}
-	return child.Methods(i)
+	return child.Method(i)
 }
 
-func (t *typeSelector) MethodsByName(name string) (Type, bool) {
+func (t *typeSelector) MethodByName(name string) (Type, bool) {
 	child, ok := t.ToChild()
 	if !ok {
 		return nil, false
 	}
-	return child.MethodsByName(name)
+	return child.MethodByName(name)
 }
 
 func (t *typeSelector) Child(i int) Type {

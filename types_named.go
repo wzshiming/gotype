@@ -180,7 +180,7 @@ func (t *typeNamed) IsVariadic() bool {
 	return child.IsVariadic()
 }
 
-func (t *typeNamed) NumMethods() int {
+func (t *typeNamed) NumMethod() int {
 	if t.info == nil {
 		return 0
 	}
@@ -188,7 +188,7 @@ func (t *typeNamed) NumMethods() int {
 	return b.Len()
 }
 
-func (t *typeNamed) Methods(i int) Type {
+func (t *typeNamed) Method(i int) Type {
 	if t.info == nil {
 		return nil
 	}
@@ -199,7 +199,7 @@ func (t *typeNamed) Methods(i int) Type {
 	return b.Index(i)
 }
 
-func (t *typeNamed) MethodsByName(name string) (Type, bool) {
+func (t *typeNamed) MethodByName(name string) (Type, bool) {
 	if t.info == nil {
 		return nil, false
 	}
@@ -210,7 +210,7 @@ func (t *typeNamed) MethodsByName(name string) (Type, bool) {
 	}
 	child, ok := t.ToChild()
 	if ok {
-		return child.MethodsByName(name)
+		return child.MethodByName(name)
 	}
 	return nil, false
 }

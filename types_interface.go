@@ -30,21 +30,21 @@ func (t *typeInterface) Kind() Kind {
 	return Interface
 }
 
-func (t *typeInterface) NumMethods() int {
+func (t *typeInterface) NumMethod() int {
 	return t.methods.Len()
 }
 
-func (t *typeInterface) Methods(i int) Type {
+func (t *typeInterface) Method(i int) Type {
 	return t.methods.Index(i)
 }
 
-func (t *typeInterface) MethodsByName(name string) (Type, bool) {
+func (t *typeInterface) MethodByName(name string) (Type, bool) {
 	b, ok := t.methods.Search(name)
 	if ok {
 		return b, true
 	}
 	for _, v := range t.anonymo {
-		b, ok := v.MethodsByName(name)
+		b, ok := v.MethodByName(name)
 		if ok {
 			return b, true
 		}

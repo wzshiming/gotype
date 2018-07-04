@@ -124,7 +124,7 @@ type Type interface {
 	//
 	// For an interface type, the returned Method's Type field gives the
 	// method signature, without a receiver, and the Func field is nil.
-	Methods(int) Type
+	Method(int) Type
 
 	// MethodByName returns the method with that name in the type's
 	// method set and a boolean indicating if the method was found.
@@ -134,11 +134,11 @@ type Type interface {
 	//
 	// For an interface type, the returned Method's Type field gives the
 	// method signature, without a receiver, and the Func field is nil.
-	MethodsByName(string) (Type, bool)
+	MethodByName(string) (Type, bool)
 
 	// NumMethod returns the number of exported methods in the type's method set.
 	// Not contain anonymo
-	NumMethods() int
+	NumMethod() int
 
 	// Field returns a scope type's i'th field.
 	// It panics if i is not in the range [0, NumChild()).
@@ -318,18 +318,18 @@ func (t *typeBase) IsAnonymous() bool {
 	return false
 }
 
-func (t *typeBase) Methods(int) Type {
-	//panic("Methods of invalid type")
+func (t *typeBase) Method(int) Type {
+	//panic("Method of invalid type")
 	return nil
 }
 
-func (t *typeBase) MethodsByName(string) (Type, bool) {
-	//panic("MethodsByName of invalid type")
+func (t *typeBase) MethodByName(string) (Type, bool) {
+	//panic("MethodByName of invalid type")
 	return nil, false
 }
 
-func (t *typeBase) NumMethods() int {
-	//panic("NumMethods of invalid type")
+func (t *typeBase) NumMethod() int {
+	//panic("NumMethod of invalid type")
 	return 0
 }
 
