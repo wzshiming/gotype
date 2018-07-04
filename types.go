@@ -140,15 +140,15 @@ type Type interface {
 	// Not contain anonymo
 	NumMethod() int
 
-	// Field returns a scope type's i'th field.
+	// Child returns a scope type's i'th child.
 	// It panics if i is not in the range [0, NumChild()).
 	Child(int) Type
 
 	// ChildByName returns the scope with the given name
-	// and a boolean indicating if the field was found.
+	// and a boolean indicating if the child was found.
 	ChildByName(string) (Type, bool)
 
-	// NumChild returns a scope type's field count.
+	// NumChild returns a scope type's child count.
 	NumChild() int
 
 	// Origin returns the type's origin data within its package.
