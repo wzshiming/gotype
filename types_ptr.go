@@ -17,7 +17,7 @@ func (t *typePtr) String() string {
 	return fmt.Sprintf("*%v", t.elem)
 }
 
-func (y *typePtr) Kind() Kind {
+func (t *typePtr) Kind() Kind {
 	return Ptr
 }
 

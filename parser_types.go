@@ -101,11 +101,10 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 	case *ast.ArrayType:
 		if t.Len == nil {
 			return newTypeSlice(r.EvalType(t.Elt))
-		} else {
-			le := constValue(t.Len)
-			i, _ := strconv.ParseInt(le, 0, 0)
-			return newTypeArray(r.EvalType(t.Elt), int(i))
 		}
+		le := constValue(t.Len)
+		i, _ := strconv.ParseInt(le, 0, 0)
+		return newTypeArray(r.EvalType(t.Elt), int(i))
 	case *ast.StructType:
 		s := &typeStruct{}
 
