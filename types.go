@@ -47,8 +47,12 @@ type Type interface {
 	Key() Type
 
 	// Elem returns a type's element type.
-	// It panics if the type's Kind is not Var, Array, Chan, Map, Ptr, or Slice.
+	// It panics if the type's Kind is not Array, Chan, Map, Ptr, or Slice.
 	Elem() Type
+
+	// Declaration returns a type's declaration.
+	// It panics if the type's Kind is not declaration.
+	Declaration() Type
 
 	// Tag returns a field type's tag.
 	// It panics if the type's Kind is not Field.
@@ -251,6 +255,11 @@ func (t *typeBase) Key() Type {
 
 func (t *typeBase) Elem() Type {
 	panic("Elem of invalid type")
+	return nil
+}
+
+func (t *typeBase) Declaration() Type {
+	panic("Declaration of non-declaration type")
 	return nil
 }
 

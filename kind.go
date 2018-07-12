@@ -40,8 +40,8 @@ const (
 	Slice
 	Struct
 
-	// Special
-	Field // Struct Field
-	Var   //
-	Scope // package or func body
+	// Special is different from other Kinds
+	Field       // a Struct Field
+	Scope       // package or func body
+	Declaration // a top-level function, variable, or constant.
 )

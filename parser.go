@@ -71,22 +71,19 @@ func (r *parser) parseDecl(decl ast.Decl) {
 func (r *parser) parseFunc(decl *ast.FuncDecl) {
 	doc := decl.Doc
 	f := r.EvalType(decl.Type)
+	t := newTypeOrigin(f, decl, r.info, doc, nil)
+	t = newDeclaration(decl.Name.Name, t)
+
 	if decl.Recv != nil {
 		name, ok := typeName(decl.Recv.List[0].Type)
 		if ok {
 			return
 		}
-
-		t := newTypeAlias(decl.Name.Name, f)
-		t = newTypeOrigin(t, decl, r.info, doc, nil)
 		b := r.info.Methods[name]
 		b.Add(t)
 		r.info.Methods[name] = b
 		return
 	}
-
-	t := newTypeAlias(decl.Name.Name, f)
-	t = newTypeOrigin(t, decl, r.info, doc, nil)
 	r.info.Named.Add(t)
 	return
 }
@@ -221,7 +218,7 @@ loop:
 						break
 					}
 					val = tup.all.Index(i)
-					tt := newTypeVar(v.Name, val)
+					tt := newDeclaration(v.Name, val)
 					tt = newTypeOrigin(tt, s, r.info, doc, comment)
 					r.info.Named.Add(tt)
 				}
@@ -240,7 +237,7 @@ loop:
 				if decl.Tok == token.CONST {
 					val = newEvalBind(val, int64(index), r.info)
 				}
-				tt := newTypeVar(v.Name, val)
+				tt := newDeclaration(v.Name, val)
 				tt = newTypeOrigin(tt, s, r.info, doc, comment)
 				r.info.Named.Add(tt)
 			}
@@ -257,7 +254,7 @@ loop:
 
 			if typ == nil {
 				if val != nil {
-					tt := newTypeVar(v.Name, val)
+					tt := newDeclaration(v.Name, val)
 					tt = newTypeOrigin(tt, s, r.info, doc, comment)
 					r.info.Named.Add(tt)
 				} else {
@@ -265,11 +262,11 @@ loop:
 				}
 			} else {
 				if val == nil {
-					tt := newTypeVar(v.Name, typ)
+					tt := newDeclaration(v.Name, typ)
 					tt = newTypeOrigin(tt, s, r.info, doc, comment)
 					r.info.Named.Add(tt)
 				} else {
-					tt := newTypeVar(v.Name, typ)
+					tt := newDeclaration(v.Name, typ)
 					tt = newTypeOrigin(tt, s, r.info, doc, comment)
 					tt = newTypeValueBind(tt, val, r.info)
 					r.info.Named.Add(tt)

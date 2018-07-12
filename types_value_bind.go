@@ -17,13 +17,13 @@ func newTypeValueBind(typ, val Type, info *info) Type {
 			}
 			return nt
 		}
-	case Var:
+	case Declaration:
 		name := typ.Name()
-		t := newTypeValueBind(typ.Elem(), val, info)
+		t := newTypeValueBind(typ.Declaration(), val, info)
 		if typ.Origin() != nil {
 			t = newTypeOrigin(t, typ.Origin(), info, typ.Doc(), typ.Comment())
 		}
-		return newTypeVar(name, t)
+		return newDeclaration(name, t)
 	}
 
 	return newValueBind(typ, val.Value)

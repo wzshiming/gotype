@@ -39,28 +39,20 @@ func main() {
 
 	ts := []m{}
 	vs := []m{}
-	fd := []m{}
 
 	nc := n.NumChild()
 	for i := 0; i != nc; i++ {
 		v := n.Child(i)
 		if ast.IsExported(v.Name()) {
 			switch v.Kind() {
-			case gotype.Var:
+			case gotype.Declaration:
 				doc := v
 				vs = append(vs, m{
 					Name:    v.Name(),
 					Doc:     Comment(doc.Doc().Text()),
 					Comment: Comment(doc.Comment().Text()),
 				})
-			case gotype.Func:
-				doc := v
-				fd = append(fd, m{
-					Name:    v.Name(),
-					Doc:     Comment(doc.Doc().Text()),
-					Comment: Comment(doc.Comment().Text()),
-				})
-			case gotype.Scope:
+			case gotype.Scope, gotype.Invalid:
 			// No action
 			default:
 				doc := v
@@ -88,7 +80,6 @@ func main() {
 		"Origin":      i,
 		"TypeSpec":    ts,
 		"ValueSpec":   vs,
-		"FuncDecl":    fd,
 		"Filename":    fn,
 	})
 
@@ -148,18 +139,8 @@ type (
 )
 {{end}}
 
-{{if .FuncDecl}}
-// function
-var (
-	{{range .FuncDecl}}
-	{{.Doc}}
-	{{.Name}} = origin.{{.Name}} {{.Comment}}
-	{{end}}
-)
-{{end}}
-
 {{if .ValueSpec}}
-// value
+// Declaration
 var (
 	{{range .ValueSpec}}
 	{{.Doc}}

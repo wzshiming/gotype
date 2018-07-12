@@ -76,8 +76,8 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 		}
 
 		b := r.EvalType(t.Fun)
-		for b.Kind() == Var {
-			b = b.Elem()
+		for b.Kind() == Declaration {
+			b = b.Declaration()
 		}
 		if b.Kind() == Func {
 			l := b.NumOut()
@@ -161,12 +161,12 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 				}
 
 				if v.Names == nil {
-					t := newTypeVar("_", ty)
+					t := newDeclaration("_", ty)
 					s.params = append(s.params, t)
 					continue
 				}
 				for nk, name := range v.Names {
-					tv := newTypeVar(name.Name, ty)
+					tv := newDeclaration(name.Name, ty)
 					tt := newTypeOrigin(tv, v, r.info, v.Doc, v.Comment)
 
 					// Parameter comment, Because the default criteria are not handled.
@@ -198,12 +198,12 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 				}
 
 				if v.Names == nil {
-					t := newTypeVar("_", ty)
+					t := newDeclaration("_", ty)
 					s.results = append(s.results, t)
 					continue
 				}
 				for nk, name := range v.Names {
-					tv := newTypeVar(name.Name, ty)
+					tv := newDeclaration(name.Name, ty)
 					tt := newTypeOrigin(tv, v, r.info, v.Doc, v.Comment)
 
 					// Parameter comment, Because the default criteria are not handled.

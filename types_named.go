@@ -76,6 +76,14 @@ func (t *typeNamed) Elem() Type {
 	return child.Elem()
 }
 
+func (t *typeNamed) Declaration() Type {
+	child, ok := t.ToChild()
+	if !ok {
+		return nil
+	}
+	return child.Declaration()
+}
+
 func (t *typeNamed) NumField() int {
 	child, ok := t.ToChild()
 	if !ok {

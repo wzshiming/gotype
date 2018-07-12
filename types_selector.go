@@ -26,10 +26,15 @@ func (t *typeSelector) ToChild() (Type, bool) {
 	s := t.x
 	for {
 		k := s.Kind()
-		if k != Var && k != Ptr {
-			break
+		if k == Declaration {
+			s = s.Declaration()
+			continue
 		}
-		s = s.Elem()
+		if k == Ptr {
+			s = s.Elem()
+			continue
+		}
+		break
 	}
 	name := t.sel
 
@@ -99,6 +104,14 @@ func (t *typeSelector) Elem() Type {
 		return nil
 	}
 	return child.Elem()
+}
+
+func (t *typeSelector) Declaration() Type {
+	child, ok := t.ToChild()
+	if !ok {
+		return nil
+	}
+	return child.Declaration()
 }
 
 func (t *typeSelector) NumField() int {

@@ -17,8 +17,8 @@ func (t *typeFunc) String() string {
 			buf.WriteString(", ")
 		}
 		if t.variadic && i+1 == len(t.results) {
-			if d, ok := v.(*typeVar); ok {
-				if d0, ok := d.elem.(*typeSlice); ok {
+			if d, ok := v.(*typeDeclaration); ok {
+				if d0, ok := d.declaration.(*typeSlice); ok {
 					buf.WriteString(d.name)
 					buf.WriteString(" ...")
 					buf.WriteString(d0.elem.String())
