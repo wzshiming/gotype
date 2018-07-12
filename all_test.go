@@ -6,6 +6,49 @@ import (
 	"testing"
 )
 
+func TestImport(t *testing.T) {
+	const src = `
+package a
+
+import "time"
+var now = time.Now()
+`
+	scope, err := NewImporter().ImportSource("_", []byte(src))
+	if err != nil {
+		t.Fatal(err)
+	}
+	typ, ok := scope.ChildByName("now")
+	if !ok {
+		t.Fail()
+	}
+
+	if typ.Name() != "now" {
+		t.Fail()
+	}
+	if typ.Kind() != Declaration {
+		t.Fail()
+	}
+	typ = typ.Declaration()
+
+	if typ.Name() != "_" {
+		t.Fail()
+	}
+	if typ.Kind() != Declaration {
+		t.Fail()
+	}
+	typ = typ.Declaration()
+
+	if typ.Name() != "Time" {
+		t.Fail()
+	}
+	if typ.PkgPath() != "time" {
+		t.Fail()
+	}
+	if typ.Doc() == nil {
+		t.Fail()
+	}
+}
+
 func TestKind(t *testing.T) {
 	const src = `
 package a
@@ -94,6 +137,77 @@ B int, // B
 			comment := strings.TrimSpace(v.Comment().Text())
 			if name != comment {
 				t.Fatal("Error func parameter comment:", name, comment)
+			}
+		}
+	}
+}
+
+func TestFieldMedhodDoc(t *testing.T) {
+	const src = `
+package a
+
+type Type struct {}
+
+// Medhod
+func(Type) Medhod(){}
+
+`
+	scope, err := NewImporter().ImportSource("_", []byte(src))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	typ, ok := scope.ChildByName("Type")
+	if !ok {
+		t.Fail()
+	}
+
+	num := typ.NumMethod()
+	for i := 0; i != num; i++ {
+		v := typ.Method(i)
+		name := v.Name()
+		doc := strings.TrimSpace(v.Doc().Text())
+		if name != doc {
+			t.Fatal("Error method doc:", name, doc)
+		}
+	}
+}
+
+func TestInterfaceMedhodDocAndComment(t *testing.T) {
+	const src = `
+package a
+
+type Type interface {
+	// Medhod doc
+	Medhod() // Medhod comment
+}
+`
+	scope, err := NewImporter().ImportSource("_", []byte(src))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	typ, ok := scope.ChildByName("Type")
+	if !ok {
+		t.Fail()
+	}
+
+	num := typ.NumMethod()
+	for i := 0; i != num; i++ {
+		v := typ.Method(i)
+		{
+			name := v.Name() + " doc"
+			doc := strings.TrimSpace(v.Doc().Text())
+			if name != doc {
+				t.Fatal("Error field doc:", name, doc)
+			}
+		}
+
+		{
+			name := v.Name() + " comment"
+			comment := strings.TrimSpace(v.Comment().Text())
+			if name != comment {
+				t.Fatal("Error field comment:", name, comment)
 			}
 		}
 	}
