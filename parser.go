@@ -70,9 +70,9 @@ func (r *parser) parseDecl(decl ast.Decl) {
 // parseFunc parse function
 func (r *parser) parseFunc(decl *ast.FuncDecl) {
 	doc := decl.Doc
-	f := r.EvalType(decl.Type)
-	t := newTypeOrigin(f, decl, r.info, doc, nil)
+	t := r.EvalType(decl.Type)
 	t = newDeclaration(decl.Name.Name, t)
+	t = newTypeOrigin(t, decl, r.info, doc, nil)
 
 	if decl.Recv != nil {
 		name, ok := typeName(decl.Recv.List[0].Type)
