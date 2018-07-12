@@ -53,7 +53,7 @@ func constantEval(expr ast.Node, iota int64, info *info) (r constant.Value, err 
 		if t.Name == "iota" {
 			r = constant.MakeInt64(iota)
 		} else if val, ok := info.Named.Search(t.Name); ok && val.Kind() == Declaration {
-			val = val.Elem()
+			val = val.Declaration()
 			switch val.Kind() {
 			case Int, Int8, Int16, Int32, Int64:
 				i, err := strconv.ParseInt(val.Value(), 0, 0)
