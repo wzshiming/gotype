@@ -20,7 +20,7 @@ type Importer struct {
 }
 
 // NewImporter creates a new importer
-func NewImporter(options ...option) *Importer {
+func NewImporter(options ...Option) *Importer {
 	i := &Importer{
 		fset:     token.NewFileSet(),
 		mode:     goparser.ParseComments,

@@ -1,16 +1,16 @@
 package gotype
 
-type option func(i *Importer)
+type Option func(i *Importer)
 
 // ErrorHandler returns the error handler option
-func ErrorHandler(f func(error)) option {
+func ErrorHandler(f func(error)) Option {
 	return func(i *Importer) {
 		i.errorHandler = f
 	}
 }
 
 // WithCommentLocator sets comment locator
-func WithCommentLocator() option {
+func WithCommentLocator() Option {
 	return func(i *Importer) {
 		i.isCommentLocator = true
 	}
