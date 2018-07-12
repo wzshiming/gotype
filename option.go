@@ -1,5 +1,6 @@
 package gotype
 
+// Option some basic options
 type Option func(i *Importer)
 
 // ErrorHandler returns the error handler option
