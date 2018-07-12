@@ -1,6 +1,9 @@
 package gotype
 
 //go:generate stringer -type Kind kind.go
+
+// Kind represents the specific kind of type that a Type represents.
+// The zero Kind is not a valid kind.
 type Kind uint8
 
 const (

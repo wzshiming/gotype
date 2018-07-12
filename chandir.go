@@ -1,6 +1,8 @@
 package gotype
 
 //go:generate stringer -type ChanDir chandir.go
+
+// ChanDir represents a channel type's direction.
 type ChanDir int
 
 const (
