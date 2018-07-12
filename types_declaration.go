@@ -1,15 +1,8 @@
 package gotype
 
 func newDeclaration(name string, typ Type) Type {
-	v, ok := typ.(*typeDeclaration)
-	if ok {
-		return &typeDeclaration{
-			name: name,
-			declaration: v.declaration,
-		}
-	}
 	return &typeDeclaration{
-		name: name,
+		name:        name,
 		declaration: typ,
 	}
 }
@@ -17,7 +10,7 @@ func newDeclaration(name string, typ Type) Type {
 type typeDeclaration struct {
 	typeBase
 	declaration Type
-	name string
+	name        string
 }
 
 func (t *typeDeclaration) String() string {
