@@ -130,7 +130,7 @@ import (
 )
 
 {{if .TypeSpec}}
-// type
+// Type
 type (
 	{{range .TypeSpec}}
 	{{.Doc}}
