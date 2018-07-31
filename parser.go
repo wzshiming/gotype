@@ -7,14 +7,14 @@ import (
 )
 
 type parser struct {
-	importer         importParseFunc
+	importer         importer
 	isCommentLocator bool
 	info             *info
 	comments         []*ast.CommentGroup
 }
 
 // NewParser
-func newParser(i importParseFunc, c bool, pkg string, goroot bool) *parser {
+func newParser(i importer, c bool, pkg string, goroot bool) *parser {
 	r := &parser{
 		importer:         i,
 		isCommentLocator: c,
@@ -145,7 +145,7 @@ func (r *parser) parseImport(decl *ast.GenDecl) {
 			switch s.Name.Name {
 			case "_":
 			case ".":
-				p, err := r.importer(path, r.info.PkgPath)
+				p, err := r.importer.importParse(path, r.info.PkgPath)
 				if err != nil {
 					continue
 				}

@@ -6,7 +6,10 @@ import (
 	"strings"
 )
 
-type importParseFunc func(path string, src string) (Type, error)
+type importer interface {
+	importParse(path string, src string) (Type, error)
+	importName(path string, src string) (name string, goroot bool)
+}
 
 func constValue(x ast.Expr) string {
 	switch t := x.(type) {
