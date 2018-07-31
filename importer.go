@@ -88,6 +88,7 @@ func (i *Importer) importBuild(path string, src string) (*build.Package, error) 
 
 	imp, err := build.Import(path, src, 0)
 	if err != nil {
+		i.errorHandler(err)
 		return nil, err
 	}
 	i.bufBuild[k] = imp
@@ -100,14 +101,6 @@ func (i *Importer) importName(path string, src string) (name string, goroot bool
 		return "", false
 	}
 	return imp.Name, imp.Goroot
-}
-
-func (i *Importer) importParseErrorHandler(path string, src string) (Type, error) {
-	t, err := i.importParse(path, src)
-	if err != nil {
-		i.errorHandler(err)
-	}
-	return t, err
 }
 
 func (i *Importer) importParse(path string, src string) (Type, error) {
@@ -132,6 +125,7 @@ func (i *Importer) importParse(path string, src string) (Type, error) {
 	}, i.mode)
 
 	if err != nil {
+		i.errorHandler(err)
 		return nil, err
 	}
 
@@ -141,5 +135,7 @@ func (i *Importer) importParse(path string, src string) (Type, error) {
 		i.bufType[dir] = t
 		return t, nil
 	}
-	return nil, fmt.Errorf(`No go source code was found under the package path "%s"`, path)
+	err = fmt.Errorf(`No go source code was found under the package path "%s"`, path)
+	i.errorHandler(err)
+	return nil, err
 }
