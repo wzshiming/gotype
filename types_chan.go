@@ -1,6 +1,8 @@
 package gotype
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func newTypeChan(v Type, dir ChanDir) Type {
 	return &typeChan{
@@ -18,9 +20,9 @@ type typeChan struct {
 func (t *typeChan) String() string {
 	switch t.dir {
 	case RecvDir:
-		return fmt.Sprintf("<-chan %v", t.elem)
-	case SendDir:
 		return fmt.Sprintf("chan<- %v", t.elem)
+	case SendDir:
+		return fmt.Sprintf("<-chan %v", t.elem)
 	case BothDir:
 	}
 	return fmt.Sprintf("chan %v", t.elem)

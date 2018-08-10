@@ -4,9 +4,9 @@ package gotype
 
 import "strconv"
 
-const _ChanDir_name = "RecvDirSendDir"
+const _ChanDir_name = "RecvDirSendDirBothDir"
 
-var _ChanDir_index = [...]uint8{0, 7, 14}
+var _ChanDir_index = [...]uint8{0, 7, 14, 21}
 
 func (i ChanDir) String() string {
 	i -= 1

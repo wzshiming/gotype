@@ -201,7 +201,6 @@ loop:
 
 		switch l := len(values); l {
 		case 0:
-			continue loop
 		case 1:
 			val = r.EvalType(values[0])
 			if decl.Tok == token.CONST {
@@ -244,9 +243,6 @@ loop:
 			continue loop
 		}
 
-		if val == nil {
-			continue
-		}
 		for _, v := range s.Names {
 			if v.Name == "" {
 				continue
