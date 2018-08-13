@@ -250,27 +250,22 @@ func (t *typeBase) Kind() Kind {
 
 func (t *typeBase) Key() Type {
 	panic("Key of non-map type")
-	return nil
 }
 
 func (t *typeBase) Elem() Type {
 	panic("Elem of invalid type")
-	return nil
 }
 
 func (t *typeBase) Declaration() Type {
 	panic("Declaration of non-declaration type")
-	return nil
 }
 
 func (t *typeBase) Tag() reflect.StructTag {
 	panic("Tag of non-field type")
-	return ""
 }
 
 func (t *typeBase) Len() int {
 	panic("Len of non-array type")
-	return 0
 }
 
 func (t *typeBase) Value() string {
@@ -279,52 +274,42 @@ func (t *typeBase) Value() string {
 
 func (t *typeBase) ChanDir() ChanDir {
 	panic("ChanDir of non-chan type")
-	return 0
 }
 
 func (t *typeBase) Out(int) Type {
 	panic("Out of non-func type")
-	return nil
 }
 
 func (t *typeBase) NumOut() int {
 	panic("NumOut of non-func type")
-	return 0
 }
 
 func (t *typeBase) In(int) Type {
 	panic("In of non-func type")
-	return nil
 }
 
 func (t *typeBase) NumIn() int {
 	panic("NumIn of non-func type")
-	return 0
 }
 
 func (t *typeBase) IsVariadic() bool {
 	panic("IsVariadic of non-func type")
-	return false
 }
 
 func (t *typeBase) Field(int) Type {
 	panic("Field of non-struct type")
-	return nil
 }
 
 func (t *typeBase) FieldByName(string) (Type, bool) {
 	panic("FieldByName of non-struct type")
-	return nil, false
 }
 
 func (t *typeBase) NumField() int {
 	panic("NumField of non-struct type")
-	return 0
 }
 
 func (t *typeBase) IsAnonymous() bool {
 	panic("IsAnonymous of non-field type")
-	return false
 }
 
 func (t *typeBase) Method(int) Type {
