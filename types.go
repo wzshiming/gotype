@@ -189,7 +189,7 @@ func (t *types) AddNoRepeat(n Type) {
 	}
 	name := n.Name()
 	i := t.SearchIndex(name)
-	tt := t.Index(i - 1)
+	tt := t.Index(i)
 	if tt == nil || tt.Name() != name {
 		t.add(i, n)
 	}
@@ -198,10 +198,7 @@ func (t *types) AddNoRepeat(n Type) {
 
 func (t *types) Search(name string) (Type, bool) {
 	i := t.SearchIndex(name)
-	if i == 0 {
-		return nil, false
-	}
-	tt := t.Index(i - 1)
+	tt := t.Index(i)
 	if tt == nil || tt.Name() != name {
 		return nil, false
 	}
@@ -209,18 +206,13 @@ func (t *types) Search(name string) (Type, bool) {
 }
 
 func (t *types) SearchIndex(name string) int {
-	i := sort.Search(t.Len(), func(i int) bool {
-		d := t.Index(i)
-		if d == nil {
-			return false
-		}
-		return d.Name() < name
+	return sort.Search(t.Len(), func(i int) bool {
+		return t.Index(i).Name() <= name
 	})
-	return i
 }
 
 func (t *types) Index(i int) Type {
-	if i >= t.Len() || i < 0 {
+	if i >= t.Len() {
 		return nil
 	}
 	return (*t)[i]
