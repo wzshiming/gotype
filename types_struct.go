@@ -49,6 +49,7 @@ func (t *typeStruct) FieldByName(name string) (Type, bool) {
 
 	for _, i := range anonymo {
 		v := t.fields[i]
+		v = v.Elem()
 		t, ok := v.FieldByName(name)
 		if ok {
 			return t, true
@@ -60,6 +61,7 @@ func (t *typeStruct) FieldByName(name string) (Type, bool) {
 func (t *typeStruct) MethodByName(name string) (Type, bool) {
 	for _, v := range t.fields {
 		if v.IsAnonymous() {
+			v = v.Elem()
 			b, ok := v.MethodByName(name)
 			if ok {
 				return b, true
