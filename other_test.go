@@ -12,6 +12,7 @@ func TestOhter(t *testing.T) {
 	var testpath = []string{
 		"github.com/wzshiming/gotype/testdata/value",
 		"github.com/wzshiming/gotype/testdata/kind",
+		"github.com/wzshiming/gotype/testdata/struct",
 	}
 	for _, src := range testpath {
 		testAll(t, Import(t, src))
@@ -37,22 +38,88 @@ func testType(t *testing.T, v Type) {
 		if data, ok := tag.Lookup("To"); ok {
 			st := strings.Split(data, ",")
 			for _, to := range st {
-				switch to {
+				method := strings.Split(to, ":")
+				switch method[0] {
 				case "Elem":
 					v = v.Elem()
 				case "Declaration":
 					v = v.Declaration()
 				case "Key":
 					v = v.Key()
-				default:
-					switch {
-					case strings.HasPrefix(to, "In"):
-						i, _ := strconv.ParseInt(to[len("In"):], 10, 64)
-						v = v.In(int(i))
-					case strings.HasPrefix(to, "Out"):
-						i, _ := strconv.ParseInt(to[len("Out"):], 10, 64)
-						v = v.Out(int(i))
+				case "In":
+					if len(method) < 2 {
+						t.Fatal("Error In num: ", to)
 					}
+					i, _ := strconv.ParseInt(method[1], 10, 64)
+					v = v.In(int(i))
+				case "Out":
+					if len(method) < 2 {
+						t.Fatal("Error Out num: ", to)
+					}
+					i, _ := strconv.ParseInt(method[1], 10, 64)
+					v = v.Out(int(i))
+				case "Field":
+					if len(method) < 2 {
+						t.Fatal("Error Field num: ", to)
+					}
+					i, err := strconv.ParseInt(method[1], 10, 64)
+					if err != nil {
+						t.Fatal("Error Field: ", err)
+					}
+					if v.NumField() <= int(i) {
+						t.Fatal("Error Out of index range: ", to)
+					}
+					v = v.Field(int(i))
+				case "Method":
+					if len(method) < 2 {
+						t.Fatal("Error Method num: ", to)
+					}
+					i, err := strconv.ParseInt(method[1], 10, 64)
+					if err != nil {
+						t.Fatal("Error Method: ", err)
+					}
+					if v.NumMethod() <= int(i) {
+						t.Fatal("Error Out of index range: ", to)
+					}
+					v = v.Method(int(i))
+				case "Child":
+					if len(method) < 2 {
+						t.Fatal("Error Child num: ", to)
+					}
+					i, err := strconv.ParseInt(method[1], 10, 64)
+					if err != nil {
+						t.Fatal("Error Child: ", err)
+					}
+					if v.NumMethod() <= int(i) {
+						t.Fatal("Error Out of index range: ", to)
+					}
+					v = v.Child(int(i))
+				case "FieldByName":
+					if len(method) < 2 {
+						t.Fatal("Error FieldByName num: ", to)
+					}
+					v, ok = v.FieldByName(method[1])
+					if !ok {
+						t.Fatal("Error not found: ", to)
+					}
+				case "MethodByName":
+					if len(method) < 2 {
+						t.Fatal("Error MethodByName num: ", to)
+					}
+					v, ok = v.MethodByName(method[1])
+					if !ok {
+						t.Fatal("Error not found: ", to)
+					}
+				case "ChildByName":
+					if len(method) < 2 {
+						t.Fatal("Error ChildByName num: ", to)
+					}
+					v, ok = v.ChildByName(method[1])
+					if !ok {
+						t.Fatal("Error not found: ", to)
+					}
+				default:
+					t.Fatal("Error to: ", to)
 				}
 			}
 		}
@@ -108,6 +175,12 @@ func testType(t *testing.T, v Type) {
 			num := fmt.Sprint(v.NumField())
 			if data != num {
 				t.Fatal("Error num field:", num, data)
+			}
+		}
+		if data, ok := tag.Lookup("Tag"); ok {
+			num := string(v.Tag())
+			if data != num {
+				t.Fatal("Error tag:", num, data)
 			}
 		}
 	}
