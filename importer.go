@@ -88,9 +88,15 @@ func (i *Importer) importBuild(path string, src string) (*build.Package, error) 
 
 	imp, err := build.Import(path, src, 0)
 	if err != nil {
-		i.errorHandler(err)
-		return nil, err
+		if src != "." {
+			imp, err = build.Import(path, ".", 0)
+		}
+		if err != nil {
+			i.errorHandler(err)
+			return nil, err
+		}
 	}
+
 	i.bufBuild[k] = imp
 	return imp, nil
 }
