@@ -27,13 +27,26 @@ func (t *typeImport) check() {
 	t.scope = s
 }
 
+func (t *typeImport) PkgPath() string {
+	return t.path
+}
+
+func (t *typeImport) IsGoroot() bool {
+	_, ok := t.imp.importName(t.path, t.src)
+	return ok
+}
+
 func (t *typeImport) String() string {
-	return t.name
+	return t.path
 }
 
 func (t *typeImport) Name() string {
-	name, _ := t.imp.importName(t.path, t.src)
-	return name
+	if t.name != "" {
+		return t.name
+	}
+
+	t.name, _ = t.imp.importName(t.path, t.src)
+	return t.name
 }
 
 func (t *typeImport) Kind() Kind {
