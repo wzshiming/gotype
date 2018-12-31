@@ -244,7 +244,7 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 			}
 
 			for _, name := range v.Names {
-				t := newTypeAlias(name.Name, ty)
+				t := newDeclaration(name.Name, ty)
 				tt := newTypeOrigin(t, v, r.info, v.Doc, v.Comment)
 				s.methods.Add(tt)
 			}
