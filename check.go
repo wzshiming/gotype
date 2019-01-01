@@ -1,5 +1,21 @@
 package gotype
 
+// Equal Reports whether the type type is equal
+func Equal(t0 Type, t1 Type) bool {
+	if t0.PkgPath() != t1.PkgPath() {
+		return false
+	}
+	n0 := t0.Name()
+	n1 := t1.Name()
+	if n0 != n1 {
+		return false
+	}
+	if n0 == "" {
+		return Identical(t0, t1)
+	}
+	return true
+}
+
 // Implements reports whether type inter implements interface t.
 func Implements(t Type, inter Type) bool {
 	if inter.Kind() == Declaration {
