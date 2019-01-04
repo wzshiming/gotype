@@ -45,3 +45,8 @@ var (
 	// To:"Declaration" String:"<-chan int"
 	Dir3 <-chan int
 )
+
+var (
+	// To:"Declaration" String:"[3]int"
+	Arr1 [D2]int
+)
