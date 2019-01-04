@@ -5,12 +5,8 @@ import (
 )
 
 func Parse(t *testing.T, src string) Type {
-	typ, err := NewImporter(
-		WithCommentLocator(),
-		ErrorHandler(func(err error) {
-			t.Error(err)
-		}),
-	).ImportSource("_", []byte(src))
+	imp := getImporter(t)
+	typ, err := imp.ImportSource("_", []byte(src))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -18,14 +14,21 @@ func Parse(t *testing.T, src string) Type {
 }
 
 func Import(t *testing.T, path string) Type {
-	typ, err := NewImporter(
-		WithCommentLocator(),
-		ErrorHandler(func(err error) {
-			t.Error(err)
-		}),
-	).Import(path)
+	imp := getImporter(t)
+	typ, err := imp.Import(path)
 	if err != nil {
 		t.Fatal(err)
 	}
 	return typ
+
+}
+
+func getImporter(t *testing.T) *Importer {
+	imp := NewImporter(
+		WithCommentLocator(),
+		ErrorHandler(func(err error) {
+			t.Error(err)
+		}),
+	)
+	return imp
 }
