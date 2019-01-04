@@ -11,14 +11,6 @@ type importer interface {
 	importName(path string, src string) (name string, goroot bool)
 }
 
-func constValue(x ast.Expr) string {
-	switch t := x.(type) {
-	case *ast.BasicLit:
-		return t.Value
-	}
-	return ""
-}
-
 // typeName 解析表达式获取类型名字以及是否是导入的
 func typeName(x ast.Expr) (name string, imported bool) {
 	switch t := x.(type) {

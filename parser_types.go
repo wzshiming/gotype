@@ -102,8 +102,13 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 		if t.Len == nil {
 			return newTypeSlice(r.EvalType(t.Elt))
 		}
-		le := constValue(t.Len)
-		i, _ := strconv.ParseInt(le, 0, 0)
+
+		if ell, ok := t.Len.(*ast.Ellipsis); ok && ell.Ellipsis != 0 {
+			return newTypeArray(r.EvalType(t.Elt), 0)
+		}
+
+		length := newEvalBind(r.EvalType(t.Len), 0, r.info)
+		i, _ := strconv.ParseInt(length.Value(), 0, 0)
 		return newTypeArray(r.EvalType(t.Elt), int(i))
 	case *ast.StructType:
 		s := &typeStruct{}
