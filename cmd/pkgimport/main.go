@@ -49,8 +49,8 @@ func main() {
 				doc := v
 				vs = append(vs, m{
 					Name:    v.Name(),
-					Doc:     Comment(doc.Doc().Text()),
-					Comment: Comment(doc.Comment().Text()),
+					Doc:     comment(doc.Doc().Text()),
+					Comment: comment(doc.Comment().Text()),
 				})
 			case gotype.Scope, gotype.Invalid:
 			// No action
@@ -58,8 +58,8 @@ func main() {
 				doc := v
 				ts = append(ts, m{
 					Name:    v.Name(),
-					Doc:     Comment(doc.Doc().Text()),
-					Comment: Comment(doc.Comment().Text()),
+					Doc:     comment(doc.Doc().Text()),
+					Comment: comment(doc.Comment().Text()),
 				})
 			}
 		}
@@ -96,7 +96,7 @@ func main() {
 	}
 }
 
-func Comment(s string) string {
+func comment(s string) string {
 	ss := []string{}
 	dd := strings.Split(s, "\n")
 	for i, v := range dd {
