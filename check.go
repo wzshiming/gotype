@@ -94,9 +94,8 @@ func identical(t0, t1 Type, cmpTags bool) bool {
 	case Field:
 		if cmpTags {
 			return t0.Tag() == t1.Tag() && identical(t0.Elem(), t1.Elem(), cmpTags)
-		} else {
-			return identical(t0.Elem(), t1.Elem(), cmpTags)
 		}
+		return identical(t0.Elem(), t1.Elem(), cmpTags)
 	case Scope:
 		return t0.PkgPath() == t1.PkgPath()
 	case Declaration:
