@@ -1,5 +1,9 @@
 package a
 
+import (
+	. "time"
+)
+
 // Kind:"Bool" Name:"TBool" String:"TBool"
 type TBool bool
 
@@ -80,3 +84,6 @@ type TPtr *int
 
 // Kind:"Slice" Name:"TSlice" String:"TSlice"
 type TSlice []struct{}
+
+// Kind:"Struct" Name:"MyTime"
+type MyTime Time

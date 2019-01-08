@@ -13,7 +13,7 @@ func TestOhter(t *testing.T) {
 	var testpath = []string{
 		"github.com/wzshiming/gotype/testdata/value",
 		"github.com/wzshiming/gotype/testdata/kind",
-		"github.com/wzshiming/gotype/testdata/struct",
+		"github.com/wzshiming/gotype/testdata/type",
 	}
 	for _, src := range testpath {
 		testAll(t, src)
@@ -136,61 +136,67 @@ func testType(t *testing.T, fset *token.FileSet, v Type) {
 		if data, ok := tag.Lookup("Value"); ok {
 			val := v.Value()
 			if data != val {
-				t.Fatal(pos, "Error value:", val, data)
+				t.Fatal(pos, "Error value:", val, ":", data)
 			}
 		}
 		if data, ok := tag.Lookup("Name"); ok {
 			name := v.Name()
 			if data != name {
-				t.Fatal(pos, "Error name:", name, data)
+				t.Fatal(pos, "Error name:", name, ":", data)
 			}
 		}
 		if data, ok := tag.Lookup("String"); ok {
 			str := v.String()
 			if data != str {
-				t.Fatal(pos, "Error string:", str, data)
+				t.Fatal(pos, "Error string:", str, ":", data)
 			}
 		}
 		if data, ok := tag.Lookup("Kind"); ok {
 			kind := v.Kind().String()
 			if data != kind {
-				t.Fatal(pos, "Error kind:", kind, data)
+				t.Fatal(pos, "Error kind:", kind, ":", data)
 			}
 		}
 		if data, ok := tag.Lookup("Len"); ok {
 			l := fmt.Sprint(v.Len())
 			if data != l {
-				t.Fatal(pos, "Error len:", l, data)
+				t.Fatal(pos, "Error len:", l, ":", data)
+			}
+		}
+		if data, ok := tag.Lookup("NumChild"); ok {
+			num := fmt.Sprint(v.NumChild())
+			if data != num {
+				t.Fatal(pos, "Error num child:", num, ":", data)
 			}
 		}
 		if data, ok := tag.Lookup("NumMethod"); ok {
 			num := fmt.Sprint(v.NumMethod())
 			if data != num {
-				t.Fatal(pos, "Error num method:", num, data)
+				t.Fatal(pos, "Error num method:", num, ":", data)
 			}
 		}
 		if data, ok := tag.Lookup("NumIn"); ok {
 			num := fmt.Sprint(v.NumIn())
 			if data != num {
-				t.Fatal(pos, "Error num in:", num, data)
+				t.Fatal(pos, "Error num in:", num, ":", data)
 			}
 		}
 		if data, ok := tag.Lookup("NumOut"); ok {
 			num := fmt.Sprint(v.NumOut())
 			if data != num {
-				t.Fatal(pos, "Error num out:", num, data)
+				t.Fatal(pos, "Error num out:", num, ":", data)
 			}
 		}
 		if data, ok := tag.Lookup("NumField"); ok {
 			num := fmt.Sprint(v.NumField())
 			if data != num {
-				t.Fatal(pos, "Error num field:", num, data)
+				t.Fatal(pos, "Error num field:", num, ":", data)
 			}
 		}
 		if data, ok := tag.Lookup("Tag"); ok {
 			num := string(v.Tag())
 			if data != num {
-				t.Fatal(pos, "Error tag:", num, data)
+				t.Fatal(pos, "Error tag:", num, ":", data)
 			}
 		}
 	}
