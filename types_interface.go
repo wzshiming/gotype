@@ -1,6 +1,8 @@
 package gotype
 
-import "bytes"
+import (
+	"bytes"
+)
 
 type typeInterface struct {
 	typeBase
@@ -14,7 +16,7 @@ func (t *typeInterface) String() string {
 	buf.WriteString("interface{")
 	for i, v := range t.all {
 		if i != 0 {
-			buf.WriteByte(' ')
+			buf.WriteString("; ")
 		}
 		buf.WriteString(v.String())
 	}
@@ -40,6 +42,7 @@ func (t *typeInterface) MethodByName(name string) (Type, bool) {
 		return b, true
 	}
 	for _, v := range t.anonymo {
+		v := v.Declaration()
 		b, ok := v.MethodByName(name)
 		if ok {
 			return b, true

@@ -14,7 +14,14 @@ type typeStructField struct {
 }
 
 func (t *typeStructField) String() string {
-	return fmt.Sprintf("%v %v `%v`", t.name, t.elem, t.tag)
+	tag := ""
+	if t.tag != "" {
+		tag = " `" + string(t.tag) + "`"
+	}
+	if t.anonymous {
+		return fmt.Sprintf("%v%s", t.elem, tag)
+	}
+	return fmt.Sprintf("%v %v%s", t.name, t.elem, tag)
 }
 
 func (t *typeStructField) Name() string {

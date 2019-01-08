@@ -144,8 +144,12 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 				continue
 			}
 			for _, name := range v.Names {
+				n := name.Name
+				if n == "" {
+					n = "_"
+				}
 				t := &typeStructField{
-					name: name.Name,
+					name: n,
 					elem: ty,
 					tag:  tag,
 				}

@@ -14,7 +14,7 @@ func (t *typeStruct) String() string {
 	buf.WriteString("struct{")
 	for i, v := range t.fields {
 		if i != 0 {
-			buf.WriteByte(' ')
+			buf.WriteString("; ")
 		}
 		buf.WriteString(v.String())
 	}
