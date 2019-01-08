@@ -5,6 +5,7 @@ package gotype
 // ChanDir represents a channel type's direction.
 type ChanDir int
 
+// Define channel direction
 const (
 	RecvDir ChanDir = 1 << iota         // chan<-
 	SendDir                             // <-chan

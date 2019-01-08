@@ -1,6 +1,7 @@
 package gotype
 
 //go:generate stringer -type builtinfunc builtinfunc.go
+
 type builtinfunc uint8
 
 // Built-in function results

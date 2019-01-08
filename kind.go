@@ -6,10 +6,12 @@ package gotype
 // The zero Kind is not a valid kind.
 type Kind uint8
 
+// Define kind
 const (
 	Invalid Kind = iota
 
 	// Built-in base type
+
 	predeclaredTypesBeg
 	Bool
 	Int
@@ -34,6 +36,7 @@ const (
 	predeclaredTypesEnd
 
 	// Built-in combination
+
 	Array
 	Chan
 	Func
@@ -44,6 +47,7 @@ const (
 	Struct
 
 	// Special is different from other Kinds
+
 	Field       // a Struct Field
 	Scope       // package or func body
 	Declaration // a top-level function, variable, or constant.
