@@ -89,12 +89,12 @@ func identical(t0, t1 Type, cmpTags bool) bool {
 	case Array:
 		return t0.Len() == t1.Len() && identical(t0.Elem(), t1.Elem(), cmpTags)
 	case Chan:
-		return t0.ChanDir() == t1.ChanDir() && t0.Len() == t1.Len() && identical(t0.Elem(), t1.Elem(), cmpTags)
+		return t0.ChanDir() == t1.ChanDir() && identical(t0.Elem(), t1.Elem(), cmpTags)
 	case Map:
 		return identical(t0.Key(), t1.Key(), cmpTags) && identical(t0.Elem(), t1.Elem(), cmpTags)
 	case Field:
-		if cmpTags {
-			return t0.Tag() == t1.Tag() && identical(t0.Elem(), t1.Elem(), cmpTags)
+		if cmpTags && t0.Tag() != t1.Tag() {
+			return false
 		}
 		return identical(t0.Elem(), t1.Elem(), cmpTags)
 	case Scope:
