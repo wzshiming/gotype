@@ -11,15 +11,14 @@ type typeStruct struct {
 
 func (t *typeStruct) String() string {
 	buf := bytes.NewBuffer(nil)
-	buf.WriteString("struct {")
-	if len(t.fields) != 0 {
-		buf.WriteByte('\n')
-	}
-	for _, v := range t.fields {
+	buf.WriteString("struct{")
+	for i, v := range t.fields {
+		if i != 0 {
+			buf.WriteByte(' ')
+		}
 		buf.WriteString(v.String())
-		buf.WriteByte('\n')
 	}
-	buf.WriteString("}\n")
+	buf.WriteByte('}')
 	return buf.String()
 }
 

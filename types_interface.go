@@ -11,15 +11,14 @@ type typeInterface struct {
 
 func (t *typeInterface) String() string {
 	buf := bytes.NewBuffer(nil)
-	buf.WriteString("interface {")
-	if len(t.all) != 0 {
-		buf.WriteByte('\n')
-	}
-	for _, v := range t.all {
+	buf.WriteString("interface{")
+	for i, v := range t.all {
+		if i != 0 {
+			buf.WriteByte(' ')
+		}
 		buf.WriteString(v.String())
-		buf.WriteByte('\n')
 	}
-	buf.WriteString("}\n")
+	buf.WriteByte('}')
 	return buf.String()
 }
 
