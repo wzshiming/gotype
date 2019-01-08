@@ -91,6 +91,9 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 	case *ast.StarExpr:
 		return newTypePtr(r.EvalType(t.X))
 	case *ast.UnaryExpr:
+		if t.Op == token.AND {
+			return newTypePtr(r.EvalType(t.X))
+		}
 		return r.EvalType(t.X)
 	case *ast.BinaryExpr:
 		return r.EvalType(t.X)
