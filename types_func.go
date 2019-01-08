@@ -1,6 +1,8 @@
 package gotype
 
-import "bytes"
+import (
+	"bytes"
+)
 
 type typeFunc struct {
 	typeBase
@@ -16,18 +18,10 @@ func (t *typeFunc) String() string {
 		if i != 0 {
 			buf.WriteString(", ")
 		}
-		if t.variadic && i+1 == len(t.results) {
-			if d, ok := v.(*typeDeclaration); ok {
-				if d0, ok := d.declaration.(*typeSlice); ok {
-					buf.WriteString(d.name)
-					buf.WriteString(" ...")
-					buf.WriteString(d0.elem.String())
-					continue
-				}
-			}
-		}
 		buf.WriteString(v.String())
-
+	}
+	if t.variadic {
+		buf.WriteString("...")
 	}
 	buf.WriteString(") (")
 
