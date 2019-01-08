@@ -37,14 +37,12 @@ type typeValuePairs struct {
 func (t *typeValuePairs) String() string {
 	buf := bytes.NewBuffer(nil)
 	buf.WriteString("{")
-	if len(t.li) != 0 {
-		buf.WriteByte('\n')
-	}
-	for _, v := range t.li {
+	for i, v := range t.li {
+		if i != 0 {
+			buf.WriteString("; ")
+		}
 		buf.WriteString(v.String())
-		buf.WriteByte('\n')
 	}
-
-	buf.WriteString("}\n")
+	buf.WriteByte('}')
 	return buf.String()
 }
