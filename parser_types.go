@@ -246,12 +246,14 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 
 			if v.Names == nil {
 				s.anonymo.Add(ty)
+			} else {
+				s.method.Add(ty)
 			}
 
 			for _, name := range v.Names {
 				t := newDeclaration(name.Name, ty)
 				tt := newTypeOrigin(t, v, r.info, v.Doc, v.Comment)
-				s.methods.Add(tt)
+				s.all.Add(tt)
 			}
 		}
 		return s

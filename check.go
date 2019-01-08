@@ -30,24 +30,25 @@ func Implements(t Type, inter Type) bool {
 		t = t.Declaration()
 	}
 
-	lenMet0 := inter.NumMethod()
+	lenMet0 := inter.NumField()
 	lenMet1 := t.NumMethod()
 	if lenMet1 < lenMet0 {
 		return false
 	}
 	for i := 0; i != lenMet0; i++ {
-		m0 := inter.Method(i)
-		name := m0.Name()
+		m0 := inter.Field(i)
 
-		m1, ok := t.MethodByName(name)
-		if !ok {
-			return false
-		}
+		if m0.Kind() == Declaration {
+			name := m0.Name()
+			m1, ok := t.MethodByName(name)
+			if !ok {
+				return false
+			}
 
-		m0 = m0.Declaration()
-		m1 = m1.Declaration()
-
-		if !Identical(m0, m1) {
+			if !Identical(m0, m1) {
+				return false
+			}
+		} else if !Implements(t, m0) {
 			return false
 		}
 	}

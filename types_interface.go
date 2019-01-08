@@ -4,21 +4,18 @@ import "bytes"
 
 type typeInterface struct {
 	typeBase
-	methods types // 这个类型的方法集合
-	anonymo types // 组合的接口
+	all     types
+	anonymo types
+	method  types
 }
 
 func (t *typeInterface) String() string {
 	buf := bytes.NewBuffer(nil)
 	buf.WriteString("interface {")
-	if len(t.anonymo)+len(t.methods) != 0 {
+	if len(t.all) != 0 {
 		buf.WriteByte('\n')
 	}
-	for _, v := range t.anonymo {
-		buf.WriteString(v.String())
-		buf.WriteByte('\n')
-	}
-	for _, v := range t.methods {
+	for _, v := range t.all {
 		buf.WriteString(v.String())
 		buf.WriteByte('\n')
 	}
@@ -31,15 +28,15 @@ func (t *typeInterface) Kind() Kind {
 }
 
 func (t *typeInterface) NumMethod() int {
-	return t.methods.Len()
+	return t.method.Len()
 }
 
 func (t *typeInterface) Method(i int) Type {
-	return t.methods.Index(i)
+	return t.method.Index(i)
 }
 
 func (t *typeInterface) MethodByName(name string) (Type, bool) {
-	b, ok := t.methods.Search(name)
+	b, ok := t.method.Search(name)
 	if ok {
 		return b, true
 	}
@@ -52,14 +49,18 @@ func (t *typeInterface) MethodByName(name string) (Type, bool) {
 	return nil, false
 }
 
-func (t *typeInterface) NumAnonymo() int {
-	return t.anonymo.Len()
+func (t *typeInterface) NumField() int {
+	return t.all.Len()
 }
 
-func (t *typeInterface) Anonymo(i int) Type {
-	return t.anonymo.Index(i)
+func (t *typeInterface) Field(i int) Type {
+	return t.all.Index(i)
 }
 
-func (t *typeInterface) AnonymoByName(name string) (Type, bool) {
-	return t.anonymo.Search(name)
+func (t *typeInterface) FieldByName(name string) (Type, bool) {
+	b, ok := t.all.Search(name)
+	if ok {
+		return b, true
+	}
+	return nil, false
 }
