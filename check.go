@@ -31,15 +31,12 @@ func Implements(t Type, inter Type) bool {
 	}
 
 	lenMet0 := inter.NumField()
-	lenMet1 := t.NumMethod()
-	if lenMet1 < lenMet0 {
-		return false
-	}
 	for i := 0; i != lenMet0; i++ {
 		m0 := inter.Field(i)
-
-		if m0.Kind() == Declaration {
-			name := m0.Name()
+		name := m0.Name()
+		m := m0.Declaration()
+		switch m.Kind() {
+		case Func:
 			m1, ok := t.MethodByName(name)
 			if !ok {
 				return false
@@ -48,8 +45,10 @@ func Implements(t Type, inter Type) bool {
 			if !Identical(m0, m1) {
 				return false
 			}
-		} else if !Implements(t, m0) {
-			return false
+		case Interface:
+			if !Implements(t, m0) {
+				return false
+			}
 		}
 	}
 	return true
