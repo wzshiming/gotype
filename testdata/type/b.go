@@ -21,7 +21,7 @@ var a = (interface {
 })(nil)
 
 // Name:"b" Value:""
-// To:"Declaration" Kind:"Struct" String:"struct{fmt.Stringer; String string `s:\"\"`}"
+// To:"Declaration" Kind:"Struct" String:"struct{Stringer; String string `s:\"\"`}"
 // To:"Declaration,MethodByName:String,Declaration" String:"func() (_)" Value:""
 var b = struct {
 	fmt.Stringer
