@@ -188,7 +188,10 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 						} else {
 							beg = v.Type.End()
 						}
-						if pk != len(list)-1 {
+
+						if nk != len(v.Names)-1 {
+							end = v.Names[nk+1].Pos()
+						} else if pk != len(list)-1 {
 							end = list[pk+1].Pos()
 						} else {
 							end = t.Params.End()
@@ -225,7 +228,9 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 						} else {
 							beg = v.Type.End()
 						}
-						if pk != len(list)-1 {
+						if nk != len(v.Names)-1 {
+							end = v.Names[nk+1].Pos()
+						} else if pk != len(list)-1 {
 							end = list[pk+1].Pos()
 						} else {
 							end = t.Results.End()
