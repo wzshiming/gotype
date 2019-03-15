@@ -96,9 +96,9 @@ func (r *parser) parseType(decl *ast.GenDecl) {
 			continue
 		}
 
-		doc := s.Doc
-		if decl.Lparen == 0 {
-			doc = decl.Doc
+		doc := decl.Doc
+		if s.Doc != nil {
+			doc = s.Doc
 		}
 		comment := s.Comment
 
@@ -122,9 +122,9 @@ func (r *parser) parseImport(decl *ast.GenDecl) {
 			continue
 		}
 
-		doc := s.Doc
-		if decl.Lparen == 0 {
-			doc = decl.Doc
+		doc := decl.Doc
+		if s.Doc != nil {
+			doc = s.Doc
 		}
 		comment := s.Comment
 
@@ -175,9 +175,10 @@ loop:
 		if !ok {
 			continue
 		}
-		doc := s.Doc
-		if decl.Lparen == 0 {
-			doc = decl.Doc
+
+		doc := decl.Doc
+		if s.Doc != nil {
+			doc = s.Doc
 		}
 		comment := s.Comment
 
