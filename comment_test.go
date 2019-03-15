@@ -303,3 +303,37 @@ func testComment(t *testing.T, scope Type) {
 		}
 	}
 }
+
+func TestInversion(t *testing.T) {
+	var testdata = `package p
+
+// S 
+type S struct {
+	t T
+}
+
+// T t
+type T struct {
+}
+
+`
+
+	scope := Parse(t, testdata)
+	s, ok := scope.ChildByName("S")
+	if !ok {
+		t.Log(ok)
+		return
+	}
+	t0 := s.Field(0).Elem()
+	d0 := t0.Doc().Text()
+
+	t1, ok := scope.ChildByName("T")
+	if !ok {
+		t.Log(ok)
+		return
+	}
+	d1 := t1.Doc().Text()
+	if d0 != d1 {
+		t.Fail()
+	}
+}
