@@ -5,21 +5,9 @@ import (
 )
 
 func newTypeOrigin(v Type, ori ast.Node, info *info, doc, comment *ast.CommentGroup) Type {
-	pkg := info.PkgPath
-	goroot := info.Goroot || v.IsGoroot()
-	if p := v.PkgPath(); p != "" {
-		pkg = p
-	}
-	if doc == nil {
-		doc = v.Doc()
-	}
-	if comment == nil {
-		comment = v.Comment()
-	}
 	return &typeOrigin{
 		Type:    v,
-		pkgPath: pkg,
-		goroot:  goroot,
+		info:    info,
 		ori:     ori,
 		doc:     doc,
 		comment: comment,
@@ -29,10 +17,11 @@ func newTypeOrigin(v Type, ori ast.Node, info *info, doc, comment *ast.CommentGr
 type typeOrigin struct {
 	Type
 	ori     ast.Node
-	pkgPath string
+	info    *info
 	goroot  bool
 	doc     *ast.CommentGroup
 	comment *ast.CommentGroup
+	pkgPath string
 }
 
 func (t *typeOrigin) Origin() ast.Node {
@@ -40,17 +29,30 @@ func (t *typeOrigin) Origin() ast.Node {
 }
 
 func (t *typeOrigin) PkgPath() string {
+	if t.pkgPath != "" {
+		return t.pkgPath
+	}
+	t.pkgPath = t.Type.PkgPath()
+	if t.pkgPath == "" {
+		t.pkgPath = t.info.PkgPath
+	}
 	return t.pkgPath
 }
 
 func (t *typeOrigin) IsGoroot() bool {
-	return t.goroot
+	return t.info.Goroot || t.Type.IsGoroot()
 }
 
 func (t *typeOrigin) Doc() *ast.CommentGroup {
-	return t.doc
+	if t.doc != nil {
+		return t.doc
+	}
+	return t.Type.Doc()
 }
 
 func (t *typeOrigin) Comment() *ast.CommentGroup {
-	return t.comment
+	if t.comment != nil {
+		return t.comment
+	}
+	return t.Type.Comment()
 }
