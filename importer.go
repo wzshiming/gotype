@@ -7,6 +7,7 @@ import (
 	goparser "go/parser"
 	"go/token"
 	"os"
+	"path/filepath"
 )
 
 // Importer Go source type analyzer
@@ -17,6 +18,7 @@ type Importer struct {
 	bufBuild         map[string]*build.Package
 	errorHandler     func(error)
 	isCommentLocator bool
+	ctx              build.Context
 }
 
 // NewImporter creates a new importer
@@ -29,6 +31,7 @@ func NewImporter(options ...Option) *Importer {
 		errorHandler: func(err error) {
 			return
 		},
+		ctx: build.Default,
 	}
 	for _, v := range options {
 		v(i)
@@ -37,8 +40,8 @@ func NewImporter(options ...Option) *Importer {
 }
 
 // Import returns go package scope
-func (i *Importer) Import(path string) (Type, error) {
-	return i.importParse(path, ".")
+func (i *Importer) Import(path, src string) (Type, error) {
+	return i.importParse(path, src)
 }
 
 // ImportPackage returns go package scope
@@ -66,43 +69,34 @@ func (i *Importer) ImportSource(path string, src []byte) (Type, error) {
 	return i.ImportFile(path, f)
 }
 
-// ImportBuild returns details about the Go package named by the import path.
-func (i *Importer) ImportBuild(path string) (*build.Package, error) {
-	imp, err := i.importBuild(path, ".")
-	if err != nil {
-		return nil, err
-	}
-	return imp, nil
-}
-
 // FileSet returns the FileSet
 func (i *Importer) FileSet() *token.FileSet {
 	return i.fset
 }
 
-func (i *Importer) importBuild(path string, src string) (*build.Package, error) {
-	k := path + " " + src
+// ImportBuild returns details about the Go package named by the import path.
+func (i *Importer) ImportBuild(path string, src string) (*build.Package, error) {
+	src = filepath.Clean(src)
+	gopath := filepath.Join(i.ctx.GOPATH, "src")
+	rsrc := src
+	if !filepath.HasPrefix(src, gopath) {
+		rsrc = filepath.Join(gopath, src)
+	}
+	k := path + " " + rsrc
 	if v, ok := i.bufBuild[k]; ok {
 		return v, nil
 	}
-
-	imp, err := build.Import(path, src, 0)
+	imp, err := i.ctx.Import(path, rsrc, 0)
 	if err != nil {
-		if src != "." {
-			imp, err = build.Import(path, ".", 0)
-		}
-		if err != nil {
-			i.errorHandler(err)
-			return nil, err
-		}
+		i.errorHandler(err)
+		return nil, err
 	}
-
 	i.bufBuild[k] = imp
 	return imp, nil
 }
 
 func (i *Importer) importName(path string, src string) (name string, goroot bool) {
-	imp, err := i.importBuild(path, src)
+	imp, err := i.ImportBuild(path, src)
 	if err != nil {
 		return "", false
 	}
@@ -110,7 +104,7 @@ func (i *Importer) importName(path string, src string) (name string, goroot bool
 }
 
 func (i *Importer) importParse(path string, src string) (Type, error) {
-	imp, err := i.importBuild(path, src)
+	imp, err := i.ImportBuild(path, src)
 	if err != nil {
 		return nil, err
 	}

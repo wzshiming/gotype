@@ -22,7 +22,7 @@ func TestOhter(t *testing.T) {
 
 func testAll(t *testing.T, src string) {
 	imp := getImporter(t)
-	scope, err := imp.Import(src)
+	scope, err := imp.Import(src, "")
 	if err != nil {
 		t.Fatal(err)
 	}

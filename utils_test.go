@@ -15,7 +15,7 @@ func Parse(t *testing.T, src string) Type {
 
 func Import(t *testing.T, path string) Type {
 	imp := getImporter(t)
-	typ, err := imp.Import(path)
+	typ, err := imp.Import(path, "")
 	if err != nil {
 		t.Fatal(err)
 	}

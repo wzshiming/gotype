@@ -31,7 +31,7 @@ func init() {
 
 func main() {
 	imp := gotype.NewImporter()
-	n, err := imp.Import(*i)
+	n, err := imp.Import(*i, "")
 	if err != nil {
 		fmt.Println(err)
 		return
