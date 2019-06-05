@@ -7,8 +7,9 @@ import (
 )
 
 type importer interface {
-	importParse(path string, src string) (Type, error)
-	importName(path string, src string) (name string, goroot bool)
+	appendError(err error)
+	Import(path string, src string) (Type, error)
+	ImportName(path string, src string) (name string, goroot bool)
 }
 
 // typeName 解析表达式获取类型名字以及是否是导入的

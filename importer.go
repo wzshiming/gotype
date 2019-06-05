@@ -39,11 +39,6 @@ func NewImporter(options ...Option) *Importer {
 	return i
 }
 
-// Import returns go package scope
-func (i *Importer) Import(path, src string) (Type, error) {
-	return i.importParse(path, src)
-}
-
 // ImportPackage returns go package scope
 func (i *Importer) ImportPackage(path string, pkg *ast.Package) (Type, error) {
 	np := newParser(i, i.isCommentLocator, path, false)
@@ -79,7 +74,14 @@ func (i *Importer) ImportBuild(path string, src string) (*build.Package, error) 
 	src = filepath.Clean(src)
 	gopath := filepath.Join(i.ctx.GOPATH, "src")
 	rsrc := src
-	if !filepath.HasPrefix(src, gopath) {
+
+	if filepath.HasPrefix(src, ".") {
+		pwd, err := os.Getwd()
+		if err != nil {
+			return nil, err
+		}
+		rsrc = filepath.Join(pwd, src)
+	} else if !filepath.HasPrefix(src, gopath) {
 		rsrc = filepath.Join(gopath, src)
 	}
 	k := path + " " + rsrc
@@ -88,14 +90,22 @@ func (i *Importer) ImportBuild(path string, src string) (*build.Package, error) 
 	}
 	imp, err := i.ctx.Import(path, rsrc, 0)
 	if err != nil {
-		i.errorHandler(err)
+		i.appendError(err)
 		return nil, err
 	}
 	i.bufBuild[k] = imp
 	return imp, nil
 }
 
-func (i *Importer) importName(path string, src string) (name string, goroot bool) {
+// appendError append error
+func (i *Importer) appendError(err error) {
+	if i.errorHandler != nil {
+		i.errorHandler(err)
+	}
+}
+
+// ImportName returns go package name
+func (i *Importer) ImportName(path string, src string) (name string, goroot bool) {
 	imp, err := i.ImportBuild(path, src)
 	if err != nil {
 		return "", false
@@ -103,7 +113,8 @@ func (i *Importer) importName(path string, src string) (name string, goroot bool
 	return imp.Name, imp.Goroot
 }
 
-func (i *Importer) importParse(path string, src string) (Type, error) {
+// Import returns go package scope
+func (i *Importer) Import(path string, src string) (Type, error) {
 	imp, err := i.ImportBuild(path, src)
 	if err != nil {
 		return nil, err
@@ -125,7 +136,7 @@ func (i *Importer) importParse(path string, src string) (Type, error) {
 	}, i.mode)
 
 	if err != nil {
-		i.errorHandler(err)
+		i.appendError(err)
 		return nil, err
 	}
 
@@ -136,6 +147,6 @@ func (i *Importer) importParse(path string, src string) (Type, error) {
 		return t, nil
 	}
 	err = fmt.Errorf(`No go source code was found under the package path "%s"`, path)
-	i.errorHandler(err)
+	i.appendError(err)
 	return nil, err
 }

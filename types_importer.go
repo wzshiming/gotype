@@ -23,7 +23,10 @@ func (t *typeImport) check() {
 		return
 	}
 
-	s, _ := t.imp.importParse(t.path, t.src)
+	s, err := t.imp.Import(t.path, t.src)
+	if err != nil {
+		t.imp.appendError(err)
+	}
 	t.scope = s
 }
 
@@ -32,7 +35,7 @@ func (t *typeImport) PkgPath() string {
 }
 
 func (t *typeImport) IsGoroot() bool {
-	_, ok := t.imp.importName(t.path, t.src)
+	_, ok := t.imp.ImportName(t.path, t.src)
 	return ok
 }
 
@@ -45,7 +48,7 @@ func (t *typeImport) Name() string {
 		return t.name
 	}
 
-	t.name, _ = t.imp.importName(t.path, t.src)
+	t.name, _ = t.imp.ImportName(t.path, t.src)
 	return t.name
 }
 
