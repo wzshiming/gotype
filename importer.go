@@ -78,30 +78,44 @@ func (i *Importer) FileSet() *token.FileSet {
 	return i.fset
 }
 
-// ImportBuild returns details about the Go package named by the import path.
-func (i *Importer) ImportBuild(path string, src string) (*build.Package, error) {
-	dot := filepath.HasPrefix(src, ".")
-	src = filepath.Clean(src)
-	gopath := filepath.Join(i.ctx.GOPATH, "src")
-	rsrc := src
-
-	if dot {
+func (i *Importer) importPath(path string, src string) (string, string, error) {
+	if filepath.HasPrefix(path, ".") {
 		pwd, err := os.Getwd()
 		if err != nil {
-			return nil, err
+			return "", "", err
 		}
-		rsrc = filepath.Join(pwd, src)
-	} else if filepath.HasPrefix(src, "/") {
-		rsrc = src
-	} else if !filepath.HasPrefix(src, gopath) {
-		rsrc = filepath.Join(gopath, src)
+		src = pwd
+	} else {
+		if filepath.HasPrefix(src, ".") {
+			pwd, err := os.Getwd()
+			if err != nil {
+				return "", "", err
+			}
+			src = filepath.Join(pwd, src)
+		} else {
+			src = filepath.Clean(src)
+		}
+		if !filepath.HasPrefix(src, "/") {
+			gopath := filepath.Join(i.ctx.GOPATH, "src")
+			src = filepath.Join(gopath, src)
+		}
 	}
 
-	k := path + " " + rsrc
+	return path, src, nil
+}
+
+// ImportBuild returns details about the Go package named by the import path.
+func (i *Importer) ImportBuild(path string, src string) (*build.Package, error) {
+	path, src, err := i.importPath(path, src)
+	if err != nil {
+		return nil, err
+	}
+
+	k := path + " " + src
 	if v, ok := i.bufBuild[k]; ok {
 		return v, nil
 	}
-	imp, err := i.ctx.Import(path, rsrc, 0)
+	imp, err := i.ctx.Import(path, src, 0)
 	if err != nil {
 		i.appendError(err)
 		return nil, err
