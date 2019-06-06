@@ -41,16 +41,24 @@ func NewImporter(options ...Option) *Importer {
 
 // ImportPackage returns go package scope
 func (i *Importer) ImportPackage(path string, pkg *ast.Package) (Type, error) {
+	t, ok := i.bufType[path]
+	if ok {
+		return t, nil
+	}
 	np := newParser(i, i.isCommentLocator, path, false)
-	t := np.ParsePackage(pkg)
+	t = np.ParsePackage(pkg)
 	i.bufType[path] = t
 	return t, nil
 }
 
 // ImportFile returns go package scope
 func (i *Importer) ImportFile(path string, f *ast.File) (Type, error) {
+	t, ok := i.bufType[path]
+	if ok {
+		return t, nil
+	}
 	np := newParser(i, i.isCommentLocator, path, false)
-	t := np.ParseFile(f)
+	t = np.ParseFile(f)
 	i.bufType[path] = t
 	return t, nil
 }
