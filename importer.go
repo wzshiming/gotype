@@ -80,19 +80,23 @@ func (i *Importer) FileSet() *token.FileSet {
 
 // ImportBuild returns details about the Go package named by the import path.
 func (i *Importer) ImportBuild(path string, src string) (*build.Package, error) {
+	dot := filepath.HasPrefix(src, ".")
 	src = filepath.Clean(src)
 	gopath := filepath.Join(i.ctx.GOPATH, "src")
 	rsrc := src
 
-	if filepath.HasPrefix(src, ".") {
+	if dot {
 		pwd, err := os.Getwd()
 		if err != nil {
 			return nil, err
 		}
 		rsrc = filepath.Join(pwd, src)
+	} else if filepath.HasPrefix(src, "/") {
+		rsrc = src
 	} else if !filepath.HasPrefix(src, gopath) {
 		rsrc = filepath.Join(gopath, src)
 	}
+
 	k := path + " " + rsrc
 	if v, ok := i.bufBuild[k]; ok {
 		return v, nil
