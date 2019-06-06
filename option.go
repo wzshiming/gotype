@@ -16,3 +16,10 @@ func WithCommentLocator() Option {
 		i.isCommentLocator = true
 	}
 }
+
+// ImportHandler returns the import handler option
+func ImportHandler(f func(path, src, dir string)) Option {
+	return func(i *Importer) {
+		i.importHandler = f
+	}
+}

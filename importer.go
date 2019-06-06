@@ -17,6 +17,7 @@ type Importer struct {
 	bufType          map[string]Type
 	bufBuild         map[string]*build.Package
 	errorHandler     func(error)
+	importHandler    func(path, src, dir string)
 	isCommentLocator bool
 	ctx              build.Context
 }
@@ -132,6 +133,9 @@ func (i *Importer) Import(path string, src string) (Type, error) {
 	tt, ok := i.bufType[dir]
 	if ok {
 		return tt, nil
+	}
+	if i.importHandler != nil {
+		i.importHandler(path, src, dir)
 	}
 
 	m := map[string]bool{}
