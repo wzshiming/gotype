@@ -20,6 +20,7 @@ type Importer struct {
 	importHandler    func(path, src, dir string)
 	isCommentLocator bool
 	ctx              build.Context
+	gopath           []string
 }
 
 // NewImporter creates a new importer
@@ -32,7 +33,8 @@ func NewImporter(options ...Option) *Importer {
 		errorHandler: func(err error) {
 			return
 		},
-		ctx: build.Default,
+		ctx:    build.Default,
+		gopath: filepath.SplitList(build.Default.GOPATH),
 	}
 	for _, v := range options {
 		v(i)
@@ -46,7 +48,7 @@ func (i *Importer) ImportPackage(path string, pkg *ast.Package) (Type, error) {
 	if ok {
 		return t, nil
 	}
-	np := newParser(i, i.isCommentLocator, path, false)
+	np := newParser(i, i.isCommentLocator, "", path, false)
 	t = np.ParsePackage(pkg)
 	i.bufType[path] = t
 	return t, nil
@@ -58,7 +60,7 @@ func (i *Importer) ImportFile(path string, f *ast.File) (Type, error) {
 	if ok {
 		return t, nil
 	}
-	np := newParser(i, i.isCommentLocator, path, false)
+	np := newParser(i, i.isCommentLocator, "", path, false)
 	t = np.ParseFile(f)
 	i.bufType[path] = t
 	return t, nil
@@ -79,27 +81,51 @@ func (i *Importer) FileSet() *token.FileSet {
 }
 
 func (i *Importer) importPath(path string, src string) (string, string, error) {
-	if filepath.HasPrefix(path, ".") {
-		pwd, err := os.Getwd()
+	if !filepath.HasPrefix(src, "/") {
+		abs, err := filepath.Abs(src)
 		if err != nil {
 			return "", "", err
 		}
-		src = pwd
-	} else {
-		if filepath.HasPrefix(src, ".") {
-			pwd, err := os.Getwd()
-			if err != nil {
-				return "", "", err
+		src = abs
+	}
+
+	// If modules are not enabled, then the in-process code works fine and we should keep using it.
+	switch os.Getenv("GO111MODULE") {
+	case "off":
+		return path, src, nil
+	case "on":
+		// ok
+	default: // "", "auto", anything else
+		// Automatic mode: no module use in $GOPATH/src.
+		for _, root := range i.gopath {
+			if filepath.HasPrefix(src, filepath.Join(root, "src")) {
+				return path, src, nil
 			}
-			src = filepath.Join(pwd, src)
-		} else {
-			src = filepath.Clean(src)
-		}
-		if !filepath.HasPrefix(src, "/") {
-			gopath := filepath.Join(i.ctx.GOPATH, "src")
-			src = filepath.Join(gopath, src)
 		}
 	}
+
+	for _, root := range i.gopath {
+		if filepath.HasPrefix(src, filepath.Join(root, "pkg", "mod")) {
+			src, _ = os.Getwd()
+			return path, src, nil
+		}
+	}
+
+	// Look to see if there is a go.mod.
+	abs := src
+	for {
+		info, err := os.Stat(filepath.Join(abs, "go.mod"))
+		if err == nil && !info.IsDir() {
+			break
+		}
+		d, _ := filepath.Split(abs)
+		if len(d) >= len(abs) {
+			return path, src, nil
+		}
+		abs = d
+	}
+
+	src = abs
 
 	return path, src, nil
 }
@@ -171,7 +197,7 @@ func (i *Importer) Import(path string, src string) (Type, error) {
 	}
 
 	for _, v := range p {
-		np := newParser(i, i.isCommentLocator, imp.ImportPath, imp.Goroot)
+		np := newParser(i, i.isCommentLocator, dir, imp.ImportPath, imp.Goroot)
 		t := np.ParsePackage(v)
 		i.bufType[dir] = t
 		return t, nil

@@ -6,12 +6,14 @@ package gotype
 type info struct {
 	Named   types            // var, func, type, packgae
 	Methods map[string]types // type method
+	Src     string
 	PkgPath string
 	Goroot  bool
 }
 
-func newInfo(pkg string, goroot bool) *info {
+func newInfo(src string, pkg string, goroot bool) *info {
 	return &info{
+		Src:     src,
 		PkgPath: pkg,
 		Goroot:  goroot,
 		Methods: map[string]types{},

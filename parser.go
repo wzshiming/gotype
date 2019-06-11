@@ -14,11 +14,11 @@ type parser struct {
 }
 
 // NewParser
-func newParser(i importer, c bool, pkg string, goroot bool) *parser {
+func newParser(i importer, c bool, src string, pkg string, goroot bool) *parser {
 	r := &parser{
 		importer:         i,
 		isCommentLocator: c,
-		info:             newInfo(pkg, goroot),
+		info:             newInfo(src, pkg, goroot),
 	}
 	return r
 }
@@ -138,7 +138,7 @@ func (r *parser) parseImport(decl *ast.GenDecl) {
 		}
 
 		if s.Name == nil {
-			tt := newTypeImport("", path, r.info.PkgPath, r.importer)
+			tt := newTypeImport("", path, r.info.Src, r.importer)
 			tt = newTypeOrigin(tt, s, r.info, doc, comment)
 			r.info.Named.AddNoRepeat(tt)
 		} else {
@@ -157,7 +157,7 @@ func (r *parser) parseImport(decl *ast.GenDecl) {
 					r.info.Named.AddNoRepeat(tt)
 				}
 			default:
-				tt := newTypeImport(s.Name.Name, path, r.info.PkgPath, r.importer)
+				tt := newTypeImport(s.Name.Name, path, r.info.Src, r.importer)
 				tt = newTypeOrigin(tt, s, r.info, doc, comment)
 				r.info.Named.AddNoRepeat(tt)
 			}
