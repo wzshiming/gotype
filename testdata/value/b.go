@@ -2,6 +2,7 @@ package a
 
 import (
 	"fmt"
+	"time"
 	t "time"
 )
 
@@ -15,13 +16,17 @@ var (
 	TNow = t.Now()
 
 	// Name:"MyNow"
-	// To:"Declaration" String:"Now"
+	// To:"Declaration" String:"t.Now"
 	// To:"Declaration,Declaration" String:"func() (_)"
 	MyNow = t.Now
 
 	// Name:"MyPrintf"
-	// To:"Declaration" String:"Printf"
+	// To:"Declaration" String:"fmt.Printf"
 	// To:"Declaration,Declaration" Kind:"Func" String:"func(format, a...) (n, err)"
 	// To:"Declaration,Declaration,In:1,Declaration" String:"[]interface{}"
 	MyPrintf = fmt.Printf
+
+	// Name:"ts" Value:""
+	// To:"Declaration" String:"[]time.Time"
+	ts []time.Time
 )
