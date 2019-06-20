@@ -59,9 +59,6 @@ func (t *typeSelector) ToChild() (Type, bool) {
 }
 
 func (t *typeSelector) String() string {
-	if t.x.Kind() == Scope {
-		return t.sel
-	}
 	return fmt.Sprintf("%v.%v", t.x, t.sel)
 }
 
