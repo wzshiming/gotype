@@ -1,5 +1,9 @@
 package gotype
 
+import (
+	"strings"
+)
+
 // Equal Reports whether the type type is equal
 func Equal(t0 Type, t1 Type) bool {
 	if t0.PkgPath() != t1.PkgPath() {
@@ -149,4 +153,13 @@ func identical(t0, t1 Type, cmpTags bool) bool {
 		return true
 	}
 	return false
+}
+
+// IsBuiltin return it is a built-in base type
+func IsBuiltin(t Type) bool {
+	kind := t.Kind()
+	if kind <= predeclaredTypesBeg || kind >= predeclaredTypesEnd {
+		return false
+	}
+	return t.Name() == strings.ToLower(kind.String())
 }
