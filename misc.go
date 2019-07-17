@@ -12,12 +12,12 @@ type importer interface {
 	ImportName(path string, src string) (name string, goroot bool)
 }
 
-// typeName 解析表达式获取类型名字以及是否是导入的
+// typeName Parses the expression to get the type name and whether it is imported
 func typeName(x ast.Expr) (name string, imported bool) {
 	switch t := x.(type) {
-	case *ast.Ident: // 当前包定义的
+	case *ast.Ident: // Defined by the current package
 		return t.Name, false
-	case *ast.SelectorExpr: // 外部导入的
+	case *ast.SelectorExpr: // Defined by the imported
 		if _, ok := t.X.(*ast.Ident); ok {
 			return t.Sel.Name, true
 		}
