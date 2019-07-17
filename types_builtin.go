@@ -7,6 +7,7 @@ import (
 func newTypeBuiltin(kind Kind, value string) Type {
 	return &typeBuiltin{
 		kind:  kind,
+		name:  strings.ToLower(kind.String()),
 		value: value,
 	}
 }
@@ -14,15 +15,16 @@ func newTypeBuiltin(kind Kind, value string) Type {
 type typeBuiltin struct {
 	typeBase
 	kind  Kind
+	name  string
 	value string
 }
 
 func (t *typeBuiltin) String() string {
-	return strings.ToLower(t.kind.String())
+	return t.name
 }
 
 func (t *typeBuiltin) Name() string {
-	return strings.ToLower(t.kind.String())
+	return t.name
 }
 
 func (t *typeBuiltin) Kind() Kind {
