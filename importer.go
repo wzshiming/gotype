@@ -1,7 +1,6 @@
 package gotype
 
 import (
-	"fmt"
 	"go/ast"
 	"go/build"
 	goparser "go/parser"
@@ -202,7 +201,17 @@ func (i *Importer) Import(path string, src string) (Type, error) {
 		i.bufType[dir] = t
 		return t, nil
 	}
-	err = fmt.Errorf(`No go source code was found under the package path "%s"`, path)
+	err = &NoGoError{path}
 	i.appendError(err)
 	return nil, err
+}
+
+// NoGoError is the error used by Import to describe a directory
+// containing no Go source files.
+type NoGoError struct {
+	Dir string
+}
+
+func (e *NoGoError) Error() string {
+	return "no Go source code files in " + e.Dir
 }
