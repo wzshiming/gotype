@@ -6,7 +6,7 @@ Golang源代码解析，像反射包一样使用
 [![Go Report Card](https://goreportcard.com/badge/github.com/wzshiming/gotype)](https://goreportcard.com/report/github.com/wzshiming/gotype)
 [![GoDoc](https://godoc.org/github.com/wzshiming/gotype?status.svg)](https://godoc.org/github.com/wzshiming/gotype)
 [![GitHub license](https://img.shields.io/github/license/wzshiming/gotype.svg)](https://github.com/wzshiming/gotype/blob/master/LICENSE)
-[![cover.run](https://cover.run/go/github.com/wzshiming/gotype.svg?style=flat&tag=golang-1.10)](https://cover.run/go?tag=golang-1.10&repo=github.com%2Fwzshiming%2Fgotype)
+[![gocover.io](https://gocover.io/_badge/github.com/wzshiming/gotype)](https://gocover.io/github.com/wzshiming/gotype)
 
 - [English](https://github.com/wzshiming/gotype/blob/master/README.md)
 - [简体中文](https://github.com/wzshiming/gotype/blob/master/README_cn.md)
