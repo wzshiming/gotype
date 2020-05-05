@@ -4,6 +4,46 @@ package gotype
 
 import "strconv"
 
+func _() {
+	// An "invalid array index" compiler error signifies that the constant values have changed.
+	// Re-run the stringer command to generate them again.
+	var x [1]struct{}
+	_ = x[Invalid-0]
+	_ = x[predeclaredTypesBeg-1]
+	_ = x[Bool-2]
+	_ = x[Int-3]
+	_ = x[Int8-4]
+	_ = x[Int16-5]
+	_ = x[Int32-6]
+	_ = x[Int64-7]
+	_ = x[Uint-8]
+	_ = x[Uint8-9]
+	_ = x[Uint16-10]
+	_ = x[Uint32-11]
+	_ = x[Uint64-12]
+	_ = x[Uintptr-13]
+	_ = x[Float32-14]
+	_ = x[Float64-15]
+	_ = x[Complex64-16]
+	_ = x[Complex128-17]
+	_ = x[String-18]
+	_ = x[Byte-19]
+	_ = x[Rune-20]
+	_ = x[Error-21]
+	_ = x[predeclaredTypesEnd-22]
+	_ = x[Array-23]
+	_ = x[Chan-24]
+	_ = x[Func-25]
+	_ = x[Interface-26]
+	_ = x[Map-27]
+	_ = x[Ptr-28]
+	_ = x[Slice-29]
+	_ = x[Struct-30]
+	_ = x[Field-31]
+	_ = x[Scope-32]
+	_ = x[Declaration-33]
+}
+
 const _Kind_name = "InvalidpredeclaredTypesBegBoolIntInt8Int16Int32Int64UintUint8Uint16Uint32Uint64UintptrFloat32Float64Complex64Complex128StringByteRuneErrorpredeclaredTypesEndArrayChanFuncInterfaceMapPtrSliceStructFieldScopeDeclaration"
 
 var _Kind_index = [...]uint8{0, 7, 26, 30, 33, 37, 42, 47, 52, 56, 61, 67, 73, 79, 86, 93, 100, 109, 119, 125, 129, 133, 138, 157, 162, 166, 170, 179, 182, 185, 190, 196, 201, 206, 217}

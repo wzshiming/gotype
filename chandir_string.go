@@ -4,6 +4,15 @@ package gotype
 
 import "strconv"
 
+func _() {
+	// An "invalid array index" compiler error signifies that the constant values have changed.
+	// Re-run the stringer command to generate them again.
+	var x [1]struct{}
+	_ = x[RecvDir-1]
+	_ = x[SendDir-2]
+	_ = x[BothDir-3]
+}
+
 const _ChanDir_name = "RecvDirSendDirBothDir"
 
 var _ChanDir_index = [...]uint8{0, 7, 14, 21}

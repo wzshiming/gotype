@@ -4,6 +4,17 @@ package gotype
 
 import "strconv"
 
+func _() {
+	// An "invalid array index" compiler error signifies that the constant values have changed.
+	// Re-run the stringer command to generate them again.
+	var x [1]struct{}
+	_ = x[builtinfuncInt-1]
+	_ = x[builtinfuncPtrItem-2]
+	_ = x[builtinfuncItem-3]
+	_ = x[builtinfuncInterface-4]
+	_ = x[builtinfuncVoid-5]
+}
+
 const _builtinfunc_name = "builtinfuncIntbuiltinfuncPtrItembuiltinfuncItembuiltinfuncInterfacebuiltinfuncVoid"
 
 var _builtinfunc_index = [...]uint8{0, 14, 32, 47, 67, 82}
