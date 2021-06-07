@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func constantEval(expr ast.Node, iota int64, info *info) (r constant.Value, err error) {
+func constantEval(expr ast.Node, iota int64, info *infoFile) (r constant.Value, err error) {
 	switch t := expr.(type) {
 	case *ast.BasicLit:
 		switch t.Kind {
@@ -58,7 +58,7 @@ func constantEval(expr ast.Node, iota int64, info *info) (r constant.Value, err 
 		if t.Name == "iota" {
 			r = constant.MakeInt64(iota)
 			return r, nil
-		} else if val, ok := info.Named.Search(t.Name); ok && val.Kind() == Declaration {
+		} else if val, ok := info.GetPkgOrType(t.Name); ok && val.Kind() == Declaration {
 			val = val.Declaration()
 			switch val.Kind() {
 			case Int, Int8, Int16, Int32, Int64:

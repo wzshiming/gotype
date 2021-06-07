@@ -9,6 +9,10 @@ import (
 )
 
 func (r *parser) EvalType(expr ast.Expr) (ret Type) {
+	return r.evalType(r.info.File(""), expr)
+}
+
+func (r *parser) evalType(info *infoFile, expr ast.Expr) (ret Type) {
 	defer func() {
 		if ret != nil {
 			ret = newTypeOrigin(ret, expr, r.info, nil, nil)
@@ -22,7 +26,7 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 			s := newTypeBuiltin(k, "")
 			return s
 		}
-		s := newTypeNamed(t.Name, nil, r.info)
+		s := newTypeNamed(t.Name, nil, info)
 		return s
 	case *ast.BasicLit:
 		if k := tokenTypes[t.Kind]; k != 0 {
@@ -31,31 +35,31 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 		}
 		return nil
 	case *ast.FuncLit:
-		return r.EvalType(t.Type)
+		return r.evalType(info, t.Type)
 	case *ast.CompositeLit:
-		typ := r.EvalType(t.Type)
+		typ := r.evalType(info, t.Type)
 		if typ.Kind() != Struct {
 			return typ
 		}
 
 		pairs := &typeValuePairs{}
 		for _, v := range t.Elts {
-			d := r.EvalType(v)
+			d := r.evalType(info, v)
 			pairs.li.Add(d)
 		}
 		return newTypeValueBind(typ, pairs, r.info)
 	case *ast.ParenExpr:
-		return r.EvalType(t.X)
+		return r.evalType(info, t.X)
 	case *ast.SelectorExpr:
-		s := r.EvalType(t.X)
+		s := r.evalType(info, t.X)
 		name := t.Sel.Name
 		return newSelector(s, name)
 	case *ast.IndexExpr:
-		return r.EvalType(t.X).Elem()
+		return r.evalType(info, t.X).Elem()
 	case *ast.SliceExpr:
-		return r.EvalType(t.X)
+		return r.evalType(info, t.X)
 	case *ast.TypeAssertExpr:
-		return r.EvalType(t.Type)
+		return r.evalType(info, t.Type)
 	case *ast.CallExpr:
 		switch b := t.Fun.(type) {
 		case *ast.Ident:
@@ -64,9 +68,9 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 				case builtinfuncInt:
 					return newTypeBuiltin(Int, "")
 				case builtinfuncPtrItem:
-					return newTypePtr(r.EvalType(t.Args[0]))
+					return newTypePtr(r.evalType(info, t.Args[0]))
 				case builtinfuncItem:
-					return r.EvalType(t.Args[0])
+					return r.evalType(info, t.Args[0])
 				case builtinfuncInterface:
 					return newTypeBuiltin(Interface, "")
 				case builtinfuncVoid:
@@ -75,7 +79,7 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 			}
 		}
 
-		b := r.EvalType(t.Fun)
+		b := r.evalType(info, t.Fun)
 		for b.Kind() == Declaration {
 			b = b.Declaration()
 		}
@@ -89,30 +93,30 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 		}
 		return b
 	case *ast.StarExpr:
-		return newTypePtr(r.EvalType(t.X))
+		return newTypePtr(r.evalType(info, t.X))
 	case *ast.UnaryExpr:
 		if t.Op == token.AND {
-			return newTypePtr(r.EvalType(t.X))
+			return newTypePtr(r.evalType(info, t.X))
 		}
-		return r.EvalType(t.X)
+		return r.evalType(info, t.X)
 	case *ast.BinaryExpr:
-		return r.EvalType(t.X)
+		return r.evalType(info, t.X)
 	case *ast.KeyValueExpr:
-		k := r.EvalType(t.Key)
-		v := r.EvalType(t.Value)
+		k := r.evalType(info, t.Key)
+		v := r.evalType(info, t.Value)
 		return newTypeValuePair(k, v)
 	case *ast.ArrayType:
 		if t.Len == nil {
-			return newTypeSlice(r.EvalType(t.Elt))
+			return newTypeSlice(r.evalType(info, t.Elt))
 		}
 
 		if ell, ok := t.Len.(*ast.Ellipsis); ok && ell.Ellipsis != 0 {
-			return newTypeArray(r.EvalType(t.Elt), 0)
+			return newTypeArray(r.evalType(info, t.Elt), 0)
 		}
 
-		length := newEvalBind(r.EvalType(t.Len), 0, r.info)
+		length := newEvalBind(r.evalType(info, t.Len), 0, info)
 		i, _ := strconv.ParseInt(length.Value(), 0, 0)
-		return newTypeArray(r.EvalType(t.Elt), int(i))
+		return newTypeArray(r.evalType(info, t.Elt), int(i))
 	case *ast.StructType:
 		s := &typeStruct{}
 
@@ -120,7 +124,7 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 			return s
 		}
 		for _, v := range t.Fields.List {
-			ty := r.EvalType(v.Type)
+			ty := r.evalType(info, v.Type)
 			var tag reflect.StructTag
 			if v.Tag != nil {
 				tv := v.Tag.Value
@@ -166,7 +170,7 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 				if _, ok := v.Type.(*ast.Ellipsis); ok {
 					s.variadic = true
 				}
-				ty := r.EvalType(v.Type)
+				ty := r.evalType(info, v.Type)
 				if ty == nil {
 					continue
 				}
@@ -206,7 +210,7 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 		if t.Results != nil {
 			list := t.Results.List
 			for pk, v := range list {
-				ty := r.EvalType(v.Type)
+				ty := r.evalType(info, v.Type)
 				if ty == nil {
 					continue
 				}
@@ -251,7 +255,7 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 		}
 
 		for _, v := range t.Methods.List {
-			ty := r.EvalType(v.Type)
+			ty := r.evalType(info, v.Type)
 			if ty == nil {
 				continue
 			}
@@ -272,16 +276,16 @@ func (r *parser) EvalType(expr ast.Expr) (ret Type) {
 		}
 		return s
 	case *ast.MapType:
-		k := r.EvalType(t.Key)
-		v := r.EvalType(t.Value)
+		k := r.evalType(info, t.Key)
+		v := r.evalType(info, t.Value)
 		s := newTypeMap(k, v)
 		return s
 	case *ast.ChanType:
-		v := r.EvalType(t.Value)
+		v := r.evalType(info, t.Value)
 		s := newTypeChan(v, ChanDir(t.Dir))
 		return s
 	case *ast.Ellipsis:
-		v := r.EvalType(t.Elt)
+		v := r.evalType(info, t.Elt)
 		s := newTypeSlice(v)
 		return s
 	default:

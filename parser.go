@@ -25,8 +25,8 @@ func newParser(i importer, c bool, src string, pkg string, goroot bool) *parser 
 
 // ParsePackage parse package
 func (r *parser) ParsePackage(pkg *ast.Package) Type {
-	for _, file := range pkg.Files {
-		r.parseFile(file)
+	for filename, file := range pkg.Files {
+		r.parseFile(r.info.File(filename), file)
 	}
 	tt := newTypeScope(pkg.Name, r.info)
 	tt = newTypeOrigin(tt, pkg, r.info, nil, nil)
@@ -35,42 +35,42 @@ func (r *parser) ParsePackage(pkg *ast.Package) Type {
 
 // ParseFile parse file
 func (r *parser) ParseFile(file *ast.File) Type {
-	r.parseFile(file)
+	r.parseFile(r.info.File(""), file)
 	tt := newTypeScope(file.Name.String(), r.info)
 	tt = newTypeOrigin(tt, file, r.info, nil, nil)
 	return tt
 }
 
 // parseFile parse file
-func (r *parser) parseFile(file *ast.File) {
+func (r *parser) parseFile(info *infoFile, file *ast.File) {
 	r.comments = file.Comments
 	for _, decl := range file.Decls {
-		r.parseDecl(decl)
+		r.parseDecl(info, decl)
 	}
 	r.comments = nil
 }
 
 // parseDecl parse declaration
-func (r *parser) parseDecl(decl ast.Decl) {
+func (r *parser) parseDecl(info *infoFile, decl ast.Decl) {
 	switch d := decl.(type) {
 	case *ast.FuncDecl:
-		r.parseFunc(d)
+		r.parseFunc(info, d)
 	case *ast.GenDecl:
 		switch d.Tok {
 		case token.CONST, token.VAR:
-			r.parseValue(d)
+			r.parseValue(info, d)
 		case token.IMPORT:
-			r.parseImport(d)
+			r.parseImport(info, d)
 		case token.TYPE:
-			r.parseType(d)
+			r.parseType(info, d)
 		}
 	}
 }
 
 // parseFunc parse function
-func (r *parser) parseFunc(decl *ast.FuncDecl) {
+func (r *parser) parseFunc(info *infoFile, decl *ast.FuncDecl) {
 	doc := decl.Doc
-	t := r.EvalType(decl.Type)
+	t := r.evalType(info, decl.Type)
 	t = newDeclaration(decl.Name.Name, t)
 	t = newTypeOrigin(t, decl, r.info, doc, nil)
 
@@ -79,17 +79,15 @@ func (r *parser) parseFunc(decl *ast.FuncDecl) {
 		if ok {
 			return
 		}
-		b := r.info.Methods[name]
-		b.Add(t)
-		r.info.Methods[name] = b
+		info.AddMethod(name, t)
 		return
 	}
-	r.info.Named.Add(t)
+	info.AddType(t)
 	return
 }
 
 // parseType parse type
-func (r *parser) parseType(decl *ast.GenDecl) {
+func (r *parser) parseType(info *infoFile, decl *ast.GenDecl) {
 	for _, spec := range decl.Specs {
 		s, ok := spec.(*ast.TypeSpec)
 		if !ok {
@@ -102,20 +100,20 @@ func (r *parser) parseType(decl *ast.GenDecl) {
 		}
 		comment := s.Comment
 
-		tt := r.EvalType(s.Type)
+		tt := r.evalType(info, s.Type)
 		if s.Assign == 0 && tt.Kind() != Interface {
-			tt = newTypeNamed(s.Name.Name, tt, r.info)
+			tt = newTypeNamed(s.Name.Name, tt, info)
 		} else {
 			tt = newTypeAlias(s.Name.Name, tt)
 		}
 
 		tt = newTypeOrigin(tt, s, r.info, doc, comment)
-		r.info.Named.Add(tt)
+		info.AddType(tt)
 	}
 }
 
 // parserImport parser import
-func (r *parser) parseImport(decl *ast.GenDecl) {
+func (r *parser) parseImport(info *infoFile, decl *ast.GenDecl) {
 	for _, spec := range decl.Specs {
 		s, ok := spec.(*ast.ImportSpec)
 		if !ok {
@@ -140,7 +138,7 @@ func (r *parser) parseImport(decl *ast.GenDecl) {
 		if s.Name == nil {
 			tt := newTypeImport("", path, r.info.Src, r.importer)
 			tt = newTypeOrigin(tt, s, r.info, doc, comment)
-			r.info.Named.AddNoRepeat(tt)
+			info.AddPkg(tt)
 		} else {
 			switch s.Name.Name {
 			case "_":
@@ -154,19 +152,19 @@ func (r *parser) parseImport(decl *ast.GenDecl) {
 				for i := 0; i != l; i++ {
 					tt := p.Child(i)
 					tt = newTypeOrigin(tt, s, r.info, doc, comment)
-					r.info.Named.AddNoRepeat(tt)
+					info.AddPkg(tt)
 				}
 			default:
 				tt := newTypeImport(s.Name.Name, path, r.info.Src, r.importer)
 				tt = newTypeOrigin(tt, s, r.info, doc, comment)
-				r.info.Named.AddNoRepeat(tt)
+				info.AddPkg(tt)
 			}
 		}
 	}
 }
 
 // parseValue parse value
-func (r *parser) parseValue(decl *ast.GenDecl) {
+func (r *parser) parseValue(info *infoFile, decl *ast.GenDecl) {
 	var prevVal ast.Expr
 	var prevTyp ast.Expr
 
@@ -193,7 +191,7 @@ loop:
 
 		var typ Type
 		if ctyp != nil { // Type definition
-			typ = r.EvalType(ctyp)
+			typ = r.evalType(info, ctyp)
 			if decl.Tok == token.CONST {
 				prevTyp = ctyp
 			}
@@ -204,10 +202,10 @@ loop:
 		switch l := len(values); l {
 		case 0:
 		case 1:
-			val = r.EvalType(values[0])
+			val = r.evalType(info, values[0])
 			if decl.Tok == token.CONST {
 				prevVal = values[0]
-				val = newEvalBind(val, int64(index), r.info)
+				val = newEvalBind(val, int64(index), info)
 			}
 			if tup, ok := val.(*typeTuple); ok {
 				l := tup.all.Len()
@@ -221,7 +219,7 @@ loop:
 					val = tup.all.Index(i)
 					tt := newDeclaration(v.Name, val)
 					tt = newTypeOrigin(tt, s, r.info, doc, comment)
-					r.info.Named.Add(tt)
+					info.AddType(tt)
 				}
 				continue loop
 			}
@@ -234,13 +232,13 @@ loop:
 				if i == l {
 					break
 				}
-				val = r.EvalType(values[i])
+				val = r.evalType(info, values[i])
 				if decl.Tok == token.CONST {
-					val = newEvalBind(val, int64(index), r.info)
+					val = newEvalBind(val, int64(index), info)
 				}
 				tt := newDeclaration(v.Name, val)
 				tt = newTypeOrigin(tt, s, r.info, doc, comment)
-				r.info.Named.Add(tt)
+				info.AddType(tt)
 			}
 			continue loop
 		}
@@ -254,7 +252,7 @@ loop:
 				if val != nil {
 					tt := newDeclaration(v.Name, val)
 					tt = newTypeOrigin(tt, s, r.info, doc, comment)
-					r.info.Named.Add(tt)
+					info.AddType(tt)
 				} else {
 					// No action
 				}
@@ -262,12 +260,12 @@ loop:
 				if val == nil {
 					tt := newDeclaration(v.Name, typ)
 					tt = newTypeOrigin(tt, s, r.info, doc, comment)
-					r.info.Named.Add(tt)
+					info.AddType(tt)
 				} else {
 					tt := newDeclaration(v.Name, typ)
 					tt = newTypeOrigin(tt, s, r.info, doc, comment)
 					tt = newTypeValueBind(tt, val, r.info)
-					r.info.Named.Add(tt)
+					info.AddType(tt)
 				}
 			}
 		}

@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-func newTypeNamed(name string, typ Type, info *info) Type {
+func newTypeNamed(name string, typ Type, info *infoFile) Type {
 	return &typeNamed{
 		name: name,
 		typ:  typ,
@@ -15,14 +15,14 @@ func newTypeNamed(name string, typ Type, info *info) Type {
 
 type typeNamed struct {
 	name string
-	info *info
+	info *infoFile
 	typ  Type
 }
 
 func (t *typeNamed) ToChild() (Type, bool) {
 	if t.typ == nil {
 		var ok bool
-		t.typ, ok = t.info.Named.Search(t.Name())
+		t.typ, ok = t.info.GetPkgOrType(t.Name())
 		return t.typ, ok
 	}
 	return t.typ, true

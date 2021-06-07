@@ -39,7 +39,7 @@ func newValueBind(typ Type, valfunc func() string) *typeValueBind {
 	}
 }
 
-func newEvalBind(val Type, index int64, info *info) Type {
+func newEvalBind(val Type, index int64, info *infoFile) Type {
 	ori := val.Origin()
 	val = newValueBind(val, func() string {
 		v, err := constantEval(ori, int64(index), info)
