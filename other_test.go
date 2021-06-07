@@ -14,6 +14,7 @@ func TestOhter(t *testing.T) {
 		"github.com/wzshiming/gotype/testdata/value",
 		"github.com/wzshiming/gotype/testdata/kind",
 		"github.com/wzshiming/gotype/testdata/type",
+		"github.com/wzshiming/gotype/testdata/pkg",
 	}
 	for _, src := range testpath {
 		testAll(t, src)
