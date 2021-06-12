@@ -4,20 +4,10 @@ import (
 	"strings"
 )
 
-// Equal Reports whether the type type is equal
+// Equal Reports whether the type is equal
+// Deprecated: should use Identical instead.
 func Equal(t0 Type, t1 Type) bool {
-	if t0.PkgPath() != t1.PkgPath() {
-		return false
-	}
-	n0 := t0.Name()
-	n1 := t1.Name()
-	if n0 != n1 {
-		return false
-	}
-	if n0 == "" {
-		return Identical(t0, t1)
-	}
-	return true
+	return Identical(t0, t1)
 }
 
 // Implements reports whether type inter implements interface t.
@@ -70,6 +60,9 @@ func IdenticalIgnoreTags(t0, t1 Type) bool {
 
 func identical(t0, t1 Type, cmpTags bool) bool {
 	if t0 == t1 {
+		return true
+	}
+	if t0.PkgPath() == t1.PkgPath() && t0.Name() == t1.Name() {
 		return true
 	}
 	k0 := t0.Kind()
