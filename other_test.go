@@ -9,12 +9,16 @@ import (
 	"testing"
 )
 
-func TestOhter(t *testing.T) {
+func TestOther(t *testing.T) {
 	var testpath = []string{
 		"github.com/wzshiming/gotype/testdata/value",
 		"github.com/wzshiming/gotype/testdata/kind",
 		"github.com/wzshiming/gotype/testdata/type",
 		"github.com/wzshiming/gotype/testdata/pkg",
+		"./testdata/value",
+		"./testdata/kind",
+		"./testdata/type",
+		"./testdata/pkg",
 	}
 	for _, src := range testpath {
 		testAll(t, src)
