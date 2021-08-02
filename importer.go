@@ -7,7 +7,6 @@ import (
 	"go/token"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // Importer Go source type analyzer
@@ -80,47 +79,15 @@ func (i *Importer) FileSet() *token.FileSet {
 	return i.fset
 }
 
-func (i *Importer) importPath(path string, src string) (string, string, error) {
+// ImportBuild returns details about the Go package named by the import path.
+func (i *Importer) ImportBuild(path string, src string) (*build.Package, error) {
 	if !filepath.IsAbs(src) {
 		abs, err := filepath.Abs(src)
 		if err != nil {
-			return "", "", err
+			return nil, err
 		}
 		src = abs
 	}
-
-	// If modules are not enabled, then the in-process code works fine and we should keep using it.
-	switch os.Getenv("GO111MODULE") {
-	case "off":
-		return path, src, nil
-	case "on":
-		// ok
-	default: // "", "auto", anything else
-		// Automatic mode: no module use in $GOPATH/src.
-		for _, root := range i.gopath {
-			if strings.HasPrefix(src, filepath.Join(root, "src")) {
-				return path, src, nil
-			}
-		}
-	}
-
-	for _, root := range i.gopath {
-		if strings.HasPrefix(src, filepath.Join(root, "pkg", "mod")) {
-			src, _ = os.Getwd()
-			return path, src, nil
-		}
-	}
-
-	return path, src, nil
-}
-
-// ImportBuild returns details about the Go package named by the import path.
-func (i *Importer) ImportBuild(path string, src string) (*build.Package, error) {
-	path, src, err := i.importPath(path, src)
-	if err != nil {
-		return nil, err
-	}
-
 	k := path + " " + src
 	if v, ok := i.bufBuild[k]; ok {
 		return v, nil
