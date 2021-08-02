@@ -7,6 +7,7 @@ import (
 	"go/token"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // Importer Go source type analyzer
@@ -80,7 +81,7 @@ func (i *Importer) FileSet() *token.FileSet {
 }
 
 func (i *Importer) importPath(path string, src string) (string, string, error) {
-	if !filepath.HasPrefix(src, "/") {
+	if !filepath.IsAbs(src) {
 		abs, err := filepath.Abs(src)
 		if err != nil {
 			return "", "", err
@@ -97,34 +98,18 @@ func (i *Importer) importPath(path string, src string) (string, string, error) {
 	default: // "", "auto", anything else
 		// Automatic mode: no module use in $GOPATH/src.
 		for _, root := range i.gopath {
-			if filepath.HasPrefix(src, filepath.Join(root, "src")) {
+			if strings.HasPrefix(src, filepath.Join(root, "src")) {
 				return path, src, nil
 			}
 		}
 	}
 
 	for _, root := range i.gopath {
-		if filepath.HasPrefix(src, filepath.Join(root, "pkg", "mod")) {
+		if strings.HasPrefix(src, filepath.Join(root, "pkg", "mod")) {
 			src, _ = os.Getwd()
 			return path, src, nil
 		}
 	}
-
-	// Look to see if there is a go.mod.
-	abs := src
-	for {
-		info, err := os.Stat(filepath.Join(abs, "go.mod"))
-		if err == nil && !info.IsDir() {
-			break
-		}
-		d, _ := filepath.Split(abs)
-		if len(d) >= len(abs) {
-			return path, src, nil
-		}
-		abs = d
-	}
-
-	src = abs
 
 	return path, src, nil
 }
