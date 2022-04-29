@@ -17,6 +17,10 @@ Golang源代码解析，像反射包一样使用
 
 [示例](https://github.com/wzshiming/gotype/blob/master/cmd/pkgimport/main.go)
 
+## TODO
+
+- 支持泛型
+
 ## 许可证
 
 软包根据MIT License。有关完整的许可证文本，请参阅[LICENSE](https://github.com/wzshiming/gotype/blob/master/LICENSE)。

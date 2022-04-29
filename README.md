@@ -17,6 +17,10 @@ Golang source code parsing, usage like reflect package
 
 [Examples](https://github.com/wzshiming/gotype/blob/master/cmd/pkgimport/main.go)
 
+## TODO
+
+- Supports generics
+
 ## License
 
-Pouch is licensed under the MIT License. See [LICENSE](https://github.com/wzshiming/gotype/blob/master/LICENSE) for the full license text.
+Licensed under the MIT License. See [LICENSE](https://github.com/wzshiming/gotype/blob/master/LICENSE) for the full license text.
