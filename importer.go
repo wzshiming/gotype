@@ -138,6 +138,10 @@ func (i *Importer) Import(path string, src string) (Type, error) {
 		m[v] = true
 	}
 
+	for _, v := range imp.CgoFiles {
+		m[v] = true
+	}
+
 	p, err := goparser.ParseDir(i.fset, dir, func(fi os.FileInfo) bool {
 		return m[fi.Name()]
 	}, i.mode)
