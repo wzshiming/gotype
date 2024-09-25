@@ -23,7 +23,6 @@ var (
 	// Name:"MyPrintf"
 	// To:"Declaration" String:"fmt.Printf"
 	// To:"Declaration,Declaration" Kind:"Func" String:"func(format, a...) (n, err)"
-	// To:"Declaration,Declaration,In:1,Declaration" String:"[]interface{}"
 	MyPrintf = fmt.Printf
 
 	// Name:"ts" Value:""

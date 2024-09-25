@@ -38,6 +38,10 @@ func (r *parser) evalType(info *infoFile, expr ast.Expr) (ret Type) {
 		return r.evalType(info, t.Type)
 	case *ast.CompositeLit:
 		typ := r.evalType(info, t.Type)
+		if typ == nil {
+			return nil
+		}
+
 		if typ.Kind() != Struct {
 			return typ
 		}
@@ -55,7 +59,16 @@ func (r *parser) evalType(info *infoFile, expr ast.Expr) (ret Type) {
 		name := t.Sel.Name
 		return newSelector(s, name)
 	case *ast.IndexExpr:
-		return r.evalType(info, t.X).Elem()
+		typ := r.evalType(info, t.X)
+		if typ == nil {
+			return nil
+		}
+
+		switch typ.Kind() {
+		case Array, Chan, Map, Ptr, Slice:
+			return typ.Elem()
+		}
+		return nil
 	case *ast.SliceExpr:
 		return r.evalType(info, t.X)
 	case *ast.TypeAssertExpr:
@@ -80,6 +93,9 @@ func (r *parser) evalType(info *infoFile, expr ast.Expr) (ret Type) {
 		}
 
 		b := r.evalType(info, t.Fun)
+		if b == nil {
+			return nil
+		}
 		for b.Kind() == Declaration {
 			b = b.Declaration()
 		}
