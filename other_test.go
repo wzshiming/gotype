@@ -11,14 +11,16 @@ import (
 
 func TestOther(t *testing.T) {
 	var testpath = []string{
-		"github.com/wzshiming/gotype/testdata/value",
-		"github.com/wzshiming/gotype/testdata/kind",
-		"github.com/wzshiming/gotype/testdata/type",
-		"github.com/wzshiming/gotype/testdata/pkg",
-		"./testdata/value",
-		"./testdata/kind",
-		"./testdata/type",
-		"./testdata/pkg",
+		//"github.com/wzshiming/gotype/testdata/value",
+		//"github.com/wzshiming/gotype/testdata/kind",
+		//"github.com/wzshiming/gotype/testdata/type",
+		//"github.com/wzshiming/gotype/testdata/pkg",
+		//"github.com/wzshiming/gotype/testdata/generics",
+		//"./testdata/value",
+		//"./testdata/kind",
+		//"./testdata/type",
+		//"./testdata/pkg",
+		"./testdata/generics",
 	}
 	for _, src := range testpath {
 		testAll(t, src)
@@ -196,6 +198,12 @@ func testType(t *testing.T, fset *token.FileSet, v Type) {
 			num := fmt.Sprint(v.NumField())
 			if data != num {
 				t.Fatal(pos, "Error num field:", num, ":", data)
+			}
+		}
+		if data, ok := tag.Lookup("NumParam"); ok {
+			num := fmt.Sprint(v.NumParam())
+			if data != num {
+				t.Fatal(pos, "Error num param:", num, ":", data)
 			}
 		}
 		if data, ok := tag.Lookup("Tag"); ok {

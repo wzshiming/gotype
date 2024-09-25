@@ -33,6 +33,8 @@ const (
 	Byte
 	Rune
 	Error
+	Any
+	Comparable
 	predeclaredTypesEnd
 
 	// Built-in combination
@@ -51,4 +53,5 @@ const (
 	Field       // a Struct Field
 	Scope       // package or func body
 	Declaration // a top-level function, variable, or constant.
+	Param       // a Type Param
 )

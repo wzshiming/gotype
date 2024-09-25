@@ -22,6 +22,14 @@ func (r *parser) evalType(info *infoFile, expr ast.Expr) (ret Type) {
 	case *ast.BadExpr:
 		return nil
 	case *ast.Ident:
+		p := info.Params[info.typename]
+		if len(p) != 0 {
+			for _, v := range p {
+				if v.Name() == t.Name {
+					return v
+				}
+			}
+		}
 		if k := predeclaredTypes[t.Name]; k != 0 {
 			s := newTypeBuiltin(k, "")
 			return s
@@ -64,11 +72,23 @@ func (r *parser) evalType(info *infoFile, expr ast.Expr) (ret Type) {
 			return nil
 		}
 
-		switch typ.Kind() {
-		case Array, Chan, Map, Ptr, Slice:
-			return typ.Elem()
+		if t.Index != nil {
+			actual := r.evalType(info, t.Index)
+			return newTypeGenerics(typ, info.Params[typ.Name()], []Type{actual})
 		}
-		return nil
+		return typ.Elem()
+	case *ast.IndexListExpr:
+		typ := r.evalType(info, t.X)
+		if typ == nil {
+			return typ
+		}
+
+		actual := make([]Type, 0, len(t.Indices))
+		for _, ind := range t.Indices {
+			actual = append(actual, r.evalType(info, ind))
+		}
+
+		return newTypeGenerics(typ, info.Params[typ.Name()], actual)
 	case *ast.SliceExpr:
 		return r.evalType(info, t.X)
 	case *ast.TypeAssertExpr:

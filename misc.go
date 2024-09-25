@@ -4,6 +4,7 @@ import (
 	"go/ast"
 	"go/token"
 	"strings"
+	"fmt"
 )
 
 type importer interface {
@@ -23,6 +24,31 @@ func typeName(x ast.Expr) (name string, imported bool) {
 		}
 	case *ast.StarExpr:
 		return typeName(t.X)
+	case *ast.IndexExpr:
+		name, imported := typeName(t.X)
+		if !imported {
+			return name, false
+		}
+		param, imported := typeName(t.Index)
+		if !imported {
+			return name, false
+		}
+		return fmt.Sprintf("%s[%s]", name, param), true
+	case *ast.IndexListExpr:
+		name, imported := typeName(t.X)
+		if !imported {
+			return name, false
+		}
+
+		var params = make([]string, 0, len(t.Indices))
+		for _, index := range t.Indices {
+			param, imported := typeName(index)
+			if !imported {
+				return name, false
+			}
+			params = append(params, param)
+		}
+		return fmt.Sprintf("%s[%s]", name, strings.Join(params, ", ")), true
 	}
 	return
 }

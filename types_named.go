@@ -270,3 +270,38 @@ func (t *typeNamed) Comment() *ast.CommentGroup {
 	}
 	return child.Comment()
 }
+
+func (t *typeNamed) NumParam() int {
+	if t.info == nil {
+		return 0
+	}
+	b := t.info.Params[t.Name()]
+	return b.Len()
+}
+
+func (t *typeNamed) Param(i int) Type {
+	if t.info == nil {
+		return nil
+	}
+	b := t.info.Params[t.Name()]
+	if b.Len() <= i {
+		return nil
+	}
+	return b.Index(i)
+}
+
+func (t *typeNamed) ParamByName(name string) (Type, bool) {
+	if t.info == nil {
+		return nil, false
+	}
+	b := t.info.Params[t.Name()]
+	m, ok := b.Search(name)
+	if ok {
+		return m, true
+	}
+	child, ok := t.ToChild()
+	if ok {
+		return child.ParamByName(name)
+	}
+	return nil, false
+}

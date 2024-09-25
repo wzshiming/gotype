@@ -88,6 +88,9 @@ func (r *parser) parseFunc(info *infoFile, decl *ast.FuncDecl) {
 
 // parseType parse type
 func (r *parser) parseType(info *infoFile, decl *ast.GenDecl) {
+	defer func() {
+		info.typename = ""
+	}()
 	for _, spec := range decl.Specs {
 		s, ok := spec.(*ast.TypeSpec)
 		if !ok {
@@ -100,7 +103,28 @@ func (r *parser) parseType(info *infoFile, decl *ast.GenDecl) {
 		}
 		comment := s.Comment
 
+		info.typename = s.Name.Name
+		if tp := s.TypeParams; tp != nil {
+			for _, t := range tp.List {
+				typ := r.evalType(info, t.Type)
+				if len(t.Names) == 0 {
+					info.AddParam(info.typename, &typeParam{
+						name: "_",
+						elem: typ,
+					})
+				} else {
+					for _, name := range t.Names {
+						info.AddParam(info.typename, &typeParam{
+							name: name.Name,
+							elem: typ,
+						})
+					}
+				}
+			}
+		}
+
 		tt := r.evalType(info, s.Type)
+
 		if s.Assign == 0 && tt.Kind() != Interface {
 			tt = newTypeNamed(s.Name.Name, tt, info)
 		} else {

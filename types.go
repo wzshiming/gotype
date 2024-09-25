@@ -163,6 +163,16 @@ type Type interface {
 
 	// Comment returns the type's comment within its package.
 	Comment() *ast.CommentGroup
+
+	// NumParam returns a type's param count.
+	NumParam() int
+
+	// Param returns a type's i'th param.
+	Param(int) Type
+
+	// ParamByName returns the type's param with the given name
+	// and a boolean indicating if the field was found.
+	ParamByName(string) (Type, bool)
 }
 
 type types []Type
@@ -344,4 +354,16 @@ func (t *typeBase) Doc() *ast.CommentGroup {
 
 func (t *typeBase) Comment() *ast.CommentGroup {
 	return nil
+}
+
+func (t *typeBase) NumParam() int {
+	return 0
+}
+
+func (t *typeBase) Param(int) Type {
+	panic("Param of non-param type")
+}
+
+func (t *typeBase) ParamByName(string) (Type, bool) {
+	panic("ParamByName of non-param type")
 }

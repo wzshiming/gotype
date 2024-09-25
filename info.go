@@ -7,6 +7,7 @@ type info struct {
 	PkgNamed map[string]types // map[file]packgae
 	Named    types            // var, func, type,
 	Methods  map[string]types // map[type]method
+	Params   map[string]types // map[type]param
 	Src      string
 	PkgPath  string
 	Goroot   bool
@@ -14,6 +15,7 @@ type info struct {
 
 type infoFile struct {
 	*info
+	typename string
 	filename string
 }
 
@@ -23,6 +25,7 @@ func newInfo(src string, pkg string, goroot bool) *info {
 		PkgPath:  pkg,
 		Goroot:   goroot,
 		Methods:  map[string]types{},
+		Params:   map[string]types{},
 		PkgNamed: map[string]types{},
 	}
 }
@@ -66,4 +69,10 @@ func (i *infoFile) AddMethod(name string, t Type) {
 	methods := i.Methods[name]
 	methods.Add(t)
 	i.Methods[name] = methods
+}
+
+func (i *infoFile) AddParam(name string, t Type) {
+	params := i.Params[name]
+	params.Add(t)
+	i.Params[name] = params
 }

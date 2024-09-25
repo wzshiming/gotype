@@ -30,23 +30,26 @@ func _() {
 	_ = x[Byte-19]
 	_ = x[Rune-20]
 	_ = x[Error-21]
-	_ = x[predeclaredTypesEnd-22]
-	_ = x[Array-23]
-	_ = x[Chan-24]
-	_ = x[Func-25]
-	_ = x[Interface-26]
-	_ = x[Map-27]
-	_ = x[Ptr-28]
-	_ = x[Slice-29]
-	_ = x[Struct-30]
-	_ = x[Field-31]
-	_ = x[Scope-32]
-	_ = x[Declaration-33]
+	_ = x[Any-22]
+	_ = x[Comparable-23]
+	_ = x[predeclaredTypesEnd-24]
+	_ = x[Array-25]
+	_ = x[Chan-26]
+	_ = x[Func-27]
+	_ = x[Interface-28]
+	_ = x[Map-29]
+	_ = x[Ptr-30]
+	_ = x[Slice-31]
+	_ = x[Struct-32]
+	_ = x[Field-33]
+	_ = x[Scope-34]
+	_ = x[Declaration-35]
+	_ = x[Param-36]
 }
 
-const _Kind_name = "InvalidpredeclaredTypesBegBoolIntInt8Int16Int32Int64UintUint8Uint16Uint32Uint64UintptrFloat32Float64Complex64Complex128StringByteRuneErrorpredeclaredTypesEndArrayChanFuncInterfaceMapPtrSliceStructFieldScopeDeclaration"
+const _Kind_name = "InvalidpredeclaredTypesBegBoolIntInt8Int16Int32Int64UintUint8Uint16Uint32Uint64UintptrFloat32Float64Complex64Complex128StringByteRuneErrorAnyComparablepredeclaredTypesEndArrayChanFuncInterfaceMapPtrSliceStructFieldScopeDeclarationParam"
 
-var _Kind_index = [...]uint8{0, 7, 26, 30, 33, 37, 42, 47, 52, 56, 61, 67, 73, 79, 86, 93, 100, 109, 119, 125, 129, 133, 138, 157, 162, 166, 170, 179, 182, 185, 190, 196, 201, 206, 217}
+var _Kind_index = [...]uint8{0, 7, 26, 30, 33, 37, 42, 47, 52, 56, 61, 67, 73, 79, 86, 93, 100, 109, 119, 125, 129, 133, 138, 141, 151, 170, 175, 179, 183, 192, 195, 198, 203, 209, 214, 219, 230, 235}
 
 func (i Kind) String() string {
 	if i >= Kind(len(_Kind_index)-1) {
