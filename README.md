@@ -3,7 +3,7 @@
 Golang source code parsing, usage like reflect package
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/wzshiming/gotype)](https://goreportcard.com/report/github.com/wzshiming/gotype)
-[![GoDoc](https://godoc.org/github.com/wzshiming/gotype?status.svg)](https://godoc.org/github.com/wzshiming/gotype)
+[![Go Reference](https://pkg.go.dev/badge/github.com/wzshiming/gotype.svg)](https://pkg.go.dev/github.com/wzshiming/gotype)
 [![GitHub license](https://img.shields.io/github/license/wzshiming/gotype.svg)](https://github.com/wzshiming/gotype/blob/master/LICENSE)
 
 - [English](https://github.com/wzshiming/gotype/blob/master/README.md)
@@ -11,7 +11,7 @@ Golang source code parsing, usage like reflect package
 
 ## Usage
 
-[API Documentation](https://godoc.org/github.com/wzshiming/gotype)
+[API Documentation](https://pkg.go.dev/github.com/wzshiming/gotype)
 
 [Examples](https://github.com/wzshiming/gotype/blob/master/cmd/pkgimport/main.go)
 

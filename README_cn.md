@@ -3,7 +3,7 @@
 Golang 源代码解析，像反射包一样使用
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/wzshiming/gotype)](https://goreportcard.com/report/github.com/wzshiming/gotype)
-[![GoDoc](https://godoc.org/github.com/wzshiming/gotype?status.svg)](https://godoc.org/github.com/wzshiming/gotype)
+[![Go Reference](https://pkg.go.dev/badge/github.com/wzshiming/gotype.svg)](https://pkg.go.dev/github.com/wzshiming/gotype)
 [![GitHub license](https://img.shields.io/github/license/wzshiming/gotype.svg)](https://github.com/wzshiming/gotype/blob/master/LICENSE)
 
 - [English](https://github.com/wzshiming/gotype/blob/master/README.md)
@@ -11,10 +11,10 @@ Golang 源代码解析，像反射包一样使用
 
 ## 用法
 
-[API 文档](https://godoc.org/github.com/wzshiming/gotype)
+[API 文档](https://pkg.go.dev/github.com/wzshiming/gotype)
 
 [示例](https://github.com/wzshiming/gotype/blob/master/cmd/pkgimport/main.go)
 
 ## 许可证
 
-软包根据MIT License。有关完整的许可证文本，请参阅[LICENSE](https://github.com/wzshiming/gotype/blob/master/LICENSE)。
+软件包根据MIT License。有关完整的许可证文本，请参阅[LICENSE](https://github.com/wzshiming/gotype/blob/master/LICENSE)。
