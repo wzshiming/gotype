@@ -289,3 +289,27 @@ func (t *typeSelector) Comment() *ast.CommentGroup {
 	}
 	return child.Comment()
 }
+
+func (t *typeSelector) NumTypeParam() int {
+	child, ok := t.ToChild()
+	if !ok {
+		return 0
+	}
+	return child.NumTypeParam()
+}
+
+func (t *typeSelector) TypeParam(i int) Type {
+	child, ok := t.ToChild()
+	if !ok {
+		return nil
+	}
+	return child.TypeParam(i)
+}
+
+func (t *typeSelector) Constraint() Type {
+	child, ok := t.ToChild()
+	if !ok {
+		return nil
+	}
+	return child.Constraint()
+}

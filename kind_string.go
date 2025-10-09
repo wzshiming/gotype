@@ -42,15 +42,17 @@ func _() {
 	_ = x[Field-31]
 	_ = x[Scope-32]
 	_ = x[Declaration-33]
+	_ = x[TypeParam-34]
 }
 
-const _Kind_name = "InvalidpredeclaredTypesBegBoolIntInt8Int16Int32Int64UintUint8Uint16Uint32Uint64UintptrFloat32Float64Complex64Complex128StringByteRuneErrorpredeclaredTypesEndArrayChanFuncInterfaceMapPtrSliceStructFieldScopeDeclaration"
+const _Kind_name = "InvalidpredeclaredTypesBegBoolIntInt8Int16Int32Int64UintUint8Uint16Uint32Uint64UintptrFloat32Float64Complex64Complex128StringByteRuneErrorpredeclaredTypesEndArrayChanFuncInterfaceMapPtrSliceStructFieldScopeDeclarationTypeParam"
 
-var _Kind_index = [...]uint8{0, 7, 26, 30, 33, 37, 42, 47, 52, 56, 61, 67, 73, 79, 86, 93, 100, 109, 119, 125, 129, 133, 138, 157, 162, 166, 170, 179, 182, 185, 190, 196, 201, 206, 217}
+var _Kind_index = [...]uint8{0, 7, 26, 30, 33, 37, 42, 47, 52, 56, 61, 67, 73, 79, 86, 93, 100, 109, 119, 125, 129, 133, 138, 157, 162, 166, 170, 179, 182, 185, 190, 196, 201, 206, 217, 226}
 
 func (i Kind) String() string {
-	if i >= Kind(len(_Kind_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_Kind_index)-1 {
 		return "Kind(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _Kind_name[_Kind_index[i]:_Kind_index[i+1]]
+	return _Kind_name[_Kind_index[idx]:_Kind_index[idx+1]]
 }

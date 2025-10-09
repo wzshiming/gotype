@@ -68,7 +68,15 @@ func (r *parser) evalType(info *infoFile, expr ast.Expr) (ret Type) {
 		case Array, Chan, Map, Ptr, Slice:
 			return typ.Elem()
 		}
-		return nil
+		return typ
+	case *ast.IndexListExpr:
+		// Generic type instantiation with multiple type arguments
+		// e.g., Pair[string, int]
+		typ := r.evalType(info, t.X)
+		if typ == nil {
+			return nil
+		}
+		return typ
 	case *ast.SliceExpr:
 		return r.evalType(info, t.X)
 	case *ast.TypeAssertExpr:
@@ -180,6 +188,20 @@ func (r *parser) evalType(info *infoFile, expr ast.Expr) (ret Type) {
 		return s
 	case *ast.FuncType:
 		s := &typeFunc{}
+
+		// Handle type parameters for generic functions
+		if t.TypeParams != nil && t.TypeParams.NumFields() > 0 {
+			typeParams := make([]Type, 0, t.TypeParams.NumFields())
+			for _, field := range t.TypeParams.List {
+				constraint := r.evalType(info, field.Type)
+				for _, name := range field.Names {
+					param := newTypeParam(name.Name, constraint)
+					typeParams = append(typeParams, param)
+				}
+			}
+			s.typeParams = typeParams
+		}
+
 		if t.Params != nil {
 			list := t.Params.List
 			for pk, v := range list {

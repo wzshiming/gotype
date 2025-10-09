@@ -51,4 +51,5 @@ const (
 	Field       // a Struct Field
 	Scope       // package or func body
 	Declaration // a top-level function, variable, or constant.
+	TypeParam   // a type parameter in a generic type or function
 )

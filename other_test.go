@@ -15,10 +15,12 @@ func TestOther(t *testing.T) {
 		"github.com/wzshiming/gotype/testdata/kind",
 		"github.com/wzshiming/gotype/testdata/type",
 		"github.com/wzshiming/gotype/testdata/pkg",
+		"github.com/wzshiming/gotype/testdata/generics",
 		"./testdata/value",
 		"./testdata/kind",
 		"./testdata/type",
 		"./testdata/pkg",
+		"./testdata/generics",
 	}
 	for _, src := range testpath {
 		testAll(t, src)
@@ -133,6 +135,20 @@ func testType(t *testing.T, fset *token.FileSet, v Type) {
 					if !ok {
 						t.Fatal(pos, "Error not found: ", to)
 					}
+				case "TypeParam":
+					if len(method) < 2 {
+						t.Fatal(pos, "Error TypeParam num: ", to)
+					}
+					i, err := strconv.ParseInt(method[1], 10, 64)
+					if err != nil {
+						t.Fatal(pos, "Error TypeParam: ", err)
+					}
+					if v.NumTypeParam() <= int(i) {
+						t.Fatal(pos, "Error Out of index range: ", to)
+					}
+					v = v.TypeParam(int(i))
+				case "Constraint":
+					v = v.Constraint()
 				default:
 					t.Fatal(pos, "Error to: ", to)
 				}
@@ -202,6 +218,12 @@ func testType(t *testing.T, fset *token.FileSet, v Type) {
 			num := string(v.Tag())
 			if data != num {
 				t.Fatal(pos, "Error tag:", num, ":", data)
+			}
+		}
+		if data, ok := tag.Lookup("NumTypeParam"); ok {
+			num := fmt.Sprint(v.NumTypeParam())
+			if data != num {
+				t.Fatal(pos, "Error num type param:", num, ":", data)
 			}
 		}
 	}

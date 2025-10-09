@@ -163,6 +163,18 @@ type Type interface {
 
 	// Comment returns the type's comment within its package.
 	Comment() *ast.CommentGroup
+
+	// NumTypeParam returns the number of type parameters for a generic type or function.
+	// It returns 0 for non-generic types.
+	NumTypeParam() int
+
+	// TypeParam returns the i'th type parameter.
+	// It panics if i is not in the range [0, NumTypeParam()).
+	TypeParam(int) Type
+
+	// Constraint returns the constraint of a type parameter.
+	// It panics if the type's Kind is not TypeParam.
+	Constraint() Type
 }
 
 type types []Type
@@ -344,4 +356,16 @@ func (t *typeBase) Doc() *ast.CommentGroup {
 
 func (t *typeBase) Comment() *ast.CommentGroup {
 	return nil
+}
+
+func (t *typeBase) NumTypeParam() int {
+	return 0
+}
+
+func (t *typeBase) TypeParam(int) Type {
+	panic("TypeParam of non-generic type")
+}
+
+func (t *typeBase) Constraint() Type {
+	panic("Constraint of non-type-parameter type")
 }

@@ -49,6 +49,19 @@ func (t *typeNamed) Name() string {
 }
 
 func (t *typeNamed) String() string {
+	child, ok := t.ToChild()
+	if ok && child.NumTypeParam() > 0 {
+		// Build string with type parameters
+		s := t.name + "["
+		for i := 0; i < child.NumTypeParam(); i++ {
+			if i > 0 {
+				s += ", "
+			}
+			s += child.TypeParam(i).String()
+		}
+		s += "]"
+		return s
+	}
 	return t.name
 }
 
@@ -269,4 +282,28 @@ func (t *typeNamed) Comment() *ast.CommentGroup {
 		return nil
 	}
 	return child.Comment()
+}
+
+func (t *typeNamed) NumTypeParam() int {
+	child, ok := t.ToChild()
+	if !ok {
+		return 0
+	}
+	return child.NumTypeParam()
+}
+
+func (t *typeNamed) TypeParam(i int) Type {
+	child, ok := t.ToChild()
+	if !ok {
+		return nil
+	}
+	return child.TypeParam(i)
+}
+
+func (t *typeNamed) Constraint() Type {
+	child, ok := t.ToChild()
+	if !ok {
+		return nil
+	}
+	return child.Constraint()
 }

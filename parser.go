@@ -101,6 +101,20 @@ func (r *parser) parseType(info *infoFile, decl *ast.GenDecl) {
 		comment := s.Comment
 
 		tt := r.evalType(info, s.Type)
+		
+		// Handle type parameters for generic types
+		if s.TypeParams != nil && s.TypeParams.NumFields() > 0 {
+			typeParams := make([]Type, 0, s.TypeParams.NumFields())
+			for _, field := range s.TypeParams.List {
+				constraint := r.evalType(info, field.Type)
+				for _, name := range field.Names {
+					param := newTypeParam(name.Name, constraint)
+					typeParams = append(typeParams, param)
+				}
+			}
+			tt = newTypeGeneric(tt, typeParams)
+		}
+		
 		if s.Assign == 0 && tt.Kind() != Interface {
 			tt = newTypeNamed(s.Name.Name, tt, info)
 		} else {

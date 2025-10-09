@@ -14,6 +14,18 @@ type typeDeclaration struct {
 }
 
 func (t *typeDeclaration) String() string {
+	if t.declaration.NumTypeParam() > 0 {
+		// Build string with type parameters
+		s := t.name + "["
+		for i := 0; i < t.declaration.NumTypeParam(); i++ {
+			if i > 0 {
+				s += ", "
+			}
+			s += t.declaration.TypeParam(i).String()
+		}
+		s += "]"
+		return s
+	}
 	return t.name
 }
 
