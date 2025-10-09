@@ -18,6 +18,7 @@ type Importer struct {
 	errorHandler     func(error)
 	importHandler    func(path, src, dir string)
 	isCommentLocator bool
+	isLazyParsing    bool
 	ctx              build.Context
 	gopath           []string
 }
@@ -47,7 +48,7 @@ func (i *Importer) ImportPackage(path string, pkg *ast.Package) (Type, error) {
 	if ok {
 		return t, nil
 	}
-	np := newParser(i, i.isCommentLocator, "", path, false)
+	np := newParser(i, i.isCommentLocator, i.isLazyParsing, "", path, false)
 	t = np.ParsePackage(pkg)
 	i.bufType[path] = t
 	return t, nil
@@ -59,7 +60,7 @@ func (i *Importer) ImportFile(path string, f *ast.File) (Type, error) {
 	if ok {
 		return t, nil
 	}
-	np := newParser(i, i.isCommentLocator, "", path, false)
+	np := newParser(i, i.isCommentLocator, i.isLazyParsing, "", path, false)
 	t = np.ParseFile(f)
 	i.bufType[path] = t
 	return t, nil
@@ -152,7 +153,7 @@ func (i *Importer) Import(path string, src string) (Type, error) {
 	}
 
 	for _, v := range p {
-		np := newParser(i, i.isCommentLocator, dir, imp.ImportPath, imp.Goroot)
+		np := newParser(i, i.isCommentLocator, i.isLazyParsing, dir, imp.ImportPath, imp.Goroot)
 		t := np.ParsePackage(v)
 		i.bufType[dir] = t
 		return t, nil

@@ -9,15 +9,17 @@ import (
 type parser struct {
 	importer         importer
 	isCommentLocator bool
+	isLazyParsing    bool
 	info             *info
 	comments         []*ast.CommentGroup
 }
 
 // NewParser
-func newParser(i importer, c bool, src string, pkg string, goroot bool) *parser {
+func newParser(i importer, c bool, lazy bool, src string, pkg string, goroot bool) *parser {
 	r := &parser{
 		importer:         i,
 		isCommentLocator: c,
+		isLazyParsing:    lazy,
 		info:             newInfo(src, pkg, goroot),
 	}
 	return r
@@ -44,10 +46,78 @@ func (r *parser) ParseFile(file *ast.File) Type {
 // parseFile parse file
 func (r *parser) parseFile(info *infoFile, file *ast.File) {
 	r.comments = file.Comments
-	for _, decl := range file.Decls {
-		r.parseDecl(info, decl)
+	if r.isLazyParsing {
+		r.parseFileLazy(info, file)
+	} else {
+		for _, decl := range file.Decls {
+			r.parseDecl(info, decl)
+		}
 	}
 	r.comments = nil
+}
+
+// parseFileLazy creates lazy wrappers for declarations
+func (r *parser) parseFileLazy(info *infoFile, file *ast.File) {
+	for _, decl := range file.Decls {
+		switch d := decl.(type) {
+		case *ast.FuncDecl:
+			// Functions are lightweight, parse them eagerly
+			r.parseFunc(info, d)
+		case *ast.GenDecl:
+			switch d.Tok {
+			case token.IMPORT:
+				// Imports need to be parsed eagerly for dependency resolution
+				r.parseImport(info, d)
+			case token.CONST, token.VAR, token.TYPE:
+				// Defer parsing of constants, variables, and types
+				r.parseDeclLazy(info, d)
+			}
+		}
+	}
+}
+
+// parseDeclLazy creates lazy wrappers for declarations
+func (r *parser) parseDeclLazy(info *infoFile, decl *ast.GenDecl) {
+	for _, spec := range decl.Specs {
+		doc := decl.Doc
+		var name string
+		
+		switch s := spec.(type) {
+		case *ast.TypeSpec:
+			name = s.Name.Name
+			if s.Doc != nil {
+				doc = s.Doc
+			}
+		case *ast.ValueSpec:
+			// For value specs with multiple names, we need to handle each
+			if len(s.Names) > 0 {
+				for _, n := range s.Names {
+					if n.Name != "" && n.Name != "_" {
+						lazyDecl := &ast.GenDecl{
+							Doc:   doc,
+							Tok:   decl.Tok,
+							Specs: []ast.Spec{s},
+						}
+						lazy := newTypeLazy(n.Name, lazyDecl, r, info, doc)
+						info.AddType(lazy)
+					}
+				}
+				continue
+			}
+		default:
+			continue
+		}
+		
+		if name != "" && name != "_" {
+			lazyDecl := &ast.GenDecl{
+				Doc:   doc,
+				Tok:   decl.Tok,
+				Specs: []ast.Spec{spec},
+			}
+			lazy := newTypeLazy(name, lazyDecl, r, info, doc)
+			info.AddType(lazy)
+		}
+	}
 }
 
 // parseDecl parse declaration

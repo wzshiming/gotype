@@ -23,3 +23,10 @@ func ImportHandler(f func(path, src, dir string)) Option {
 		i.importHandler = f
 	}
 }
+
+// WithLazyParsing enables lazy parsing to reduce memory usage
+func WithLazyParsing() Option {
+	return func(i *Importer) {
+		i.isLazyParsing = true
+	}
+}
