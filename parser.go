@@ -118,7 +118,7 @@ func (r *parser) parseType(info *infoFile, decl *ast.GenDecl) {
 		if s.Assign == 0 && tt.Kind() != Interface {
 			tt = newTypeNamed(s.Name.Name, tt, info)
 		} else {
-			tt = newTypeAlias(s.Name.Name, tt)
+			tt = newTypeAlias(s.Name.Name, tt, info)
 		}
 
 		tt = newTypeOrigin(tt, s, r.info, doc, comment)
