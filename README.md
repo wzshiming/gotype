@@ -2,7 +2,6 @@
 
 Golang source code parsing, usage like reflect package
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/wzshiming/gotype)](https://goreportcard.com/report/github.com/wzshiming/gotype)
 [![Go Reference](https://pkg.go.dev/badge/github.com/wzshiming/gotype.svg)](https://pkg.go.dev/github.com/wzshiming/gotype)
 [![GitHub license](https://img.shields.io/github/license/wzshiming/gotype.svg)](https://github.com/wzshiming/gotype/blob/master/LICENSE)
 
